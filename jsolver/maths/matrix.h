@@ -27,13 +27,16 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 {
 	auto log_row = [&os](const auto& row)
 	{
+		os << "[";
 		for (const auto& elem : row)
 		{
 			os << elem << ",";
 		}
+		os << "]";
 		os << std::endl;
 	};
 
+	os << std::endl;
 	for (const auto& row : m.get_impl())
 	{
 		log_row(row);

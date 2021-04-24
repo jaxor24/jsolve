@@ -12,4 +12,5 @@ void do_work()
 	Mat m1{ 5, 5, 10};
 
 	log()->info("{}", m0);
+	log()->info("{}", m1);
 }
