@@ -4,6 +4,8 @@
 
 #include <vector>
 #include <iostream>
+#include <stdexcept>
+
 
 template <typename T>
 class Matrix
@@ -39,6 +41,15 @@ private:
 
 	std::vector<std::vector<T>> m_data;
 };
+
+class MatrixError : public std::runtime_error
+{
+public:
+	explicit MatrixError(const std::string& msg) : std::runtime_error(msg) {}
+
+	virtual ~MatrixError() throw () {}
+};
+
 
 // Operators
 template <typename T>
