@@ -117,6 +117,41 @@ public:
 
 		return *this;
 	}
+	Matrix& operator*=(const Matrix& rhs)
+	{
+		if (n_cols() != rhs.n_rows())
+		{
+			throw MatrixError(
+				"Cannot multiply dimensions {}x{} and {}x{}", 
+				n_rows(), 
+				n_cols(),
+				rhs.n_rows(),
+				rhs.n_cols()
+			);
+		}
+		// (r1 x c1).(r2 x c2) = r1 x c2
+		Matrix result{ n_rows(), rhs.n_cols() };
+
+		for (std::size_t lhs_n_r = 0; lhs_n_r < n_rows(); lhs_n_r++)
+		{
+			for (std::size_t rhs_n_c = 0; rhs_n_c < rhs.n_cols(); rhs_n_c++)
+			{
+				// For this LHS row and RHS col, sum product the elements.
+				value_type element{ 0.0 };
+
+				for (std::size_t lhs_n_c = 0; lhs_n_c < n_cols(); lhs_n_c++)
+				{
+					element += operator()(lhs_n_r, lhs_n_c) * rhs(lhs_n_c, rhs_n_c);
+				}
+
+				result(lhs_n_r, rhs_n_c) = element;
+			}
+		}
+
+		m_data = result.m_data;
+		return *this;
+	}
+	
 	// Binary - Scalar
 	Matrix operator+=(double x)
 	{
@@ -187,6 +222,13 @@ template <typename U>
 Matrix<U> operator-(Matrix<U> lhs, const Matrix<U>& rhs)
 {
 	lhs -= rhs;
+	return lhs;
+}
+
+template <typename U>
+Matrix<U> operator*(Matrix<U> lhs, const Matrix<U>& rhs)
+{
+	lhs *= rhs;
 	return lhs;
 }
 

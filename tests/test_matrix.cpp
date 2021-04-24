@@ -596,7 +596,6 @@ TEST_CASE("::operator*=", "[matrix]")
 
 TEST_CASE("::operator*", "[matrix]")
 {
-    // matrix * matrix
     SECTION("matrix * double")
     {
         SECTION("valid")
@@ -623,6 +622,14 @@ TEST_CASE("::operator*", "[matrix]")
                     }
                 }
             }
+        }
+    }
+
+    SECTION("matrix * matrix")
+    {
+        SECTION("valid")
+        {
+
         }
     }
 }
