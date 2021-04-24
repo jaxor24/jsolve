@@ -48,7 +48,7 @@ public:
 	double& operator()(const std::size_t row, const std::size_t col);
 	double operator()(const std::size_t row, const std::size_t col) const;
 
-	// Unary arithmetic
+	// Unary
 	Matrix& operator++()
 	{
 		for_each_element([](value_type& elem) { elem++; });
@@ -72,8 +72,7 @@ public:
 		return tmp;
 	}
 
-	// Binary arithmetic
-	// Matrix
+	// Binary - Matrix
 	Matrix& operator+=(const Matrix& rhs)
 	{
 		if (n_rows() != rhs.n_rows())
@@ -118,7 +117,7 @@ public:
 
 		return *this;
 	}
-	// Scalar
+	// Binary - Scalar
 	Matrix operator+=(double x)
 	{
 		for_each_element([x](value_type& elem) { elem += x; });
@@ -144,6 +143,7 @@ public:
 		for_each_element([x](value_type& elem) { elem /= x; });
 		return *this;
 	}
+
 
 private:
 	std::size_t m_rows;
