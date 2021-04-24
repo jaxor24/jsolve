@@ -27,7 +27,8 @@ public:
 	double operator()(const unsigned row, const unsigned col) const;
 
 	//// Matrix
-	//Matrix operator+(Matrix&);
+	template <typename U>
+	friend Matrix<U> operator+(const Matrix<U>& lhs, const Matrix<U>& rhs);
 	//Matrix operator-(Matrix&);
 	//Matrix operator*(Matrix&);
 	//// Scalar
@@ -63,6 +64,32 @@ template <typename T>
 double Matrix<T>::operator()(const unsigned row, const unsigned col) const
 {
 	return m_data[row][col];
+}
+
+template <typename U>
+Matrix<U> operator+(const Matrix<U>& lhs, const Matrix<U>& rhs)
+{
+	if (lhs.rows() != rhs.rows())
+	{
+		throw MatrixError("Cannot add matrices with different row count");
+	}
+
+	if (lhs.cols() != rhs.cols())
+	{
+		throw MatrixError("Cannot add matrices with different col count");
+	}
+
+	Matrix result{ lhs.rows(), lhs.cols(), 0.0 };
+
+	for (const auto& [n_row, lhs_row] : enumerate(lhs.m_data))
+	{
+		for (const auto& [n_col, lhs_elem] : enumerate(lhs_row))
+		{
+			result(n_row, n_col) = lhs_elem + rhs(n_row, n_col);
+		}
+	}
+
+	return result;
 }
 
 template <typename T>
