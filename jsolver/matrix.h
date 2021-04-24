@@ -11,6 +11,8 @@ template <typename T>
 class Matrix
 {
 public:
+	typedef T value_type;
+
 	explicit Matrix(std::size_t r, std::size_t c);
 	explicit Matrix(std::size_t r, std::size_t c, T initial);
 
