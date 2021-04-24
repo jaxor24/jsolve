@@ -1,9 +1,11 @@
 #pragma once
 
+#include "counter.h"
+
 
 namespace jsolve
 {
-	class Constraint
+	class Constraint : public counter<Variable>
 	{
 	public:
 		enum class Type
