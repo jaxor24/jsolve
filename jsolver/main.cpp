@@ -1,6 +1,6 @@
 ﻿#include "logging.h"
 
-#include "scratch/test.h"
+#include "test.h"
 
 int main()
 {

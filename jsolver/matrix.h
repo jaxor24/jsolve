@@ -15,11 +15,35 @@ public:
 
 	auto get_impl() const;
 
+	// Matrix transpose();
+
+	// Operators
+	// Access
+	double& operator()(const unsigned&, const unsigned&);
+
+	//// Matrix
+	//Matrix operator+(Matrix&);
+	//Matrix operator-(Matrix&);
+	//Matrix operator*(Matrix&);
+	//// Scalar
+	//Matrix operator+(double);
+	//Matrix operator-(double);
+	//Matrix operator*(double);
+	//Matrix operator/(double);
+
 private:
 	unsigned m_rows;
 	unsigned m_cols;
+
 	std::vector<std::vector<T>> m_data;
 };
+
+// Operators
+template <typename T>
+double& Matrix<T>::operator()(const unsigned& row, const unsigned& col)
+{
+	return m_data[row][col];
+}
 
 
 template <typename T>
@@ -76,3 +100,12 @@ auto Matrix<T>::get_impl() const
 {
 	return m_data;
 }
+
+//template <typename T>
+//Matrix<T> Matrix<T>::transpose()
+//{
+//	Matrix result{ rows(), cols(), 0.0 };
+//
+//
+//	return result;
+//}
