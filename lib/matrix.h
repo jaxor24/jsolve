@@ -1,16 +1,21 @@
 #pragma once
 
 #include "tools.h"
-// #include "logging.h"
+#include "logging.h"
 
 #include <vector>
 #include <iostream>
 #include <stdexcept>
 
+
 class MatrixError : public std::runtime_error
 {
 public:
-	explicit MatrixError(const std::string& msg) : std::runtime_error(msg) {}
+	template <typename... Args>
+	explicit MatrixError(Args&&... args) 
+		: 
+		std::runtime_error(fmt::format(std::forward<Args>(args)...)) 
+	{}
 	virtual ~MatrixError() throw () {}
 };
 
