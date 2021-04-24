@@ -25,11 +25,13 @@ public:
 	std::size_t n_rows() const;
 	std::size_t n_cols() const;
 
-	auto get_impl() const;
-
 	Matrix transpose();
 
 	// Operators -------------------------------------------------------------------------------
+	// Put-to
+	template <typename T>
+	friend std::ostream& operator<<(std::ostream& os, const Matrix<T>& m);
+
 	// Comparison
 	template <typename U>
 	friend bool operator==(const Matrix<U>& lhs, const Matrix<U>& rhs);
@@ -214,7 +216,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 
 	os << '\n';
 
-	for (const auto& row : m.get_impl())
+	for (const auto& row : m.m_data)
 	{
 		log_row(row);
 	}
@@ -282,12 +284,6 @@ template <typename T>
 std::size_t Matrix<T>::n_cols() const
 {
 	return m_cols;
-}
-
-template <typename T>
-auto Matrix<T>::get_impl() const
-{
-	return m_data;
 }
 
 template <typename T>
