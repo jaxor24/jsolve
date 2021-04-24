@@ -1,6 +1,7 @@
 #include "test_includes.h"
 
 #include "constraint.h"
+#include "variable.h"
 
 
 TEST_CASE("constraint::constraint(type)", "[constraint]")
@@ -51,6 +52,26 @@ TEST_CASE("constraint::rhs()", "[constraint]")
     {
         c.rhs() = 10;
         REQUIRE(c.rhs() == 10.0);
+    }
+}
+
+TEST_CASE("constraint::add_to_lhs()", "[constraint]")
+{
+    SECTION("simple")
+    {
+        auto c = jsolve::Constraint{ jsolve::Constraint::Type::LESS };
+        auto v = std::make_shared<jsolve::Variable>( jsolve::Variable::Type::LINEAR );
+        c.add_to_lhs(5.0, v);
+    }
+}
+
+TEST_CASE("constraint::add_to_rhs()", "[constraint]")
+{
+    SECTION("simple")
+    {
+        auto c = jsolve::Constraint{ jsolve::Constraint::Type::LESS };
+        auto v = std::make_shared<jsolve::Variable>(jsolve::Variable::Type::LINEAR);
+        c.add_to_rhs(5.0, v);
     }
 }
 

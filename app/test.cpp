@@ -10,11 +10,10 @@ void do_work()
 {
 	using Matr = Matrix<double>;
 
-	auto v = jsolve::Variable(jsolve::Variable::Type::LINEAR, 0.0);
+	auto v = std::make_shared<jsolve::Variable>(jsolve::Variable::Type::LINEAR);
 	auto c = jsolve::Constraint(jsolve::Constraint::Type::LESS);
 
-	v.cost() = 6;
-	c.rhs() = 6;
+	c.add_to_lhs(1.0, v);
 
 	Matr lhs{ 1, 3, 3.0 };
 	Matr rhs{ 3, 1, 4.0 };
