@@ -1,5 +1,7 @@
 #pragma once
 
+#include "tools.h"
+
 #include <vector>
 #include <iostream>
 
@@ -15,7 +17,7 @@ public:
 
 	auto get_impl() const;
 
-	// Matrix transpose();
+	Matrix transpose();
 
 	// Operators
 	// Access
@@ -101,11 +103,18 @@ auto Matrix<T>::get_impl() const
 	return m_data;
 }
 
-//template <typename T>
-//Matrix<T> Matrix<T>::transpose()
-//{
-//	Matrix result{ rows(), cols(), 0.0 };
-//
-//
-//	return result;
-//}
+template <typename T>
+Matrix<T> Matrix<T>::transpose()
+{
+	Matrix result{ cols(), rows(), 0.0 };
+
+	for (const auto& [n_row, row] : enumerate(m_data))
+	{
+		for (const auto& [n_col, elem] : enumerate(row))
+		{
+			result(n_col, n_row) = elem;
+		}
+	}
+
+	return result;
+}
