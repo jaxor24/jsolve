@@ -42,7 +42,6 @@ public:
 private:
 	std::size_t m_rows;
 	std::size_t m_cols;
-
 	std::vector<std::vector<T>> m_data;
 };
 
@@ -50,7 +49,6 @@ class MatrixError : public std::runtime_error
 {
 public:
 	explicit MatrixError(const std::string& msg) : std::runtime_error(msg) {}
-
 	virtual ~MatrixError() throw () {}
 };
 
