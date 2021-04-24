@@ -81,7 +81,7 @@ Matrix<U> operator+(const Matrix<U>& lhs, const Matrix<U>& rhs)
 		throw MatrixError("Cannot add matrices with different col count");
 	}
 
-	Matrix<U> result{ lhs.n_rows(), lhs.n_cols(), 0.0 };
+	Matrix<U> result{ lhs.n_rows(), lhs.n_cols() };
 
 	for (const auto& [n_row, lhs_row] : enumerate(lhs.m_data))
 	{
@@ -107,7 +107,7 @@ Matrix<U> operator-(const Matrix<U>& lhs, const Matrix<U>& rhs)
 		throw MatrixError("Cannot add matrices with different col count");
 	}
 
-	Matrix<U> result{ lhs.n_rows(), lhs.n_cols(), 0.0 };
+	Matrix<U> result{ lhs.n_rows(), lhs.n_cols() };
 
 	for (const auto& [n_row, lhs_row] : enumerate(lhs.m_data))
 	{
@@ -179,7 +179,7 @@ auto Matrix<T>::get_impl() const
 template <typename T>
 Matrix<T> Matrix<T>::transpose()
 {
-	Matrix result{ n_cols(), n_rows(), 0.0 };
+	Matrix result{ n_cols(), n_rows()};
 
 	for (const auto& [n_row, row] : enumerate(m_data))
 	{
