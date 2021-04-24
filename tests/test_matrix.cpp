@@ -67,9 +67,9 @@ TEST_CASE("::operator()", "[matrix]")
 
     SECTION("access every element")
     {
-        for (auto r = 0; r < m.n_rows(); r++)
+        for (std::size_t r = 0; r < m.n_rows(); r++)
         {
-            for (auto c = 0; c < m.n_cols(); c++)
+            for (std::size_t c = 0; c < m.n_cols(); c++)
             {
                 REQUIRE(m(r, c) == 0.0);
             }
@@ -78,9 +78,9 @@ TEST_CASE("::operator()", "[matrix]")
 
     SECTION("assign every element")
     {
-        for (auto r = 0; r < m.n_rows(); r++)
+        for (std::size_t r = 0; r < m.n_rows(); r++)
         {
-            for (auto c = 0; c < m.n_cols(); c++)
+            for (std::size_t c = 0; c < m.n_cols(); c++)
             {
                 REQUIRE_NOTHROW(m(r, c) = 1234);
                 REQUIRE(m(r, c) == 1234);
@@ -172,9 +172,9 @@ TEST_CASE("::operator++", "[matrix]")
             REQUIRE_NOTHROW(++m);
         }
         
-        for (auto r = 0; r < m.n_rows(); r++)
+        for (std::size_t r = 0; r < m.n_rows(); r++)
         {
-            for (auto c = 0; c < m.n_cols(); c++)
+            for (std::size_t c = 0; c < m.n_cols(); c++)
             {
                 REQUIRE(m(r, c) == n_times);
             }
@@ -190,9 +190,9 @@ TEST_CASE("::operator++", "[matrix]")
             REQUIRE_NOTHROW(m++);
         }
 
-        for (auto r = 0; r < m.n_rows(); r++)
+        for (std::size_t r = 0; r < m.n_rows(); r++)
         {
-            for (auto c = 0; c < m.n_cols(); c++)
+            for (std::size_t c = 0; c < m.n_cols(); c++)
             {
                 REQUIRE(m(r, c) == n_times);
             }
@@ -213,9 +213,9 @@ TEST_CASE("::operator--", "[matrix]")
             REQUIRE_NOTHROW(--m);
         }
 
-        for (auto r = 0; r < m.n_rows(); r++)
+        for (std::size_t r = 0; r < m.n_rows(); r++)
         {
-            for (auto c = 0; c < m.n_cols(); c++)
+            for (std::size_t c = 0; c < m.n_cols(); c++)
             {
                 REQUIRE(m(r, c) == -n_times);
             }
@@ -231,9 +231,9 @@ TEST_CASE("::operator--", "[matrix]")
             REQUIRE_NOTHROW(m--);
         }
 
-        for (auto r = 0; r < m.n_rows(); r++)
+        for (std::size_t r = 0; r < m.n_rows(); r++)
         {
-            for (auto c = 0; c < m.n_cols(); c++)
+            for (std::size_t c = 0; c < m.n_cols(); c++)
             {
                 REQUIRE(m(r, c) == -n_times);
             }
@@ -260,9 +260,9 @@ TEST_CASE("::operator+=", "[matrix]")
 
                         lhs += rhs;
 
-                        for (auto n_r = 0; n_r < lhs.n_rows(); n_r++)
+                        for (std::size_t n_r = 0; n_r < lhs.n_rows(); n_r++)
                         {
-                            for (auto n_c = 0; n_c < lhs.n_cols(); n_c++)
+                            for (std::size_t n_c = 0; n_c < lhs.n_cols(); n_c++)
                             {
                                 REQUIRE(lhs(n_r, n_c) == (r + c) + (r - c));
                             }
@@ -295,9 +295,9 @@ TEST_CASE("::operator+=", "[matrix]")
 
                         lhs += double(r * c);
 
-                        for (auto n_r = 0; n_r < lhs.n_rows(); n_r++)
+                        for (std::size_t n_r = 0; n_r < lhs.n_rows(); n_r++)
                         {
-                            for (auto n_c = 0; n_c < lhs.n_cols(); n_c++)
+                            for (std::size_t n_c = 0; n_c < lhs.n_cols(); n_c++)
                             {
                                 REQUIRE(lhs(n_r, n_c) == (r + c) + (r * c));
                             }
@@ -328,9 +328,9 @@ TEST_CASE("::operator+", "[matrix]")
 
                     Matr result = lhs + rhs;
 
-                    for (auto n_r = 0; n_r < result.n_rows(); n_r++)
+                    for (std::size_t n_r = 0; n_r < result.n_rows(); n_r++)
                     {
-                        for (auto n_c = 0; n_c < result.n_cols(); n_c++)
+                        for (std::size_t n_c = 0; n_c < result.n_cols(); n_c++)
                         {
                             REQUIRE(result(n_r, n_c) == lhs(n_r, n_c) + rhs(n_r, n_c));
                         }
@@ -360,9 +360,9 @@ TEST_CASE("::operator+", "[matrix]")
 
                     Matr result = lhs + double(r * c);
 
-                    for (auto n_r = 0; n_r < result.n_rows(); n_r++)
+                    for (std::size_t n_r = 0; n_r < result.n_rows(); n_r++)
                     {
-                        for (auto n_c = 0; n_c < result.n_cols(); n_c++)
+                        for (std::size_t n_c = 0; n_c < result.n_cols(); n_c++)
                         {
                             REQUIRE(result(n_r, n_c) == lhs(n_r, n_c) + double(r * c));
                         }
@@ -392,9 +392,9 @@ TEST_CASE("::operator-=", "[matrix]")
 
                         lhs -= rhs;
 
-                        for (auto n_r = 0; n_r < lhs.n_rows(); n_r++)
+                        for (std::size_t n_r = 0; n_r < lhs.n_rows(); n_r++)
                         {
-                            for (auto n_c = 0; n_c < lhs.n_cols(); n_c++)
+                            for (std::size_t n_c = 0; n_c < lhs.n_cols(); n_c++)
                             {
                                 REQUIRE(lhs(n_r, n_c) == (r + c) - (r - c));
                             }
@@ -427,9 +427,9 @@ TEST_CASE("::operator-=", "[matrix]")
 
                         lhs -= double(r * c);
 
-                        for (auto n_r = 0; n_r < lhs.n_rows(); n_r++)
+                        for (std::size_t n_r = 0; n_r < lhs.n_rows(); n_r++)
                         {
-                            for (auto n_c = 0; n_c < lhs.n_cols(); n_c++)
+                            for (std::size_t n_c = 0; n_c < lhs.n_cols(); n_c++)
                             {
                                 REQUIRE(lhs(n_r, n_c) == (r + c) - (r * c));
                             }
@@ -460,9 +460,9 @@ TEST_CASE("::operator-", "[matrix]")
 
                     Matr result = lhs - rhs;
 
-                    for (auto n_r = 0; n_r < result.n_rows(); n_r++)
+                    for (std::size_t n_r = 0; n_r < result.n_rows(); n_r++)
                     {
-                        for (auto n_c = 0; n_c < result.n_cols(); n_c++)
+                        for (std::size_t n_c = 0; n_c < result.n_cols(); n_c++)
                         {
                             REQUIRE(result(n_r, n_c) == lhs(n_r, n_c) - rhs(n_r, n_c));
                         }
@@ -492,9 +492,9 @@ TEST_CASE("::operator-", "[matrix]")
 
                     Matr result = lhs - double(r * c);
 
-                    for (auto n_r = 0; n_r < result.n_rows(); n_r++)
+                    for (std::size_t n_r = 0; n_r < result.n_rows(); n_r++)
                     {
-                        for (auto n_c = 0; n_c < result.n_cols(); n_c++)
+                        for (std::size_t n_c = 0; n_c < result.n_cols(); n_c++)
                         {
                             REQUIRE(result(n_r, n_c) == lhs(n_r, n_c) - double(r * c));
                         }
@@ -524,9 +524,9 @@ TEST_CASE("::operator*=", "[matrix]")
 
                         lhs *= double(r * c);
 
-                        for (auto n_r = 0; n_r < lhs.n_rows(); n_r++)
+                        for (std::size_t n_r = 0; n_r < lhs.n_rows(); n_r++)
                         {
-                            for (auto n_c = 0; n_c < lhs.n_cols(); n_c++)
+                            for (std::size_t n_c = 0; n_c < lhs.n_cols(); n_c++)
                             {
                                 REQUIRE(lhs(n_r, n_c) == (r + c) * (r * c));
                             }
@@ -557,9 +557,9 @@ TEST_CASE("::operator*", "[matrix]")
 
                         lhs * double(r * c);
 
-                        for (auto n_r = 0; n_r < lhs.n_rows(); n_r++)
+                        for (std::size_t n_r = 0; n_r < lhs.n_rows(); n_r++)
                         {
-                            for (auto n_c = 0; n_c < lhs.n_cols(); n_c++)
+                            for (std::size_t n_c = 0; n_c < lhs.n_cols(); n_c++)
                             {
                                 REQUIRE(lhs(n_r, n_c) == (r + c) * (r * c));
                             }
@@ -590,9 +590,9 @@ TEST_CASE("::operator/=", "[matrix]")
                         auto rhs = double(r * c);
                         lhs /= rhs;
 
-                        for (auto n_r = 0; n_r < lhs.n_rows(); n_r++)
+                        for (std::size_t n_r = 0; n_r < lhs.n_rows(); n_r++)
                         {
-                            for (auto n_c = 0; n_c < lhs.n_cols(); n_c++)
+                            for (std::size_t n_c = 0; n_c < lhs.n_cols(); n_c++)
                             {
                                 REQUIRE(lhs(n_r, n_c) == (r + c) / rhs);
                             }
@@ -629,9 +629,9 @@ TEST_CASE("::operator/", "[matrix]")
                         auto rhs = double(r * c);
                         lhs / rhs;
 
-                        for (auto n_r = 0; n_r < lhs.n_rows(); n_r++)
+                        for (std::size_t n_r = 0; n_r < lhs.n_rows(); n_r++)
                         {
-                            for (auto n_c = 0; n_c < lhs.n_cols(); n_c++)
+                            for (std::size_t n_c = 0; n_c < lhs.n_cols(); n_c++)
                             {
                                 REQUIRE(lhs(n_r, n_c) == (r + c) / rhs);
                             }
