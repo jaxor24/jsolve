@@ -45,6 +45,30 @@ private:
 	std::size_t m_rows;
 	std::size_t m_cols;
 	std::vector<std::vector<T>> m_data;
+
+	template <typename F>
+	void for_each_element(F f)
+	{
+		for (auto& row : m_data)
+		{
+			for (auto& elem : row)
+			{
+				f(elem);
+			}
+		}
+	}
+
+	template <typename F>
+	void for_each_element(F f) const
+	{
+		for (const auto& row : m_data)
+		{
+			for (const auto& elem : row)
+			{
+				f(elem);
+			}
+		}
+	}
 };
 
 class MatrixError : public std::runtime_error
