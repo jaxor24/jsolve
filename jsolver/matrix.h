@@ -23,7 +23,8 @@ public:
 
 	// Operators
 	// Access
-	double& operator()(const unsigned&, const unsigned&);
+	double& operator()(const unsigned row, const unsigned col);
+	double operator()(const unsigned row, const unsigned col) const;
 
 	//// Matrix
 	//Matrix operator+(Matrix&);
@@ -53,11 +54,16 @@ public:
 
 // Operators
 template <typename T>
-double& Matrix<T>::operator()(const unsigned& row, const unsigned& col)
+double& Matrix<T>::operator()(const unsigned row, const unsigned col)
 {
 	return m_data[row][col];
 }
 
+template <typename T>
+double Matrix<T>::operator()(const unsigned row, const unsigned col) const
+{
+	return m_data[row][col];
+}
 
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
