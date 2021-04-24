@@ -505,7 +505,7 @@ TEST_CASE("::operator-", "[matrix]")
     }
 }
 
-TEST_CASE("::operator*", "[matrix]")
+TEST_CASE("::operator*=", "[matrix]")
 {
     // matrix * matrix
     SECTION("matrix *= double")
@@ -538,8 +538,40 @@ TEST_CASE("::operator*", "[matrix]")
     }
 }
 
+TEST_CASE("::operator*", "[matrix]")
+{
+    // matrix * matrix
+    SECTION("matrix * double")
+    {
+        SECTION("valid")
+        {
+            std::size_t n_max_dimension{ 10 };
 
-TEST_CASE("::operator/", "[matrix]")
+            for (std::size_t r = 1; r < n_max_dimension; r++)
+            {
+                for (std::size_t c = 1; c < n_max_dimension; c++)
+                {
+                    SECTION("unit case")
+                    {
+                        Matr lhs{ r, c, double(r + c) };
+
+                        lhs * double(r * c);
+
+                        for (auto n_r = 0; n_r < lhs.n_rows(); n_r++)
+                        {
+                            for (auto n_c = 0; n_c < lhs.n_cols(); n_c++)
+                            {
+                                REQUIRE(lhs(n_r, n_c) == (r + c) * (r * c));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+TEST_CASE("::operator/=", "[matrix]")
 {
     // matrix * matrix
     SECTION("matrix /= double")
@@ -574,6 +606,45 @@ TEST_CASE("::operator/", "[matrix]")
         {
             REQUIRE_THROWS_AS(Matr(2, 1) /= 0, MatrixError);
             REQUIRE_THROWS_AS(Matr(5, 5) /= 0, MatrixError);
+        }
+    }
+}
+
+TEST_CASE("::operator/", "[matrix]")
+{
+    // matrix * matrix
+    SECTION("matrix / double")
+    {
+        SECTION("valid")
+        {
+            std::size_t n_max_dimension{ 10 };
+
+            for (std::size_t r = 1; r < n_max_dimension; r++)
+            {
+                for (std::size_t c = 1; c < n_max_dimension; c++)
+                {
+                    SECTION("unit case")
+                    {
+                        Matr lhs{ r, c, double(r + c) };
+                        auto rhs = double(r * c);
+                        lhs / rhs;
+
+                        for (auto n_r = 0; n_r < lhs.n_rows(); n_r++)
+                        {
+                            for (auto n_c = 0; n_c < lhs.n_cols(); n_c++)
+                            {
+                                REQUIRE(lhs(n_r, n_c) == (r + c) / rhs);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        SECTION("invalid - division by zero")
+        {
+            REQUIRE_THROWS_AS(Matr(2, 1) / 0, MatrixError);
+            REQUIRE_THROWS_AS(Matr(5, 5) / 0, MatrixError);
         }
     }
 }
