@@ -60,3 +60,43 @@ TEST_CASE("::n_rows, ::n_cols", "[matrix]")
         REQUIRE(m.n_cols() == n_cols);
     }
 }
+
+TEST_CASE("::operator()", "[matrix]")
+{
+    Matr m{ 10, 5 };
+
+    SECTION("access every element")
+    {
+        for (auto r = 0; r < m.n_rows(); r++)
+        {
+            for (auto c = 0; c < m.n_cols(); c++)
+            {
+                REQUIRE(m(r, c) == 0.0);
+            }
+        }
+    }
+
+    SECTION("assign every element")
+    {
+        for (auto r = 0; r < m.n_rows(); r++)
+        {
+            for (auto c = 0; c < m.n_cols(); c++)
+            {
+                REQUIRE_NOTHROW(m(r, c) = 1234);
+                REQUIRE(m(r, c) == 1234);
+            }
+        }
+    }
+
+    SECTION("access out of bound row")
+    {
+        REQUIRE_THROWS_AS(m(m.n_rows(), m.n_cols() - 1), MatrixError);
+        REQUIRE_THROWS_AS(m(m.n_rows() + 1, m.n_cols() - 1), MatrixError);
+    }
+
+    SECTION("access out of bound col")
+    {
+        REQUIRE_THROWS_AS(m(m.n_rows() - 1, m.n_cols()), MatrixError);
+        REQUIRE_THROWS_AS(m(m.n_rows() - 1, m.n_cols() + 1), MatrixError);
+    }
+}
