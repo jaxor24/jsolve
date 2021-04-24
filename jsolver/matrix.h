@@ -14,8 +14,8 @@ public:
 	Matrix(unsigned r, unsigned c);
 	Matrix(unsigned r, unsigned c, T initial);
 
-	unsigned rows() const;
-	unsigned cols() const;
+	unsigned n_rows() const;
+	unsigned n_cols() const;
 
 	auto get_impl() const;
 
@@ -69,17 +69,17 @@ double Matrix<T>::operator()(const unsigned row, const unsigned col) const
 template <typename U>
 Matrix<U> operator+(const Matrix<U>& lhs, const Matrix<U>& rhs)
 {
-	if (lhs.rows() != rhs.rows())
+	if (lhs.n_rows() != rhs.n_rows())
 	{
 		throw MatrixError("Cannot add matrices with different row count");
 	}
 
-	if (lhs.cols() != rhs.cols())
+	if (lhs.n_cols() != rhs.n_cols())
 	{
 		throw MatrixError("Cannot add matrices with different col count");
 	}
 
-	Matrix result{ lhs.rows(), lhs.cols(), 0.0 };
+	Matrix result{ lhs.n_rows(), lhs.n_cols(), 0.0 };
 
 	for (const auto& [n_row, lhs_row] : enumerate(lhs.m_data))
 	{
@@ -131,13 +131,13 @@ Matrix<T>::Matrix(unsigned r, unsigned c, T initial) : m_rows{ r }, m_cols{ c }
 }
 
 template <typename T>
-unsigned Matrix<T>::rows() const
+unsigned Matrix<T>::n_rows() const
 {
 	return m_rows;
 }
 
 template <typename T>
-unsigned Matrix<T>::cols() const
+unsigned Matrix<T>::n_cols() const
 {
 	return m_cols;
 }
@@ -151,7 +151,7 @@ auto Matrix<T>::get_impl() const
 template <typename T>
 Matrix<T> Matrix<T>::transpose()
 {
-	Matrix result{ cols(), rows(), 0.0 };
+	Matrix result{ n_cols(), n_rows(), 0.0 };
 
 	for (const auto& [n_row, row] : enumerate(m_data))
 	{
