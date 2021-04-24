@@ -12,6 +12,7 @@ void do_work()
 
 	auto m2 = m1.transpose();
 	auto m3 = m0 + m1;
+	auto m4 = m3 - m1;
 
 	log()->info("m0: {}", m0);
 	log()->info("m1: {}", m1);

@@ -29,7 +29,9 @@ public:
 	//// Matrix
 	template <typename U>
 	friend Matrix<U> operator+(const Matrix<U>& lhs, const Matrix<U>& rhs);
-	//Matrix operator-(Matrix&);
+
+	template <typename U>
+	friend Matrix<U> operator-(const Matrix<U>& lhs, const Matrix<U>& rhs);
 	//Matrix operator*(Matrix&);
 	//// Scalar
 	//Matrix operator+(double);
@@ -86,6 +88,32 @@ Matrix<U> operator+(const Matrix<U>& lhs, const Matrix<U>& rhs)
 		for (const auto& [n_col, lhs_elem] : enumerate(lhs_row))
 		{
 			result(n_row, n_col) = lhs_elem + rhs(n_row, n_col);
+		}
+	}
+
+	return result;
+}
+
+template <typename U>
+Matrix<U> operator-(const Matrix<U>& lhs, const Matrix<U>& rhs)
+{
+	if (lhs.n_rows() != rhs.n_rows())
+	{
+		throw MatrixError("Cannot add matrices with different row count");
+	}
+
+	if (lhs.n_cols() != rhs.n_cols())
+	{
+		throw MatrixError("Cannot add matrices with different col count");
+	}
+
+	Matrix result{ lhs.n_rows(), lhs.n_cols(), 0.0 };
+
+	for (const auto& [n_row, lhs_row] : enumerate(lhs.m_data))
+	{
+		for (const auto& [n_col, lhs_elem] : enumerate(lhs_row))
+		{
+			result(n_row, n_col) = lhs_elem - rhs(n_row, n_col);
 		}
 	}
 
