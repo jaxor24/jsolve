@@ -105,7 +105,8 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 		os << "]" << '\n';
 	};
 
-	os << std::endl;
+	os << '\n';
+
 	for (const auto& row : m.get_impl())
 	{
 		log_row(row);
