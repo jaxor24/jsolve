@@ -5,9 +5,9 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("jsolver_tests")
 
+set(JSOLVER_TEST_SOURCES
+    main.cpp
+    test_matrix.cpp)
+
 # Add source to this project's executable.
-add_executable (jsolver_tests "main.cpp" "test_matrix.cpp")
-
-# TODO: Add tests and install targets if needed.
-
-# target_link_libraries(jsolver PRIVATE spdlog::spdlog)
+add_executable (jsolver_tests ${JSOLVER_TEST_SOURCES})
