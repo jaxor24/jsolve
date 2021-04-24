@@ -31,7 +31,7 @@ public:
 	std::size_t n_rows() const;
 	std::size_t n_cols() const;
 
-	Matrix transpose();
+	Matrix make_transpose();
 
 	// Operators -------------------------------------------------------------------------------
 	// Put-to
@@ -341,7 +341,7 @@ std::size_t Matrix<T>::n_cols() const
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::transpose()
+Matrix<T> Matrix<T>::make_transpose()
 {
 	Matrix result{ n_cols(), n_rows()};
 
