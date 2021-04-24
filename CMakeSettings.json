@@ -20,7 +20,7 @@
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeExecutable": "/usr/bin/cmake",
       "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
+      "buildCommandArgs": "-j4",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_x64" ],
       "wslPath": "${defaultWSLPath}",
