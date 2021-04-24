@@ -61,6 +61,62 @@ TEST_CASE("::n_rows, ::n_cols", "[matrix]")
     }
 }
 
+TEST_CASE("::make_transpose()", "[matrix]")
+{
+    SECTION("1x1 matrix")
+    {
+        Matr m{ 1, 1, 1.0 };
+        auto transpose = m.make_transpose();
+        REQUIRE(transpose.n_rows() == m.n_cols());
+        REQUIRE(transpose.n_cols() == m.n_rows());
+        REQUIRE(transpose(0, 0) == 1);
+    }
+
+    SECTION("2x2 matrix")
+    {
+        Matr m{ 2, 2, 0.0 };
+        m(0, 0) = 1;
+        m(0, 1) = 2;
+        m(1, 0) = 3;
+        m(1, 1) = 4;
+        auto transpose = m.make_transpose();
+        REQUIRE(transpose.n_rows() == m.n_cols());
+        REQUIRE(transpose.n_cols() == m.n_rows());
+        REQUIRE(transpose(0, 0) == 1);
+        REQUIRE(transpose(1, 1) == 4);
+        REQUIRE(transpose(0, 1) == 3);
+        REQUIRE(transpose(1, 0) == 2);
+    }
+
+    SECTION("1x3 vector")
+    {
+        Matr m{ 1, 3};
+        m(0, 0) = 1;
+        m(0, 1) = 2;
+        m(0, 2) = 3;
+        auto transpose = m.make_transpose();
+        REQUIRE(transpose.n_rows() == m.n_cols());
+        REQUIRE(transpose.n_cols() == m.n_rows());
+        REQUIRE(transpose(0, 0) == 1);
+        REQUIRE(transpose(1, 0) == 2);
+        REQUIRE(transpose(2, 0) == 3);
+    }
+
+    SECTION("3x1 vector")
+    {
+        Matr m{ 3, 1};
+        m(0, 0) = 1;
+        m(1, 0) = 2;
+        m(2, 0) = 3;
+        auto transpose = m.make_transpose();
+        REQUIRE(transpose.n_rows() == m.n_cols());
+        REQUIRE(transpose.n_cols() == m.n_rows());
+        REQUIRE(transpose(0, 0) == 1);
+        REQUIRE(transpose(0, 1) == 2);
+        REQUIRE(transpose(0, 2) == 3);
+    }
+}
+
 TEST_CASE("::operator()", "[matrix]")
 {
     Matr m{ 10, 5 };
