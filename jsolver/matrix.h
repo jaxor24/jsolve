@@ -123,17 +123,21 @@ public:
 		for_each_element([x](value_type& elem) { elem -= x; });
 		return *this;
 	}
+	Matrix operator*=(double x)
+	{
+		for_each_element([x](value_type& elem) { elem *= x; });
+		return *this;
+	}
+	Matrix operator/=(double x)
+	{
+		if (x == 0)
+		{
+			throw MatrixError("Scalar division by zero");
+		}
 
-//Matrix operator*(double);
-//Matrix operator/(double);
-
-
-	//Matrix operator*(Matrix&);
-	//// Scalar
-	//Matrix operator+(double);
-	//Matrix operator-(double);
-	//Matrix operator*(double);
-	//Matrix operator/(double);
+		for_each_element([x](value_type& elem) { elem /= x; });
+		return *this;
+	}
 
 private:
 	std::size_t m_rows;
