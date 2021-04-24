@@ -345,6 +345,32 @@ TEST_CASE("::operator+", "[matrix]")
             REQUIRE_THROWS_AS(Matr(5, 5) + Matr(6, 3), MatrixError);
         }
     }
+
+    SECTION("matrix + double")
+    {
+        SECTION("valid addition")
+        {
+            std::size_t n_max_dimension{ 10 };
+
+            for (std::size_t r = 1; r < n_max_dimension; r++)
+            {
+                for (std::size_t c = 1; c < n_max_dimension; c++)
+                {
+                    Matr lhs{ r, c, double(r + c) };
+
+                    Matr result = lhs + double(r * c);
+
+                    for (auto n_r = 0; n_r < result.n_rows(); n_r++)
+                    {
+                        for (auto n_c = 0; n_c < result.n_cols(); n_c++)
+                        {
+                            REQUIRE(result(n_r, n_c) == lhs(n_r, n_c) + double(r * c));
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 TEST_CASE("::operator-=", "[matrix]")
@@ -449,6 +475,32 @@ TEST_CASE("::operator-", "[matrix]")
         {
             REQUIRE_THROWS_AS(Matr(2, 1) - Matr(1, 2), MatrixError);
             REQUIRE_THROWS_AS(Matr(5, 5) - Matr(6, 3), MatrixError);
+        }
+    }
+
+    SECTION("matrix - double")
+    {
+        SECTION("valid addition")
+        {
+            std::size_t n_max_dimension{ 10 };
+
+            for (std::size_t r = 1; r < n_max_dimension; r++)
+            {
+                for (std::size_t c = 1; c < n_max_dimension; c++)
+                {
+                    Matr lhs{ r, c, double(r + c) };
+
+                    Matr result = lhs - double(r * c);
+
+                    for (auto n_r = 0; n_r < result.n_rows(); n_r++)
+                    {
+                        for (auto n_c = 0; n_c < result.n_cols(); n_c++)
+                        {
+                            REQUIRE(result(n_r, n_c) == lhs(n_r, n_c) - double(r * c));
+                        }
+                    }
+                }
+            }
         }
     }
 }
