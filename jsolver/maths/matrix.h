@@ -44,7 +44,6 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 	return os;
 }
 
-
 template <typename T>
 Matrix<T>::Matrix(unsigned r, unsigned c) : Matrix(r, c, T{ 0 }) 
 {
@@ -71,7 +70,6 @@ unsigned Matrix<T>::cols() const
 {
 	return m_cols;
 }
-
 
 template <typename T>
 auto Matrix<T>::get_impl() const
