@@ -11,8 +11,8 @@ template <typename T>
 class Matrix
 {
 public:
-	Matrix(std::size_t r, std::size_t c);
-	Matrix(std::size_t r, std::size_t c, T initial);
+	explicit Matrix(std::size_t r, std::size_t c);
+	explicit Matrix(std::size_t r, std::size_t c, T initial);
 
 	std::size_t n_rows() const;
 	std::size_t n_cols() const;

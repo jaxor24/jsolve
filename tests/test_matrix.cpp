@@ -4,29 +4,37 @@
 
 using Matr = Matrix<double>;
 
-TEST_CASE("constructor 1", "[matrix]")
+TEST_CASE("::matrix(row,col)", "[matrix]")
 {
-    SECTION("valid construction - normal matrix") 
+    SECTION("construction - zero dimension matrix")
     {
-        auto m = Matr{ 3, 6 };
+        REQUIRE_THROWS_AS(Matr( 0, 0 ), MatrixError);
     }
 
-    SECTION("valid construction - zero dimension matrix")
+    SECTION("construction - non-square matrix")
     {
-        auto m = Matr{ 0, 0 };
+        REQUIRE_NOTHROW(Matr{ 3, 6 });
+        REQUIRE_NOTHROW(Matr{ 20, 1 });
+        REQUIRE_NOTHROW(Matr{ 1, 500 });
+    }
+
+    SECTION("construction - square matrix")
+    {
+        REQUIRE_NOTHROW(Matr{ 1, 1 });
+        REQUIRE_NOTHROW(Matr{ 3, 3 });
     }
 }
 
-TEST_CASE("constructor 2", "[matrix]")
+TEST_CASE("::matrix(row,col,val)", "[matrix]")
 {
-    SECTION("valid construction - normal matrix")
+    SECTION("construction - normal matrix")
     {
-        auto m = Matr{ 3, 6, 10.0 };
+        REQUIRE_NOTHROW(Matr{ 3, 6, 10.0 });
     }
 
-    SECTION("valid construction - zero dimension matrix")
+    SECTION("construction - zero dimension matrix")
     {
-        auto m = Matr{ 0, 0, 10.0 };
+        REQUIRE_THROWS_AS(Matr( 0, 0, 10.0 ), MatrixError);
     }
 }
 
@@ -44,11 +52,11 @@ TEST_CASE("::n_rows", "[matrix]")
 
     SECTION("zero rows")
     {
-        unsigned n_rows{ 0 };
+        unsigned n_rows{ 1 };
         unsigned n_cols{ 5 };
 
         auto m = Matr{ n_rows, n_cols };
 
-        REQUIRE(m.n_rows() == 1);
+        REQUIRE(m.n_rows() == n_rows);
     }
 }
