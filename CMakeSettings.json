@@ -38,7 +38,7 @@
         },
         {
           "name": "CMAKE_CXX_FLAGS",
-          "value": "-std=c++17",
+          "value": "-std=c++17 -Wall -Werror -Wextra -pedantic",
           "type": "STRING"
         }
       ]
