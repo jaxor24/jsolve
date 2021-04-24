@@ -30,6 +30,12 @@ public:
 	Matrix transpose();
 
 	// Operators -------------------------------------------------------------------------------
+	// Comparison
+	template <typename U>
+	friend bool operator==(const Matrix<U>& lhs, const Matrix<U>& rhs);
+	template <typename U>
+	friend bool operator!=(const Matrix<U>& lhs, const Matrix<U>& rhs);
+
 	// Access
 	double& operator()(const std::size_t row, const std::size_t col);
 	double operator()(const std::size_t row, const std::size_t col) const;
@@ -180,6 +186,40 @@ Matrix<U> operator-(const Matrix<U>& lhs, const Matrix<U>& rhs)
 
 	return result;
 }
+
+template <typename U>
+bool operator==(const Matrix<U>& lhs, const Matrix<U>& rhs)
+{
+	if (lhs.n_rows() != rhs.n_rows())
+	{
+		return false;
+	}
+
+	if (lhs.n_cols() != rhs.n_cols())
+	{
+		return false;
+	}
+
+	for (const auto& [n_row, lhs_row] : enumerate(lhs.m_data))
+	{
+		for (const auto& [n_col, lhs_elem] : enumerate(lhs_row))
+		{
+			if (lhs(n_row, n_col) != rhs(n_row, n_col))
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+template <typename U>
+bool operator!=(const Matrix<U>& lhs, const Matrix<U>& rhs)
+{
+	return !operator==(lhs, rhs);
+}
+
 
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)

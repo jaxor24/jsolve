@@ -101,6 +101,63 @@ TEST_CASE("::operator()", "[matrix]")
     }
 }
 
+TEST_CASE("::operator==", "[matrix]")
+{
+    Matr m{ 5, 5 , 200.0 };
+
+    SECTION("same matrix")
+    {
+        REQUIRE(m == m);
+    }
+
+    SECTION("different matrix elements")
+    {
+        Matr m2{ 5, 5 , 100.0 };
+        REQUIRE((m == m2) == false);
+    }
+
+    SECTION("different matrix dimensions")
+    {
+        {
+            Matr m2{ 4, 5 , 200.0 };
+            REQUIRE((m == m2) == false);
+        }
+
+        {
+            Matr m2{ 5, 4 , 200.0 };
+            REQUIRE((m == m2) == false);
+        }
+    }
+}
+
+TEST_CASE("::operator!=", "[matrix]")
+{
+    Matr m{ 5, 5 , 200.0 };
+
+    SECTION("same matrix")
+    {
+        REQUIRE((m != m) == false);
+    }
+
+    SECTION("different matrix elements")
+    {
+        Matr m2{ 5, 5 , 100.0 };
+        REQUIRE(m != m2);
+    }
+
+    SECTION("different matrix dimensions")
+    {
+        {
+            Matr m2{ 4, 5 , 200.0 };
+            REQUIRE(m != m2);
+        }
+
+        {
+            Matr m2{ 5, 4 , 200.0 };
+            REQUIRE(m != m2);
+        }
+    }
+}
 
 TEST_CASE("::operator++", "[matrix]")
 {
