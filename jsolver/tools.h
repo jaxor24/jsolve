@@ -1,5 +1,4 @@
-
-
+#pragma once
 
 // Python-like enumerate()
 // Ref: http://reedbeta.com/blog/python-like-enumerate-in-cpp17/
