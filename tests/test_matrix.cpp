@@ -27,7 +27,7 @@ TEST_CASE("::matrix(row,col,val)", "[matrix]")
     {
         REQUIRE_NOTHROW(Matr{ 3, 6, 10.0 });
         REQUIRE_NOTHROW(Matr{ 1, 1, -500 });
-        REQUIRE_NOTHROW(Matr{ 100'000, 100'000, -500 });
+        REQUIRE_NOTHROW(Matr{ 100, 100, -500 });
     }
 
     SECTION("construction - invalid")
