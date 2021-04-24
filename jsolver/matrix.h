@@ -149,7 +149,13 @@ Matrix<T>::Matrix(std::size_t r, std::size_t c) : Matrix(r, c, T{ 0 })
 template <typename T>
 Matrix<T>::Matrix(std::size_t r, std::size_t c, T initial) : m_rows{ r }, m_cols{ c }
 {
+	if ((r == 0) || (c == 0))
+	{
+		throw MatrixError("Cannot construct matrix with zero row/col count");
+	}
+
 	m_data.resize(r);
+
 	for (auto& row : m_data)
 	{
 		row.resize(c, initial);
