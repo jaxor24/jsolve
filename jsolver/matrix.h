@@ -6,6 +6,12 @@
 #include <iostream>
 #include <stdexcept>
 
+class MatrixError : public std::runtime_error
+{
+public:
+	explicit MatrixError(const std::string& msg) : std::runtime_error(msg) {}
+	virtual ~MatrixError() throw () {}
+};
 
 template <typename T>
 class Matrix
@@ -101,15 +107,6 @@ private:
 	}
 };
 
-class MatrixError : public std::runtime_error
-{
-public:
-	explicit MatrixError(const std::string& msg) : std::runtime_error(msg) {}
-	virtual ~MatrixError() throw () {}
-};
-
-
-// Operators
 template <typename T>
 double& Matrix<T>::operator()(const std::size_t row, const std::size_t col)
 {
