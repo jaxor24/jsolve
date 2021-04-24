@@ -113,28 +113,7 @@ private:
 	}
 };
 
-template <typename T>
-double& Matrix<T>::operator()(const std::size_t row, const std::size_t col)
-{
-	if (row >= n_rows() || col >= n_cols())
-	{
-		throw MatrixError("Cannot access out of bounds");
-	}
-
-	return m_data[row][col];
-}
-
-template <typename T>
-double Matrix<T>::operator()(const std::size_t row, const std::size_t col) const
-{
-	if (row >= n_rows() || col >= n_cols())
-	{
-		throw MatrixError("Cannot access out of bounds");
-	}
-
-	return m_data[row][col];
-}
-
+// Free functions
 template <typename U>
 Matrix<U> operator+(const Matrix<U>& lhs, const Matrix<U>& rhs)
 {
@@ -220,7 +199,6 @@ bool operator!=(const Matrix<U>& lhs, const Matrix<U>& rhs)
 	return !operator==(lhs, rhs);
 }
 
-
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 {
@@ -244,6 +222,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 	return os;
 }
 
+// Member functions
 template <typename T>
 Matrix<T>::Matrix(std::size_t r, std::size_t c) : Matrix(r, c, T{ 0 })
 {
@@ -269,6 +248,29 @@ Matrix<T>::Matrix(std::size_t r, std::size_t c, T initial) : m_rows{ r }, m_cols
 		row.resize(c, initial);
 	}
 }
+
+template <typename T>
+double& Matrix<T>::operator()(const std::size_t row, const std::size_t col)
+{
+	if (row >= n_rows() || col >= n_cols())
+	{
+		throw MatrixError("Cannot access out of bounds");
+	}
+
+	return m_data[row][col];
+}
+
+template <typename T>
+double Matrix<T>::operator()(const std::size_t row, const std::size_t col) const
+{
+	if (row >= n_rows() || col >= n_cols())
+	{
+		throw MatrixError("Cannot access out of bounds");
+	}
+
+	return m_data[row][col];
+}
+
 
 template <typename T>
 std::size_t Matrix<T>::n_rows() const
