@@ -29,8 +29,8 @@ public:
 
 	// Operators -------------------------------------------------------------------------------
 	// Put-to
-	template <typename T>
-	friend std::ostream& operator<<(std::ostream& os, const Matrix<T>& m);
+	template <typename U>
+	friend std::ostream& operator<<(std::ostream& os, const Matrix<U>& m);
 
 	// Comparison
 	template <typename U>
