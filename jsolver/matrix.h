@@ -23,11 +23,23 @@ public:
 
 	Matrix transpose();
 
-	// Operators
+	// Operators -------------------------------------------------------------------------------
 	// Access
 	double& operator()(const std::size_t row, const std::size_t col);
 	double operator()(const std::size_t row, const std::size_t col) const;
 
+	// Unary plus
+	Matrix& operator++()
+	{
+		for_each_element([](value_type& elem) { elem++; });
+		return *this;
+	}
+	Matrix operator++(int)
+	{
+		Matrix tmp(*this);
+		operator++();
+		return tmp;
+	}
 	//// Matrix
 	template <typename U>
 	friend Matrix<U> operator+(const Matrix<U>& lhs, const Matrix<U>& rhs);

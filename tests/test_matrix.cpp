@@ -100,3 +100,45 @@ TEST_CASE("::operator()", "[matrix]")
         REQUIRE_THROWS_AS(m(m.n_rows() - 1, m.n_cols() + 1), MatrixError);
     }
 }
+
+
+TEST_CASE("::operator++", "[matrix]")
+{
+    Matr m{ 2, 3 };
+
+    SECTION("prefix")
+    {
+        int n_times{ 100 };
+
+        for (auto i = 0; i < n_times; i++)
+        {
+            REQUIRE_NOTHROW(++m);
+        }
+        
+        for (auto r = 0; r < m.n_rows(); r++)
+        {
+            for (auto c = 0; c < m.n_cols(); c++)
+            {
+                REQUIRE(m(r, c) == n_times);
+            }
+        }
+    }
+
+    SECTION("postfix")
+    {
+        int n_times{ 100 };
+
+        for (auto i = 0; i < n_times; i++)
+        {
+            REQUIRE_NOTHROW(m++);
+        }
+
+        for (auto r = 0; r < m.n_rows(); r++)
+        {
+            for (auto c = 0; c < m.n_cols(); c++)
+            {
+                REQUIRE(m(r, c) == n_times);
+            }
+        }
+    }
+}
