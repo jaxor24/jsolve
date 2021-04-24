@@ -1,6 +1,6 @@
 #include "test.h"
-#include "logging.h"
 
+#include "logging.h"
 #include "matrix.h"
 
 void do_work()

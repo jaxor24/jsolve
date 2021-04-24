@@ -4,7 +4,6 @@
 #include "spdlog/sinks/stdout_sinks.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
-
 namespace logging
 {
     void init_logging()

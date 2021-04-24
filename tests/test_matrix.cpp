@@ -1,6 +1,6 @@
 #include "includes.h"
 
-#include "../jsolver/matrix.h"
+#include "matrix.h"
 
 using Matr = Matrix<double>;
 
