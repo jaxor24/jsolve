@@ -3,9 +3,11 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
-project ("jsolver")
+project ("jsolver_v0")
+
 add_subdirectory ("external/spdlog")
 add_subdirectory ("jsolver")
+add_subdirectory ("tests")
 
 if(NOT TARGET spdlog)
   set(spdlog_DIR "H:\\jr_repos\\jsolver\\external\\spdlog\\")
@@ -13,6 +15,3 @@ if(NOT TARGET spdlog)
 endif()
 
 # Include sub-projects.
-
-
-

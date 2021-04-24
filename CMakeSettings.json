@@ -42,6 +42,27 @@
           "type": "STRING"
         }
       ]
+    },
+    {
+      "name": "WSL-GCC-Release",
+      "generator": "Unix Makefiles",
+      "configurationType": "Release",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeExecutable": "/usr/bin/cmake",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-j4",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "linux_x64" ],
+      "wslPath": "${defaultWSLPath}",
+      "addressSanitizerRuntimeFlags": "detect_leaks=0",
+      "variables": [
+        {
+          "name": "CMAKE_CXX_FLAGS",
+          "value": "-std=c++17 -Wall -Werror -Wextra -pedantic",
+          "type": "STRING"
+        }
+      ]
     }
   ]
 }

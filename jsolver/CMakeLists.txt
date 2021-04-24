@@ -1,7 +1,9 @@
 ﻿# CMakeList.txt : CMake project for jsolver, include source and define
 # project specific logic here.
-#
+
 cmake_minimum_required (VERSION 3.8)
+
+project ("jsolver")
 
 # Add source to this project's executable.
 add_executable (jsolver "main.cpp" "logging.cpp" "matrix.cpp" "test.cpp")
