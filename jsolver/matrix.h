@@ -11,11 +11,11 @@ template <typename T>
 class Matrix
 {
 public:
-	Matrix(unsigned r, unsigned c);
-	Matrix(unsigned r, unsigned c, T initial);
+	Matrix(std::size_t r, std::size_t c);
+	Matrix(std::size_t r, std::size_t c, T initial);
 
-	unsigned n_rows() const;
-	unsigned n_cols() const;
+	std::size_t n_rows() const;
+	std::size_t n_cols() const;
 
 	auto get_impl() const;
 
@@ -23,8 +23,8 @@ public:
 
 	// Operators
 	// Access
-	double& operator()(const unsigned row, const unsigned col);
-	double operator()(const unsigned row, const unsigned col) const;
+	double& operator()(const std::size_t row, const std::size_t col);
+	double operator()(const std::size_t row, const std::size_t col) const;
 
 	//// Matrix
 	template <typename U>
@@ -40,8 +40,8 @@ public:
 	//Matrix operator/(double);
 
 private:
-	unsigned m_rows;
-	unsigned m_cols;
+	std::size_t m_rows;
+	std::size_t m_cols;
 
 	std::vector<std::vector<T>> m_data;
 };
@@ -57,13 +57,13 @@ public:
 
 // Operators
 template <typename T>
-double& Matrix<T>::operator()(const unsigned row, const unsigned col)
+double& Matrix<T>::operator()(const std::size_t row, const std::size_t col)
 {
 	return m_data[row][col];
 }
 
 template <typename T>
-double Matrix<T>::operator()(const unsigned row, const unsigned col) const
+double Matrix<T>::operator()(const std::size_t row, const std::size_t col) const
 {
 	return m_data[row][col];
 }
@@ -144,12 +144,12 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 }
 
 template <typename T>
-Matrix<T>::Matrix(unsigned r, unsigned c) : Matrix(r, c, T{ 0 }) 
+Matrix<T>::Matrix(std::size_t r, std::size_t c) : Matrix(r, c, T{ 0 })
 {
 }
 
 template <typename T>
-Matrix<T>::Matrix(unsigned r, unsigned c, T initial) : m_rows{ r }, m_cols{ c }
+Matrix<T>::Matrix(std::size_t r, std::size_t c, T initial) : m_rows{ r }, m_cols{ c }
 {
 	m_data.resize(r);
 	for (auto& row : m_data)
@@ -159,13 +159,13 @@ Matrix<T>::Matrix(unsigned r, unsigned c, T initial) : m_rows{ r }, m_cols{ c }
 }
 
 template <typename T>
-unsigned Matrix<T>::n_rows() const
+std::size_t Matrix<T>::n_rows() const
 {
 	return m_rows;
 }
 
 template <typename T>
-unsigned Matrix<T>::n_cols() const
+std::size_t Matrix<T>::n_cols() const
 {
 	return m_cols;
 }
