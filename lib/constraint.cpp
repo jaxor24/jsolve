@@ -1,8 +1,18 @@
 #include "constraint.h"
+#include "logging.h"
 
+#include <iostream>
 
 namespace jsolve
 {
+	std::ostream& operator<<(std::ostream& os, const Constraint& c)
+	{
+		os << '\n';
+		os << c.to_string();
+		os << '\n';
+		return os;
+	};
+
 	Constraint::Type Constraint::type() const
 	{
 		return m_type;
@@ -26,5 +36,25 @@ namespace jsolve
 	void Constraint::add_to_rhs(double coeff, std::shared_ptr<Variable> var)
 	{
 		add_to_lhs(-1 * coeff, var);
+	}
+
+	std::string Constraint::to_string() const
+	{
+		std::string s;
+
+		if (!m_entries.empty())
+		{
+			auto it = std::begin(m_entries);
+			while (it != std::end(m_entries))
+			{
+				s.append(fmt::format("{} {}", it->second, it->first->to_string()));
+				it++;
+				if (it != std::end(m_entries))
+				{
+					s.append(" + ");
+				}
+			}
+		}
+		return s;
 	}
 }

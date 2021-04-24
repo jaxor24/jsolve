@@ -14,12 +14,12 @@ void do_work()
 	auto c = jsolve::Constraint(jsolve::Constraint::Type::LESS);
 
 	c.add_to_lhs(1.0, v);
+	c.add_to_lhs(2.0, v);
+	c.add_to_lhs(3.0, v);
 
 	Matr lhs{ 1, 3, 3.0 };
 	Matr rhs{ 3, 1, 4.0 };
 
-	log()->info("lhs: {}", lhs);
-	log()->info("rhs: {}", rhs);
-	log()->info("product a: {}", lhs * rhs);
-	log()->info("product b: {}", rhs * lhs);
+	log()->info("cons: {}", c);
+
 }
