@@ -17,7 +17,7 @@ TEST_CASE("constructor 1", "[matrix]")
     }
 }
 
-TEST_CASE("constructor 1", "[matrix]")
+TEST_CASE("constructor 2", "[matrix]")
 {
     SECTION("valid construction - normal matrix")
     {
