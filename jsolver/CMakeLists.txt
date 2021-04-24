@@ -7,3 +7,5 @@ cmake_minimum_required (VERSION 3.8)
 add_executable (jsolver "main.cpp")
 
 # TODO: Add tests and install targets if needed.
+
+target_link_libraries(jsolver PRIVATE spdlog::spdlog)
