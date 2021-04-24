@@ -32,8 +32,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 		{
 			os << elem << ",";
 		}
-		os << "]";
-		os << std::endl;
+		os << "]" << '\n';
 	};
 
 	os << std::endl;
