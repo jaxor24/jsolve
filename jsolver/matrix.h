@@ -81,7 +81,7 @@ Matrix<U> operator+(const Matrix<U>& lhs, const Matrix<U>& rhs)
 		throw MatrixError("Cannot add matrices with different col count");
 	}
 
-	Matrix result{ lhs.n_rows(), lhs.n_cols(), 0.0 };
+	Matrix<U> result{ lhs.n_rows(), lhs.n_cols(), 0.0 };
 
 	for (const auto& [n_row, lhs_row] : enumerate(lhs.m_data))
 	{
@@ -107,7 +107,7 @@ Matrix<U> operator-(const Matrix<U>& lhs, const Matrix<U>& rhs)
 		throw MatrixError("Cannot add matrices with different col count");
 	}
 
-	Matrix result{ lhs.n_rows(), lhs.n_cols(), 0.0 };
+	Matrix<U> result{ lhs.n_rows(), lhs.n_cols(), 0.0 };
 
 	for (const auto& [n_row, lhs_row] : enumerate(lhs.m_data))
 	{
