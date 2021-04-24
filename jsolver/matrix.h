@@ -55,7 +55,6 @@ public:
 		operator++();
 		return tmp;
 	}
-
 	// Unary minus
 	Matrix& operator--()
 	{
@@ -71,12 +70,51 @@ public:
 
 	// Binary arithmetic
 	// Matrix plus
-	template <typename U>
-	friend Matrix<U> operator+(const Matrix<U>& lhs, const Matrix<U>& rhs);
+	Matrix& operator+=(const Matrix& rhs)
+	{
+		if (n_rows() != rhs.n_rows())
+		{
+			throw MatrixError("Cannot add matrices with different row count");
+		}
 
+		if (n_cols() != rhs.n_cols())
+		{
+			throw MatrixError("Cannot add matrices with different col count");
+		}
+
+		for (const auto& [n_row, row] : enumerate(m_data))
+		{
+			for (const auto& [n_col, elem] : enumerate(row))
+			{
+				elem += rhs(n_row, n_col);
+			}
+		}
+
+		return *this;
+	}
 	// Matrix minus
-	template <typename U>
-	friend Matrix<U> operator-(const Matrix<U>& lhs, const Matrix<U>& rhs);
+	Matrix& operator-=(const Matrix& rhs)
+	{
+		if (n_rows() != rhs.n_rows())
+		{
+			throw MatrixError("Cannot add matrices with different row count");
+		}
+
+		if (n_cols() != rhs.n_cols())
+		{
+			throw MatrixError("Cannot add matrices with different col count");
+		}
+
+		for (const auto& [n_row, row] : enumerate(m_data))
+		{
+			for (const auto& [n_col, elem] : enumerate(row))
+			{
+				elem -= rhs(n_row, n_col);
+			}
+		}
+
+		return *this;
+	}
 
 	//Matrix operator*(Matrix&);
 	//// Scalar
@@ -117,55 +155,17 @@ private:
 
 // Free functions
 template <typename U>
-Matrix<U> operator+(const Matrix<U>& lhs, const Matrix<U>& rhs)
+Matrix<U> operator+(Matrix<U> lhs, const Matrix<U>& rhs)
 {
-	if (lhs.n_rows() != rhs.n_rows())
-	{
-		throw MatrixError("Cannot add matrices with different row count");
-	}
-
-	if (lhs.n_cols() != rhs.n_cols())
-	{
-		throw MatrixError("Cannot add matrices with different col count");
-	}
-
-	Matrix<U> result{ lhs.n_rows(), lhs.n_cols() };
-
-	for (const auto& [n_row, lhs_row] : enumerate(lhs.m_data))
-	{
-		for (const auto& [n_col, lhs_elem] : enumerate(lhs_row))
-		{
-			result(n_row, n_col) = lhs_elem + rhs(n_row, n_col);
-		}
-	}
-
-	return result;
+	lhs += rhs;
+	return lhs;
 }
 
 template <typename U>
-Matrix<U> operator-(const Matrix<U>& lhs, const Matrix<U>& rhs)
+Matrix<U> operator-(Matrix<U> lhs, const Matrix<U>& rhs)
 {
-	if (lhs.n_rows() != rhs.n_rows())
-	{
-		throw MatrixError("Cannot add matrices with different row count");
-	}
-
-	if (lhs.n_cols() != rhs.n_cols())
-	{
-		throw MatrixError("Cannot add matrices with different col count");
-	}
-
-	Matrix<U> result{ lhs.n_rows(), lhs.n_cols() };
-
-	for (const auto& [n_row, lhs_row] : enumerate(lhs.m_data))
-	{
-		for (const auto& [n_col, lhs_elem] : enumerate(lhs_row))
-		{
-			result(n_row, n_col) = lhs_elem - rhs(n_row, n_col);
-		}
-	}
-
-	return result;
+	lhs -= rhs;
+	return lhs;
 }
 
 template <typename U>
