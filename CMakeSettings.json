@@ -34,12 +34,12 @@
       "variables": [
         {
           "name": "CMAKE_CXX_COMPILER",
-          "value": "g++",
+          "value": "/usr/bin/g++",
           "type": "FILEPATH"
         },
         {
           "name": "CMAKE_C_COMPILER",
-          "value": "gcc",
+          "value": "/usr/bin/gcc",
           "type": "FILEPATH"
         },
         {
@@ -86,12 +86,12 @@
       "variables": [
         {
           "name": "CMAKE_C_COMPILER",
-          "value": "clang-10",
+          "value": "/usr/bin/clang-10",
           "type": "FILEPATH"
         },
         {
           "name": "CMAKE_CXX_COMPILER",
-          "value": "clang++-10",
+          "value": "/usr/bin/clang++-10",
           "type": "FILEPATH"
         },
         {
@@ -117,12 +117,12 @@
       "variables": [
         {
           "name": "CMAKE_C_COMPILER",
-          "value": "clang-10",
+          "value": "/usr/bin/clang-10",
           "type": "FILEPATH"
         },
         {
           "name": "CMAKE_CXX_COMPILER",
-          "value": "clang++-10",
+          "value": "/usr/bin/clang++-10",
           "type": "FILEPATH"
         },
         {
