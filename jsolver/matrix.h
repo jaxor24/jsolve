@@ -59,12 +59,22 @@ public:
 template <typename T>
 double& Matrix<T>::operator()(const std::size_t row, const std::size_t col)
 {
+	if (row >= n_rows() || col >= n_cols())
+	{
+		throw MatrixError("Cannot access out of bounds");
+	}
+
 	return m_data[row][col];
 }
 
 template <typename T>
 double Matrix<T>::operator()(const std::size_t row, const std::size_t col) const
 {
+	if (row >= n_rows() || col >= n_cols())
+	{
+		throw MatrixError("Cannot access out of bounds");
+	}
+
 	return m_data[row][col];
 }
 
