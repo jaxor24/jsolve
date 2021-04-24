@@ -83,7 +83,23 @@
       "inheritEnvironments": [ "linux_clang_x64" ],
       "wslPath": "${defaultWSLPath}",
       "addressSanitizerRuntimeFlags": "detect_leaks=0",
-      "variables": []
+      "variables": [
+        {
+          "name": "CMAKE_C_COMPILER",
+          "value": "clang-10",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "CMAKE_CXX_COMPILER",
+          "value": "clang++-10",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "CMAKE_CXX_FLAGS",
+          "value": "-fno-limit-debug-info -std=c++17 -stdlib=libc++ -Wall -pedantic",
+          "type": "STRING"
+        }
+      ]
     }
   ]
 }
