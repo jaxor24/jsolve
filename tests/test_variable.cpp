@@ -3,15 +3,16 @@
 #include "variable.h"
 
 
-TEST_CASE("::variable(type)", "[variable]")
+TEST_CASE("variable::variable()", "[variable]")
 {
-    SECTION("construction - valid")
+    SECTION("valid construction")
     {
         REQUIRE_NOTHROW(jsolve::Variable{ jsolve::Variable::Type::LINEAR });
+        REQUIRE_NOTHROW(jsolve::Variable{ jsolve::Variable::Type::LINEAR, "test_variable" });
     }
 }
 
-TEST_CASE("::cost()", "[variable]")
+TEST_CASE("variable::cost()", "[variable]")
 {
     auto c = jsolve::Variable{ jsolve::Variable::Type::LINEAR };
 

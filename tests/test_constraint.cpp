@@ -4,11 +4,12 @@
 #include "variable.h"
 
 
-TEST_CASE("constraint::constraint(type)", "[constraint]")
+TEST_CASE("constraint::constraint()", "[constraint]")
 {
-    SECTION("construction - valid")
+    SECTION("valid construction")
     {
         REQUIRE_NOTHROW(jsolve::Constraint{ jsolve::Constraint::Type::LESS });
+        REQUIRE_NOTHROW(jsolve::Constraint{ jsolve::Constraint::Type::GREAT, "test_constraint" });
     }
 }
 
