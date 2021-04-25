@@ -1,32 +1,46 @@
 #pragma once
 
+#include "logging.h"
+
+#include <string>
+
 template <typename T>
-struct counter
+class Counter
 {
-    static inline int objects_created = 0;
-    static inline int objects_alive = 0;
-
-    counter()
+public:
+    Counter(const std::string& name)
+        :
+        m_name{ name }
     {
-        ++objects_created;
-        ++objects_alive;
+        ++m_n_created;
+        ++m_n_alive;
     }
 
-    counter(const counter&)
+    Counter(const Counter&)
     {
-        ++objects_created;
-        ++objects_alive;
+        ++m_n_created;
+        ++m_n_alive;
     }
+
+    const std::string& name() const { return m_name; }
+    int n_created() const { return m_n_created; }
+    int n_alive() const { return m_n_alive; }
 
 protected:
-    ~counter()
+    ~Counter()
     {
-        --objects_alive;
+        --m_n_alive;
     }
+
+private:
+    std::string m_name;
+    static inline int m_n_created = 0;
+    static inline int m_n_alive = 0;
+
 };
 
 template <typename T>
-bool operator<(const counter<T>& a, const counter<T>& b)
+bool operator<(const Counter<T>& a, const Counter<T>& b)
 {
-    return a.objects_created < b.objects_created;
+    return a.n_created() < b.n_created();
 }
