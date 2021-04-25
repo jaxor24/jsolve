@@ -23,8 +23,9 @@ public:
     }
 
     const std::string& name() const { return m_name; }
-    int n_created() const { return m_n_created; }
-    int n_alive() const { return m_n_alive; }
+
+    static int n_created() { return m_n_created; }
+    static int n_alive() { return m_n_alive; }
 
 protected:
     ~Counter()
