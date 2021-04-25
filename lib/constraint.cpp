@@ -11,7 +11,7 @@ namespace jsolve
 		os << c.to_string();
 		os << '\n';
 		return os;
-	};
+	}
 
 	Constraint::Type Constraint::type() const
 	{

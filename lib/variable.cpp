@@ -10,7 +10,7 @@ namespace jsolve
 		os << '\n';
 		os << v.to_string();
 		return os;
-	};
+	}
 
 	Variable::Type Variable::type() const
 	{
