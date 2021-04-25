@@ -4,7 +4,7 @@
 
 using Matr = Matrix<double>;
 
-TEST_CASE("::matrix(row,col)", "[matrix]")
+TEST_CASE("matrix::matrix(row,col)", "[matrix]")
 {
     SECTION("construction - invalid")
     {
@@ -21,7 +21,7 @@ TEST_CASE("::matrix(row,col)", "[matrix]")
     }
 }
 
-TEST_CASE("::matrix(row,col,val)", "[matrix]")
+TEST_CASE("matrix::matrix(row,col,val)", "[matrix]")
 {
     SECTION("construction - valid")
     {
@@ -36,7 +36,7 @@ TEST_CASE("::matrix(row,col,val)", "[matrix]")
     }
 }
 
-TEST_CASE("::n_rows, ::n_cols", "[matrix]")
+TEST_CASE("matrix::n_rows, matrix::n_cols", "[matrix]")
 {
     SECTION("non-zero rows")
     {
@@ -61,7 +61,7 @@ TEST_CASE("::n_rows, ::n_cols", "[matrix]")
     }
 }
 
-TEST_CASE("::make_transpose()", "[matrix]")
+TEST_CASE("matrix::make_transpose()", "[matrix]")
 {
     SECTION("1x1 matrix")
     {
@@ -117,7 +117,7 @@ TEST_CASE("::make_transpose()", "[matrix]")
     }
 }
 
-TEST_CASE("::operator()", "[matrix]")
+TEST_CASE("matrix::operator()", "[matrix]")
 {
     Matr m{ 10, 5 };
 
@@ -157,7 +157,7 @@ TEST_CASE("::operator()", "[matrix]")
     }
 }
 
-TEST_CASE("::operator==", "[matrix]")
+TEST_CASE("matrix::operator==", "[matrix]")
 {
     Matr m{ 5, 5 , 200.0 };
 
@@ -186,7 +186,7 @@ TEST_CASE("::operator==", "[matrix]")
     }
 }
 
-TEST_CASE("::operator!=", "[matrix]")
+TEST_CASE("matrix::operator!=", "[matrix]")
 {
     Matr m{ 5, 5 , 200.0 };
 
@@ -215,7 +215,7 @@ TEST_CASE("::operator!=", "[matrix]")
     }
 }
 
-TEST_CASE("::operator++", "[matrix]")
+TEST_CASE("matrix::operator++", "[matrix]")
 {
     Matr m{ 2, 3 };
 
@@ -256,7 +256,7 @@ TEST_CASE("::operator++", "[matrix]")
     }
 }
 
-TEST_CASE("::operator--", "[matrix]")
+TEST_CASE("matrix::operator--", "[matrix]")
 {
     Matr m{ 2, 3 };
 
@@ -297,7 +297,7 @@ TEST_CASE("::operator--", "[matrix]")
     }
 }
 
-TEST_CASE("::operator+=", "[matrix]")
+TEST_CASE("matrix::operator+=", "[matrix]")
 {
     SECTION("matrix += matrix")
     {
@@ -365,7 +365,7 @@ TEST_CASE("::operator+=", "[matrix]")
     }
 }
 
-TEST_CASE("::operator+", "[matrix]")
+TEST_CASE("matrix::operator+", "[matrix]")
 {
     SECTION("matrix + matrix")
     {
@@ -429,7 +429,7 @@ TEST_CASE("::operator+", "[matrix]")
     }
 }
 
-TEST_CASE("::operator-=", "[matrix]")
+TEST_CASE("matrix::operator-=", "[matrix]")
 {
     SECTION("matrix -= matrix")
     {
@@ -497,7 +497,7 @@ TEST_CASE("::operator-=", "[matrix]")
     }
 }
 
-TEST_CASE("::operator-", "[matrix]")
+TEST_CASE("matrix::operator-", "[matrix]")
 {
     SECTION("matrix - matrix")
     {
@@ -561,7 +561,7 @@ TEST_CASE("::operator-", "[matrix]")
     }
 }
 
-TEST_CASE("::operator*=", "[matrix]")
+TEST_CASE("matrix::operator*=", "[matrix]")
 {
     // matrix * matrix
     SECTION("matrix *= double")
@@ -594,7 +594,7 @@ TEST_CASE("::operator*=", "[matrix]")
     }
 }
 
-TEST_CASE("::operator*", "[matrix]")
+TEST_CASE("matrix::operator*", "[matrix]")
 {
     SECTION("matrix * double")
     {
@@ -634,9 +634,8 @@ TEST_CASE("::operator*", "[matrix]")
     }
 }
 
-TEST_CASE("::operator/=", "[matrix]")
+TEST_CASE("matrix::operator/=", "[matrix]")
 {
-    // matrix * matrix
     SECTION("matrix /= double")
     {
         SECTION("valid")
@@ -673,9 +672,8 @@ TEST_CASE("::operator/=", "[matrix]")
     }
 }
 
-TEST_CASE("::operator/", "[matrix]")
+TEST_CASE("matrix::operator/", "[matrix]")
 {
-    // matrix * matrix
     SECTION("matrix / double")
     {
         SECTION("valid")
