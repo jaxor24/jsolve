@@ -69,3 +69,41 @@ TEST_CASE("variable::cost()", "[variable]")
         REQUIRE(c.cost() == 10.0);
     }
 }
+
+TEST_CASE("variable::upper_bound()", "[variable]")
+{
+    auto c = jsolve::Variable{ jsolve::Variable::Type::LINEAR };
+
+    SECTION("getter")
+    {
+        SECTION("default")
+        {
+            REQUIRE(c.upper_bound() == std::numeric_limits<double>::max());
+        }
+    }
+
+    SECTION("setter")
+    {
+        c.upper_bound() = 10;
+        REQUIRE(c.upper_bound() == 10.0);
+    }
+}
+
+TEST_CASE("variable::lower_bound()", "[variable]")
+{
+    auto c = jsolve::Variable{ jsolve::Variable::Type::LINEAR };
+
+    SECTION("getter")
+    {
+        SECTION("default")
+        {
+            REQUIRE(c.lower_bound() == 0);
+        }
+    }
+
+    SECTION("setter")
+    {
+        c.lower_bound() = 10;
+        REQUIRE(c.lower_bound() == 10.0);
+    }
+}

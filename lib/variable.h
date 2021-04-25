@@ -25,6 +25,12 @@ namespace jsolve
 		double cost() const;
 		double& cost();
 
+		double upper_bound() const;
+		double& upper_bound();
+
+		double lower_bound() const;
+		double& lower_bound();
+
 		std::string to_string() const;
 
 		friend std::ostream& operator<<(std::ostream& os, const Variable& v);
@@ -32,6 +38,8 @@ namespace jsolve
 	private:
 		Type m_type;
 		double m_cost{ 0.0 };
+		double m_lower_bound{ 0.0 };
+		double m_upper_bound{ std::numeric_limits<double>::max() };
 	};
 
 	std::ostream& operator<<(std::ostream& os, const Variable& v);
