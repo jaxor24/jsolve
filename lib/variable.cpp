@@ -7,7 +7,6 @@ namespace jsolve
 {
 	std::ostream& operator<<(std::ostream& os, const Variable& v)
 	{
-		os << '\n';
 		os << v.to_string();
 		return os;
 	}

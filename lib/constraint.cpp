@@ -7,9 +7,7 @@ namespace jsolve
 {
 	std::ostream& operator<<(std::ostream& os, const Constraint& c)
 	{
-		os << '\n';
 		os << c.to_string();
-		os << '\n';
 		return os;
 	}
 

@@ -1,6 +1,6 @@
 ﻿#include "logging.h"
 
-#include "test.h"
+#include "work.h"
 
 int main()
 {

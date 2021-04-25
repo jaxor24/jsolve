@@ -4,7 +4,6 @@
 #include "counter.h"
 
 #include <map>
-#include <memory>
 #include <string>
 
 namespace jsolve
@@ -38,7 +37,7 @@ namespace jsolve
 		friend std::ostream& operator<<(std::ostream& os, const Constraint& c);
 
 	private:
-		Type m_type;
+		Type m_type{ Type::LESS };
 		double m_rhs{ 0.0 };
 		std::map<Variable*, double> m_entries;
 	};
