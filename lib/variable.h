@@ -6,7 +6,7 @@
 
 namespace jsolve
 {
-	class Variable : public counter<Variable>
+	class Variable : public Counter<Variable>
 	{
 	public:
 		enum class Type
@@ -14,10 +14,10 @@ namespace jsolve
 			LINEAR
 		};
 
-		explicit Variable(Type type, double cost = 0.0)
+		explicit Variable(Type type, const std::string& name = "")
 			:
-			m_type{ type },
-			m_cost{ cost }
+			Counter<Variable>{ name },
+			m_type{ type }
 		{}
 
 		Type type() const;

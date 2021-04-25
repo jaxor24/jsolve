@@ -40,14 +40,14 @@ namespace jsolve
 
 	std::string Constraint::to_string() const
 	{
-		std::string s;
+		std::string s = fmt::format("{}[{}]: ", name().empty() ? "c" : name(), n_created());
 
 		if (!m_entries.empty())
 		{
 			auto it = std::begin(m_entries);
 			while (it != std::end(m_entries))
 			{
-				s.append(fmt::format("{} {}", it->second, it->first->to_string()));
+				s.append(fmt::format("{}{}", it->second, it->first->to_string()));
 				it++;
 				if (it != std::end(m_entries))
 				{

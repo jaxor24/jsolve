@@ -9,7 +9,7 @@
 
 namespace jsolve
 {
-	class Constraint : public counter<Variable>
+	class Constraint : public Counter<Constraint>
 	{
 	public:
 		enum class Type
@@ -19,8 +19,9 @@ namespace jsolve
 			EQUAL
 		};
 
-		explicit Constraint(Type type)
-			:
+		explicit Constraint(Type type, const std::string& name = "") 
+			: 
+			Counter<Constraint>{ name },
 			m_type{ type }
 		{}
 

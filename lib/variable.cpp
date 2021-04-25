@@ -29,6 +29,6 @@ namespace jsolve
 
 	std::string Variable::to_string() const
 	{
-		return fmt::format("{}", "x");
+		return fmt::format("{}", name().empty() ? fmt::format("v[{}]", n_created()) : name());
 	}
 }
