@@ -55,6 +55,26 @@ namespace jsolve
 				}
 			}
 		}
+
+		if (type() == Type::EQUAL)
+		{
+			s.append(" = ");
+		}
+		else if (type() == Type::GREAT)
+		{
+			s.append(" >= ");
+		}
+		else if (type() == Type::LESS)
+		{
+			s.append(" <= ");
+		}
+		else
+		{
+			throw std::runtime_error("Invalid constraint type");
+		}
+
+		s.append(fmt::format("{}", rhs()));
+
 		return s;
 	}
 }
