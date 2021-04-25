@@ -2,14 +2,15 @@
 
 #include "variable.h"
 #include "constraint.h"
+#include "counter.h"
 
 #include <vector>
 #include <memory>
 
 namespace jsolve
 {
-	class Model
-	{
+	class Model : public Counter<Model>
+	{ 
 	public:
 		enum class Sense
 		{
@@ -17,10 +18,13 @@ namespace jsolve
 			MIN
 		};
 
-		explicit Model(Sense sense)
+		explicit Model(Sense sense, const std::string& name)
 			:
+			Counter<Model>{ name },
 			m_sense{ sense }
 		{}
+
+		Sense sense() const;
 
 		template <typename... Args>
 		Variable* make_variable(Args&&... args)
@@ -36,10 +40,16 @@ namespace jsolve
 			return m_constraints.back().get();
 		}
 
+		std::string to_string() const;
+
+		friend std::ostream& operator<<(std::ostream& os, const Model& m);
+
 	private:
 		Sense m_sense{ Sense::MIN };
 		std::vector<std::unique_ptr<Variable>> m_variables;
 		std::vector<std::unique_ptr<Constraint>> m_constraints;
 
 	};
+
+	std::ostream& operator<<(std::ostream& os, const Model& m);
 }

@@ -45,7 +45,7 @@ namespace jsolve
 			auto it = std::begin(m_entries);
 			while (it != std::end(m_entries))
 			{
-				s.append(fmt::format("{}{}", it->second, it->first->to_string()));
+				s.append(fmt::format("{}*{}", it->second, it->first->to_string()));
 				it++;
 				if (it != std::end(m_entries))
 				{
