@@ -13,6 +13,45 @@ TEST_CASE("constraint::constraint()", "[constraint]")
     }
 }
 
+TEST_CASE("constraint::name()", "[constraint]")
+{
+    auto c = jsolve::Constraint{ jsolve::Constraint::Type::LESS, "test_name" };
+    REQUIRE(c.name() == "test_name");
+}
+
+TEST_CASE("constraint::n_created(), constraint::n_alive()", "[constraint]")
+{
+    REQUIRE(jsolve::Constraint::n_alive() == 0);
+    auto n_already_created = jsolve::Constraint::n_created();
+
+    SECTION("create one")
+    {
+        auto c = jsolve::Constraint{ jsolve::Constraint::Type::LESS };
+        REQUIRE(c.n_created() == n_already_created + 1);
+        REQUIRE(c.n_alive() == 1);
+    }
+
+    n_already_created = jsolve::Constraint::n_created();
+
+    SECTION("create two")
+    {
+        auto c1 = jsolve::Constraint{ jsolve::Constraint::Type::LESS };
+        auto c2 = jsolve::Constraint{ jsolve::Constraint::Type::LESS };
+        REQUIRE(c2.n_created() == n_already_created + 2);
+        REQUIRE(c2.n_alive() == 2);
+    }
+
+    n_already_created = jsolve::Constraint::n_created();
+
+    SECTION("create copy")
+    {
+        auto c1 = jsolve::Constraint{ jsolve::Constraint::Type::LESS };
+        auto c2 = c1;
+        REQUIRE(c2.n_created() == n_already_created + 2);
+        REQUIRE(c2.n_alive() == 2);
+    }
+}
+
 TEST_CASE("constraint::type()", "[constraint]")
 {
     SECTION("getter")
