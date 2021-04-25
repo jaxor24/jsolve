@@ -2,3 +2,4 @@
 
 #include "variable.h"
 #include "constraint.h"
+#include "model.h"

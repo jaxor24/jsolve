@@ -100,8 +100,8 @@ TEST_CASE("constraint::add_to_lhs()", "[constraint]")
     SECTION("simple")
     {
         auto c = jsolve::Constraint{ jsolve::Constraint::Type::LESS };
-        auto v = std::make_shared<jsolve::Variable>( jsolve::Variable::Type::LINEAR );
-        c.add_to_lhs(5.0, v);
+        auto v = std::make_unique<jsolve::Variable>( jsolve::Variable::Type::LINEAR );
+        c.add_to_lhs(5.0, v.get());
     }
 }
 
@@ -110,8 +110,8 @@ TEST_CASE("constraint::add_to_rhs()", "[constraint]")
     SECTION("simple")
     {
         auto c = jsolve::Constraint{ jsolve::Constraint::Type::LESS };
-        auto v = std::make_shared<jsolve::Variable>(jsolve::Variable::Type::LINEAR);
-        c.add_to_rhs(5.0, v);
+        auto v = std::make_unique<jsolve::Variable>(jsolve::Variable::Type::LINEAR);
+        c.add_to_rhs(5.0, v.get());
     }
 }
 

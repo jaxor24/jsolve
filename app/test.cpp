@@ -10,16 +10,17 @@ void do_work()
 {
 	using Matr = Matrix<double>;
 
-	auto v = std::make_shared<jsolve::Variable>(jsolve::Variable::Type::LINEAR);
-	auto c = jsolve::Constraint(jsolve::Constraint::Type::LESS);
+	auto m = jsolve::Model(jsolve::Model::Sense::MIN);
 
-	c.add_to_lhs(1.0, v);
-	c.add_to_lhs(2.0, v);
-	c.add_to_lhs(3.0, v);
+	auto* v1 = m.make_variable(jsolve::Variable::Type::LINEAR, "v1");
+	auto* v2 = m.make_variable(jsolve::Variable::Type::LINEAR, "v2");
 
-	Matr lhs{ 1, 3, 3.0 };
-	Matr rhs{ 3, 1, 4.0 };
+	auto* c1 = m.make_constraint(jsolve::Constraint::Type::LESS, "capacity");
 
-	log()->info("cons: {}", c);
+	c1->add_to_lhs(1.0, v1);
+	c1->add_to_lhs(2.0, v2);
+
+
+	log()->info("cons: {}", *c1);
 
 }

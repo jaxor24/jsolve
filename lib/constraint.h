@@ -30,8 +30,8 @@ namespace jsolve
 		double rhs() const;
 		double& rhs();
 
-		void add_to_lhs(double coeff, std::shared_ptr<Variable> var);
-		void add_to_rhs(double coeff, std::shared_ptr<Variable> var);
+		void add_to_lhs(double coeff, Variable* var);
+		void add_to_rhs(double coeff, Variable* var);
 
 		std::string to_string() const;
 
@@ -40,7 +40,7 @@ namespace jsolve
 	private:
 		Type m_type;
 		double m_rhs{ 0.0 };
-		std::map<std::shared_ptr<Variable>, double> m_entries;
+		std::map<Variable*, double> m_entries;
 	};
 
 	std::ostream& operator<<(std::ostream& os, const Constraint& c);
