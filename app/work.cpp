@@ -8,8 +8,6 @@
 
 void do_work()
 {
-	using Matr = Matrix<double>;
-
 	auto m = jsolve::Model(jsolve::Model::Sense::MIN, "Knapsack");
 
 	auto* v1 = m.make_variable(jsolve::Variable::Type::LINEAR, "ItemA");
