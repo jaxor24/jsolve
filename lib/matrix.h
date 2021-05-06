@@ -244,7 +244,7 @@ std::size_t Matrix<T>::Range::start() const
 {
 	if (!m_data)
 	{
-		throw MatrixError{ "Empty range" };
+		throw MatrixError{ "Invalid range: Empty" };
 	}
 	else
 	{
@@ -257,7 +257,7 @@ std::size_t Matrix<T>::Range::end() const
 {
 	if (!m_data)
 	{
-		throw MatrixError{ "Empty range" };
+		throw MatrixError{ "Invalid range: Empty" };
 	}
 	else
 	{
