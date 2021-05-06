@@ -232,7 +232,12 @@ template <typename T>
 Matrix<T>::Range::Range(std::size_t start, std::size_t end) 
 	: 
 	m_data{ { start, end } }
-{};
+{
+	if (start > end)	
+	{ 
+		throw MatrixError{ "Invalid range: start > end" };
+	}
+};
 
 template <typename T>
 std::size_t Matrix<T>::Range::start() const
