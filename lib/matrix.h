@@ -34,6 +34,7 @@ public:
 
 		std::size_t start() const;
 		std::size_t end() const;
+		std::size_t size() const;
 
 		operator bool() const;
 
@@ -262,6 +263,19 @@ std::size_t Matrix<T>::Range::end() const
 	else
 	{
 		return m_data.value().second;
+	}
+}
+
+template <typename T>
+std::size_t Matrix<T>::Range::size() const
+{
+	if (!m_data)
+	{
+		return 0;
+	}
+	else
+	{
+		return m_data.value().second - m_data.value().first;
 	}
 }
 
