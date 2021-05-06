@@ -30,7 +30,7 @@ public:
 	{
 	public:
 		Range() = default;
-		explicit Range(std::size_t start, std::size_t end);
+		Range(std::size_t start, std::size_t end);
 
 		std::size_t start() const;
 		std::size_t end() const;
