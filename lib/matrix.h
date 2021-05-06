@@ -49,6 +49,7 @@ public:
 	std::size_t n_cols() const;
 
 	Matrix make_transpose() const;
+	Matrix slice(Range rows, Range cols) const;
 
 	// Operators -------------------------------------------------------------------------------
 	// Put-to
@@ -469,6 +470,37 @@ Matrix<T> Matrix<T>::make_transpose() const
 		for (const auto& [n_col, elem] : enumerate(row))
 		{
 			result(n_col, n_row) = elem;
+		}
+	}
+
+	return result;
+}
+
+template <typename T>
+Matrix<T> Matrix<T>::slice(Range rows, Range cols) const
+{
+	if (!rows && !cols)
+	{
+		return *this;
+	}
+
+	Matrix result{ 
+		rows ? rows.size() : n_rows(), 
+		cols ? cols.size() : n_cols(),
+		0.0
+	};
+
+	for (const auto& [n_row, row] : enumerate(m_data))
+	{
+		if (!rows || ((n_row >= rows.start()) && (n_row <= rows.end())))
+		{
+			for (const auto& [n_col, elem] : enumerate(row))
+			{
+				if (!cols || ((n_col >= cols.start()) && (n_col <= cols.end())))
+				{
+					result(n_row, n_col) = elem;
+				}
+			}
 		}
 	}
 
