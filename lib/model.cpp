@@ -70,6 +70,16 @@ namespace jsolve
 		return s;
 	}
 
+	const std::vector<std::unique_ptr<Variable>>& Model::get_variables() const
+	{
+		return m_variables;
+	}
+
+	const std::vector<std::unique_ptr<Constraint>>& Model::get_constraints() const
+	{
+		return m_constraints;
+	}
+
 	std::ostream& operator<<(std::ostream& os, const Model& m)
 	{
 		os << m.to_string();

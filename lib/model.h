@@ -42,6 +42,9 @@ namespace jsolve
 
 		std::string to_string() const;
 
+		const std::vector<std::unique_ptr<Variable>>& get_variables() const;
+		const std::vector<std::unique_ptr<Constraint>>& get_constraints() const;
+
 		friend std::ostream& operator<<(std::ostream& os, const Model& m);
 
 	private:
