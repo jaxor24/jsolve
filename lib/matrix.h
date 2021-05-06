@@ -275,7 +275,8 @@ std::size_t Matrix<T>::Range::size() const
 	}
 	else
 	{
-		return m_data.value().second - m_data.value().first;
+		// Range from 4 to 5 includes rows 4 and 5, hence size + 1
+		return m_data.value().second - m_data.value().first + 1;
 	}
 }
 

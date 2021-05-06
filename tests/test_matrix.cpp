@@ -710,7 +710,6 @@ TEST_CASE("matrix::operator/", "[matrix]")
     }
 }
 
-
 TEST_CASE("matrix::Range", "[matrix::Range]")
 {
     SECTION("Range()")
@@ -730,7 +729,7 @@ TEST_CASE("matrix::Range", "[matrix::Range]")
             {
                 Matr::Range r{ 0, 0 };
                 REQUIRE(r);
-                REQUIRE(r.size() == 0);
+                REQUIRE(r.size() == 1);
                 REQUIRE(r.start() == 0);
                 REQUIRE(r.end() == 0);
             }
@@ -739,7 +738,7 @@ TEST_CASE("matrix::Range", "[matrix::Range]")
             {
                 Matr::Range r{ 2, 5 };
                 REQUIRE(r);
-                REQUIRE(r.size() == 3);
+                REQUIRE(r.size() == 4);
                 REQUIRE(r.start() == 2);
                 REQUIRE(r.end() == 5);
             }
