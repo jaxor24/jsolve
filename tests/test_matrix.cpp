@@ -61,7 +61,7 @@ TEST_CASE("matrix::n_rows, matrix::n_cols", "[matrix]")
     }
 }
 
-TEST_CASE("matrix::make_transpose()", "[matrix]")
+TEST_CASE("matrix::make_transpose", "[matrix]")
 {
     SECTION("1x1 matrix")
     {
