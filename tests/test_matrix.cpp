@@ -709,3 +709,23 @@ TEST_CASE("matrix::operator/", "[matrix]")
         }
     }
 }
+
+
+TEST_CASE("matrix::Range", "[matrix::Range]")
+{
+    SECTION("Range()")
+    {
+        Matr::Range r{};
+        REQUIRE(!r);
+        REQUIRE_THROWS_AS(r.start(), MatrixError);
+        REQUIRE_THROWS_AS(r.end(), MatrixError);
+    }
+
+    SECTION("Range(start, end)")
+    {
+        Matr::Range r{0, 10};
+        REQUIRE(r);
+        REQUIRE(r.start() == 0);
+        REQUIRE(r.end() == 10);
+    }
+}

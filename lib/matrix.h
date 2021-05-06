@@ -4,6 +4,7 @@
 #include "logging.h"
 
 #include <vector>
+#include <optional>
 #include <iostream>
 #include <stdexcept>
 
@@ -24,6 +25,21 @@ class Matrix
 {
 public:
 	typedef T value_type;
+
+	class Range
+	{
+	public:
+		Range() = default;
+		explicit Range(std::size_t start, std::size_t end);
+
+		std::size_t start() const;
+		std::size_t end() const;
+
+		operator bool() const;
+
+	private:
+		std::optional<std::pair<std::size_t, std::size_t>> m_data;
+	};
 
 	explicit Matrix(std::size_t r, std::size_t c);
 	explicit Matrix(std::size_t r, std::size_t c, T initial);
@@ -209,6 +225,47 @@ private:
 		}
 	}
 };
+
+// Range methods
+
+template <typename T>
+Matrix<T>::Range::Range(std::size_t start, std::size_t end) 
+	: 
+	m_data{ { start, end } }
+{};
+
+template <typename T>
+std::size_t Matrix<T>::Range::start() const
+{
+	if (!m_data)
+	{
+		throw MatrixError{ "Empty range" };
+	}
+	else
+	{
+		return m_data.value().first;
+	}
+}
+
+template <typename T>
+std::size_t Matrix<T>::Range::end() const
+{
+	if (!m_data)
+	{
+		throw MatrixError{ "Empty range" };
+	}
+	else
+	{
+		return m_data.value().second;
+	}
+}
+
+template <typename T>
+Matrix<T>::Range::operator bool() const 
+{ 
+	return m_data.has_value(); 
+}
+
 
 // Free functions
 template <typename U>
