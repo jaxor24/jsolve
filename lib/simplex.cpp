@@ -16,10 +16,23 @@ namespace jsolve::simplex
 
 	struct MatrixModel
 	{
-		Mat m_objective;
-		Mat m_a;
-		Mat m_rhs;
+		Mat c;
+		Mat A;
+		Mat b;
 	};
+
+	void verify_matrix_model(MatrixModel model)
+	{
+		if (model.A.n_rows() != model.b.n_rows())
+		{
+			throw SolveError("matrix model A row count and b row count different");
+		}
+
+		if (model.A.n_cols() != model.c.n_rows())
+		{
+			throw SolveError("matrix model A col count and b row count different");
+		}
+	}
 
 	MatrixModel to_matrix_form(const Model& user_model)
 	{	
@@ -94,6 +107,15 @@ namespace jsolve::simplex
 		log()->info(a);
 		return { objective, a, rhs };
 	}
+
+	void simplex_solve(const MatrixModel& model)
+	{
+		// Follows chapter 6 of "Linear Programming" 2014.
+
+		// Split A into B (basic section) and N (non-basic section)
+		// auto n_cons = model.A.n_rows();
+		model.A;
+	}
 }
 
 
@@ -103,7 +125,8 @@ namespace jsolve
 	{
 		using namespace jsolve::simplex;
 
-		auto MatrixModel = to_matrix_form(user_model);
-		//
+		auto matrix_model = to_matrix_form(user_model);
+		verify_matrix_model(matrix_model);
+		simplex_solve(matrix_model);
 	}
 }
