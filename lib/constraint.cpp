@@ -36,6 +36,11 @@ namespace jsolve
 		add_to_lhs(-1 * coeff, var);
 	}
 
+	const std::map<Variable*, double>& Constraint::get_entries() const
+	{ 
+		return m_entries; 
+	}
+
 	std::string Constraint::to_string() const
 	{
 		std::string s = fmt::format("{}[{}]: ", name().empty() ? "c" : name(), n_created());

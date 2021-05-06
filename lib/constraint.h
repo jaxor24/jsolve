@@ -32,6 +32,8 @@ namespace jsolve
 		void add_to_lhs(double coeff, Variable* var);
 		void add_to_rhs(double coeff, Variable* var);
 
+		const std::map<Variable*, double>& get_entries() const;
+
 		std::string to_string() const;
 
 		friend std::ostream& operator<<(std::ostream& os, const Constraint& c);
