@@ -48,6 +48,9 @@ public:
 	std::size_t n_rows() const;
 	std::size_t n_cols() const;
 
+	T max() const;
+	T min() const;
+
 	Matrix make_transpose() const;
 	Matrix slice(Range rows, Range cols) const;
 
@@ -239,7 +242,7 @@ Matrix<T>::Range::Range(std::size_t start, std::size_t end)
 	{ 
 		throw MatrixError{ "Invalid range: start > end" };
 	}
-};
+}
 
 template <typename T>
 std::size_t Matrix<T>::Range::start() const
@@ -458,6 +461,38 @@ template <typename T>
 std::size_t Matrix<T>::n_cols() const
 {
 	return m_cols;
+}
+
+template <typename T>
+T Matrix<T>::max() const
+{
+	std::optional<T> result;
+
+	for (const auto& [n_row, row] : enumerate(m_data))
+	{
+		for (const auto& [n_col, elem] : enumerate(row))
+		{
+			result = result.has_value() ? std::max(result.value(), elem) : elem;
+		}
+	}
+
+	return result.value();
+}
+
+template <typename T>
+T Matrix<T>::min() const
+{
+	std::optional<T> result;
+
+	for (const auto& [n_row, row] : enumerate(m_data))
+	{
+		for (const auto& [n_col, elem] : enumerate(row))
+		{
+			result = result.has_value() ? std::min(result.value(), elem) : elem;
+		}
+	}
+
+	return result.value();
 }
 
 template <typename T>

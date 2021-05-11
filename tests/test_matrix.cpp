@@ -61,6 +61,58 @@ TEST_CASE("matrix::n_rows, matrix::n_cols", "[matrix]")
     }
 }
 
+TEST_CASE("matrix::min, matrix::max", "[matrix]")
+{
+    SECTION("1x1 matrix")
+    {
+        Matr m{ 1, 1, 5.0 };
+        REQUIRE(m.max() == 5.0);
+        REQUIRE(m.min() == 5.0);
+    }
+        
+    SECTION("1x3 vector")
+    {
+        Matr m{ 1, 3 };
+        m(0, 0) = 1;
+        m(0, 1) = 2;
+        m(0, 2) = 3;
+
+        REQUIRE(m.max() == 3.0);
+        REQUIRE(m.min() == 1.0);
+
+    }
+
+    SECTION("3x1 vector")
+    {
+        Matr m{ 3, 1 };
+        m(0, 0) = 1;
+        m(1, 0) = 2;
+        m(2, 0) = 3;
+
+        REQUIRE(m.max() == 3.0);
+        REQUIRE(m.min() == 1.0);
+    }
+
+    SECTION("3x3 matrix")
+    {
+        Matr m{ 3, 3, 0.0 };
+        m(0, 0) = 1;
+        m(1, 0) = 400;
+        m(2, 0) = 7;
+
+        m(0, 1) = 2;
+        m(1, 1) = 5;
+        m(2, 1) = 8;
+
+        m(0, 2) = 3;
+        m(1, 2) = 6;
+        m(2, 2) = -9;
+
+        REQUIRE(m.max() == 400.0);
+        REQUIRE(m.min() == -9.0);
+    }
+}
+
 TEST_CASE("matrix::make_transpose", "[matrix]")
 {
     SECTION("1x1 matrix")
