@@ -430,7 +430,7 @@ Matrix<T>::Matrix(std::size_t r, std::size_t c, T initial)
 }
 
 template <typename T>
-double& Matrix<T>::operator()(const std::size_t row, const std::size_t col)
+T& Matrix<T>::operator()(const std::size_t row, const std::size_t col)
 {
 	if (row >= n_rows() || col >= n_cols())
 	{
@@ -441,7 +441,7 @@ double& Matrix<T>::operator()(const std::size_t row, const std::size_t col)
 }
 
 template <typename T>
-double Matrix<T>::operator()(const std::size_t row, const std::size_t col) const
+T Matrix<T>::operator()(const std::size_t row, const std::size_t col) const
 {
 	if (row >= n_rows() || col >= n_cols())
 	{
