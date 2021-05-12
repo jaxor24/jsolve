@@ -66,8 +66,8 @@ public:
 	friend bool operator!=(const Matrix<U>& lhs, const Matrix<U>& rhs);
 
 	// Access
-	double& operator()(const std::size_t row, const std::size_t col);
-	double operator()(const std::size_t row, const std::size_t col) const;
+	T& operator()(const std::size_t row, const std::size_t col);
+	T operator()(const std::size_t row, const std::size_t col) const;
 
 	// Unary
 	Matrix& operator++()
