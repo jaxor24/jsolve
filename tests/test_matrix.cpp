@@ -169,6 +169,112 @@ TEST_CASE("matrix::make_transpose", "[matrix]")
     }
 }
 
+TEST_CASE("matrix::slice", "[matrix]")
+{
+    SECTION("3x3 matrix")
+    {
+        Matr m{ 3, 3, 0.0 };
+        m(0, 0) = 1;
+        m(1, 0) = 4;
+        m(2, 0) = 7;
+
+        m(0, 1) = 2;
+        m(1, 1) = 5;
+        m(2, 1) = 8;
+
+        m(0, 2) = 3;
+        m(1, 2) = 6;
+        m(2, 2) = 9;
+
+        SECTION("slice all")
+        {
+            auto slice = m.slice({}, {});
+            REQUIRE(slice == m);
+        }
+
+        SECTION("slice first column")
+        {
+            auto slice = m.slice({}, { 0, 0 });
+            REQUIRE(slice.n_rows() == m.n_rows());
+            REQUIRE(slice.n_cols() == 1);
+            REQUIRE(slice(0, 0) == 1);
+            REQUIRE(slice(1, 0) == 4);
+            REQUIRE(slice(2, 0) == 7);
+        }
+
+        SECTION("slice first row")
+        {
+            auto slice = m.slice({0, 0}, {});
+            REQUIRE(slice.n_rows() == 1);
+            REQUIRE(slice.n_cols() == m.n_rows());
+            REQUIRE(slice(0, 0) == 1);
+            REQUIRE(slice(0, 1) == 2);
+            REQUIRE(slice(0, 2) == 3);
+        } 
+
+        SECTION("slice last column")
+        {
+            auto slice = m.slice({}, { 2, 2 });
+            REQUIRE(slice.n_rows() == m.n_rows());
+            REQUIRE(slice.n_cols() == 1);
+            REQUIRE(slice(0, 0) == 3);
+            REQUIRE(slice(1, 0) == 6);
+            REQUIRE(slice(2, 0) == 9);
+        }
+
+        SECTION("slice last row")
+        {
+            auto slice = m.slice({ 2, 2 }, {});
+            REQUIRE(slice.n_rows() == 1);
+            REQUIRE(slice.n_cols() == m.n_rows());
+            REQUIRE(slice(0, 0) == 7);
+            REQUIRE(slice(0, 1) == 8);
+            REQUIRE(slice(0, 2) == 9);
+        }
+
+    }
+
+    SECTION("1x3 vector")
+    {
+        Matr m{ 1, 3 };
+        m(0, 0) = 1;
+        m(0, 1) = 2;
+        m(0, 2) = 3;
+
+        SECTION("slice all")
+        {
+            auto slice = m.slice({}, {});
+            REQUIRE(slice == m);
+        }
+
+        SECTION("slice first column")
+        {
+            auto slice = m.slice({}, { 0, 0 });
+            REQUIRE(slice.n_rows() == m.n_rows());
+            REQUIRE(slice.n_cols() == 1);
+            REQUIRE(slice(0, 0) == 1);
+        }
+
+        SECTION("slice first row")
+        {
+            auto slice = m.slice({ 0, 0 }, {});
+            REQUIRE(slice.n_rows() == 1);
+            REQUIRE(slice.n_cols() == m.n_cols());
+            REQUIRE(slice(0, 0) == 1);
+            REQUIRE(slice(0, 1) == 2);
+            REQUIRE(slice(0, 2) == 3);
+        }
+
+        SECTION("slice last column")
+        {
+            auto slice = m.slice({}, { 2, 2 });
+            REQUIRE(slice.n_rows() == m.n_rows());
+            REQUIRE(slice.n_cols() == 1);
+            REQUIRE(slice(0, 0) == 3);
+        }
+    }
+}
+
 TEST_CASE("matrix::operator()", "[matrix]")
 {
     Matr m{ 10, 5 };

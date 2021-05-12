@@ -525,17 +525,21 @@ Matrix<T> Matrix<T>::slice(Range rows, Range cols) const
 		0.0
 	};
 
+	std::size_t result_row{ 0 };
 	for (const auto& [n_row, row] : enumerate(m_data))
 	{
 		if (!rows || ((n_row >= rows.start()) && (n_row <= rows.end())))
 		{
+			std::size_t result_col{ 0 };
 			for (const auto& [n_col, elem] : enumerate(row))
 			{
 				if (!cols || ((n_col >= cols.start()) && (n_col <= cols.end())))
 				{
-					result(n_row, n_col) = elem;
+					result(result_row, result_col) = elem;
+					result_col++;
 				}
 			}
+			result_row++;
 		}
 	}
 
