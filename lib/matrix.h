@@ -53,6 +53,10 @@ public:
 
 	std::pair<Matrix<T>, Matrix<std::size_t>> row_max() const;
 	std::pair<Matrix<T>, Matrix<std::size_t>> row_min() const;
+
+	std::pair<Matrix<T>, Matrix<std::size_t>> col_max() const;
+	std::pair<Matrix<T>, Matrix<std::size_t>> col_min() const;
+
 	Matrix make_transpose() const;
 	Matrix slice(Range rows, Range cols) const;
 
@@ -538,6 +542,49 @@ std::pair<Matrix<T>, Matrix<std::size_t>> Matrix<T>::row_min() const
 
 	return { values, indices };
 }
+
+template <typename T>
+std::pair<Matrix<T>, Matrix<std::size_t>> Matrix<T>::col_max() const
+{
+	Matrix<T> values{ 1, n_cols(), std::numeric_limits<T>::lowest() };
+	Matrix<std::size_t> indices{ 1, n_cols(), 0 };
+
+	for (const auto& [n_row, row] : enumerate(m_data))
+	{
+		for (const auto& [n_col, elem] : enumerate(row))
+		{
+			if (elem > values(0, n_col))
+			{
+				values(0, n_col) = elem;
+				indices(0, n_col) = n_row;
+			}
+		}
+	}
+
+	return { values, indices };
+}
+
+template <typename T>
+std::pair<Matrix<T>, Matrix<std::size_t>> Matrix<T>::col_min() const
+{
+	Matrix<T> values{ 1, n_cols(), std::numeric_limits<T>::max() };
+	Matrix<std::size_t> indices{ 1, n_cols(), 0 };
+
+	for (const auto& [n_row, row] : enumerate(m_data))
+	{
+		for (const auto& [n_col, elem] : enumerate(row))
+		{
+			if (elem < values(0, n_col))
+			{
+				values(0, n_col) = elem;
+				indices(0, n_col) = n_row;
+			}
+		}
+	}
+
+	return { values, indices };
+}
+
 
 template <typename T>
 Matrix<T> Matrix<T>::make_transpose() const
