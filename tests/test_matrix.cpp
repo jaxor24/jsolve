@@ -113,7 +113,7 @@ TEST_CASE("matrix::min, matrix::max", "[matrix]")
     }
 }
 
-TEST_CASE("matrix::row_min", "[matrix]")
+TEST_CASE("matrix::row_min, matrix::row_max", "[matrix]")
 {
     SECTION("1x1 matrix")
     {
@@ -184,7 +184,9 @@ TEST_CASE("matrix::row_min", "[matrix]")
         m(0, 0) = 1;
         m(1, 0) = 2;
         m(2, 0) = 0;
-        // [1,2,0]
+        // [1]
+        // [2]
+        // [0]
 
         SECTION("row_min")
         {
