@@ -50,6 +50,7 @@ public:
 
 	T max() const;
 	T min() const;
+	T sum() const;
 
 	std::pair<Matrix<T>, Matrix<std::size_t>> row_max() const;
 	std::pair<Matrix<T>, Matrix<std::size_t>> row_min() const;
@@ -501,6 +502,21 @@ T Matrix<T>::min() const
 	return result.value();
 }
 
+template <typename T>
+T Matrix<T>::sum() const
+{
+	std::optional<T> result;
+
+	for (const auto& [n_row, row] : enumerate(m_data))
+	{
+		for (const auto& [n_col, elem] : enumerate(row))
+		{
+			result = result.has_value() ? result.value() += elem : elem;
+		}
+	}
+
+	return result.value();
+}
 template <typename T>
 std::pair<Matrix<T>, Matrix<std::size_t>> Matrix<T>::row_max() const
 {
