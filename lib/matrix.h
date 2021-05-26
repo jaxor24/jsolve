@@ -509,6 +509,7 @@ T Matrix<T>::sum() const
 
 	return result.value();
 }
+
 template <typename T>
 std::pair<Matrix<T>, Matrix<std::size_t>> Matrix<T>::row_max() const
 {
