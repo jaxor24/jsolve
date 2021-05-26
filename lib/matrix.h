@@ -207,10 +207,7 @@ public:
 		return *this;
 	}
 
-
 private:
-	std::size_t m_rows;
-	std::size_t m_cols;
 	std::vector<std::vector<T>> m_data;
 
 	template <typename F>
@@ -406,17 +403,12 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 
 // Member functions
 template <typename T>
-Matrix<T>::Matrix(std::size_t r, std::size_t c) 
-	: 
-	Matrix(r, c, T{ 0 })
+Matrix<T>::Matrix(std::size_t r, std::size_t c) : Matrix(r, c, T{ 0 })
 {
 }
 
 template <typename T>
-Matrix<T>::Matrix(std::size_t r, std::size_t c, T initial) 
-	: 
-	m_rows{ r }, 
-	m_cols{ c }
+Matrix<T>::Matrix(std::size_t r, std::size_t c, T initial)
 {
 	if ((r == 0) || (c == 0))
 	{
@@ -461,13 +453,13 @@ T Matrix<T>::operator()(const std::size_t row, const std::size_t col) const
 template <typename T>
 std::size_t Matrix<T>::n_rows() const
 {
-	return m_rows;
+	return m_data.size();
 }
 
 template <typename T>
 std::size_t Matrix<T>::n_cols() const
 {
-	return m_cols;
+	return m_data.front().size();
 }
 
 template <typename T>
