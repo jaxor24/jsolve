@@ -127,12 +127,12 @@ public:
 	{
 		if (n_rows() != rhs.n_rows())
 		{
-			throw MatrixError("Cannot add matrices with different row count");
+			throw MatrixError("Cannot subtract matrices with different row count");
 		}
 
 		if (n_cols() != rhs.n_cols())
 		{
-			throw MatrixError("Cannot add matrices with different col count");
+			throw MatrixError("Cannot subtract matrices with different col count");
 		}
 
 		for (const auto& [n_row, row] : enumerate(m_data))
