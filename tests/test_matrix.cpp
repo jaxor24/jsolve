@@ -1692,6 +1692,62 @@ TEST_CASE("operator*", "[matrix]")
             REQUIRE(result(2, 0) == 18);
         }
     }
+
+    SECTION("operator*(double, Matrix)")
+    {
+        SECTION("1x1 matrix")
+        {
+            Matr m1{ 1, 1, 1.0 };
+
+            auto result = 6 * m1;
+
+            REQUIRE(result(0, 0) == 6);
+        }
+
+        SECTION("2x2 matrix")
+        {
+            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            m1(0, 0) = 1;
+            m1(0, 1) = 2;
+            m1(1, 0) = 3;
+            m1(1, 1) = 4;
+
+            auto result = 6 * m1;
+
+            REQUIRE(result(0, 0) == 6);
+            REQUIRE(result(0, 1) == 12);
+            REQUIRE(result(1, 0) == 18);
+            REQUIRE(result(1, 1) == 24);
+        }
+
+        SECTION("1x3 vector")
+        {
+            Matr m1{ 1, 3 }; // [1 2 3]
+            m1(0, 0) = 1;
+            m1(0, 1) = 2;
+            m1(0, 2) = 3;
+
+            auto result = 6 * m1;
+
+            REQUIRE(result(0, 0) == 6);
+            REQUIRE(result(0, 1) == 12);
+            REQUIRE(result(0, 2) == 18);
+        }
+
+        SECTION("3x1 vector")
+        {
+            Matr m1{ 3, 1 }; // [1;2;3]
+            m1(0, 0) = 1;
+            m1(1, 0) = 2;
+            m1(2, 0) = 3;
+
+            auto result = 6 * m1;
+
+            REQUIRE(result(0, 0) == 6);
+            REQUIRE(result(1, 0) == 12);
+            REQUIRE(result(2, 0) == 18);
+        }
+    }
 }
 
 TEST_CASE("matrix::operator/=", "[matrix]")

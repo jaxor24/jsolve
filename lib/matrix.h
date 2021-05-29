@@ -340,6 +340,14 @@ Matrix<U> operator*(Matrix<U> lhs, double x)
 }
 
 template <typename U>
+Matrix<U> operator*(double x, Matrix<U> rhs)
+{
+	rhs *= x;
+	return rhs;
+}
+
+// Operator/
+template <typename U>
 Matrix<U> operator/(Matrix<U> lhs, double x)
 {
 	lhs /= x;
