@@ -1169,7 +1169,7 @@ TEST_CASE("matrix::operator+", "[matrix]")
         }
     }
 
-    SECTION("operator+=(double)")
+    SECTION("operator+(double)")
     {
         SECTION("1x1 matrix")
         {
@@ -1228,64 +1228,138 @@ TEST_CASE("matrix::operator+", "[matrix]")
 
 TEST_CASE("matrix::operator-", "[matrix]")
 {
-    SECTION("matrix - matrix")
+    SECTION("operator-(Matrix)")
     {
-        SECTION("valid")
+        SECTION("1x1 matrix")
         {
-            std::size_t n_max_dimension{ 10 };
+            Matr m1{ 1, 1, 1.0 };
+            Matr m2{ 1, 1, -5.0 };
 
-            for (std::size_t r = 1; r < n_max_dimension; r++)
-            {
-                for (std::size_t c = 1; c < n_max_dimension; c++)
-                {
-                    Matr lhs{ r, c, double(r + c) };
-                    Matr rhs{ r, c, double(r - c) };
+            auto result = m1 - m2;
 
-                    REQUIRE_NOTHROW(lhs - rhs);
+            REQUIRE(result(0, 0) == 6);
+        }
 
-                    Matr result = lhs - rhs;
+        SECTION("2x2 matrix")
+        {
+            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            m1(0, 0) = 1;
+            m1(0, 1) = 2;
+            m1(1, 0) = 3;
+            m1(1, 1) = 4;
 
-                    for (std::size_t n_r = 0; n_r < result.n_rows(); n_r++)
-                    {
-                        for (std::size_t n_c = 0; n_c < result.n_cols(); n_c++)
-                        {
-                            REQUIRE(result(n_r, n_c) == lhs(n_r, n_c) - rhs(n_r, n_c));
-                        }
-                    }
-                }
-            }
+            Matr m2{ 2, 2, 0.0 };  // [4 3; 2 1]
+            m2(0, 0) = 4;
+            m2(0, 1) = 3;
+            m2(1, 0) = 2;
+            m2(1, 1) = 1;
+
+            auto result = m1 - m2;
+
+            REQUIRE(result(0, 0) == -3);
+            REQUIRE(result(0, 1) == -1);
+            REQUIRE(result(1, 0) == 1);
+            REQUIRE(result(1, 1) == 3);
+        }
+
+        SECTION("1x3 vector")
+        {
+            Matr m1{ 1, 3 }; // [1 2 3]
+            m1(0, 0) = 1;
+            m1(0, 1) = 2;
+            m1(0, 2) = 3;
+
+            Matr m2{ 1, 3 }; // [-3 -2 -1]
+            m2(0, 0) = -3;
+            m2(0, 1) = -2;
+            m2(0, 2) = -1;
+
+            auto result = m1 - m2;
+
+            REQUIRE(result(0, 0) == 4);
+            REQUIRE(result(0, 1) == 4);
+            REQUIRE(result(0, 2) == 4);
+        }
+
+        SECTION("3x1 vector")
+        {
+            Matr m1{ 3, 1 }; // [1;2;3]
+            m1(0, 0) = 1;
+            m1(1, 0) = 2;
+            m1(2, 0) = 3;
+
+            Matr m2{ 3, 1 }; // [-3;-2;-1]
+            m2(0, 0) = -3;
+            m2(1, 0) = -2;
+            m2(2, 0) = -1;
+
+            auto result = m1 - m2;
+
+            REQUIRE(result(0, 0) == 4);
+            REQUIRE(result(1, 0) == 4);
+            REQUIRE(result(2, 0) == 4);
         }
 
         SECTION("invalid dimensions")
         {
-            REQUIRE_THROWS_AS(Matr(2, 1) - Matr(1, 2), MatrixError);
-            REQUIRE_THROWS_AS(Matr(5, 5) - Matr(6, 3), MatrixError);
+            REQUIRE_THROWS_AS(Matr(2, 1) -= Matr(1, 2), MatrixError);
+            REQUIRE_THROWS_AS(Matr(5, 5) -= Matr(6, 3), MatrixError);
         }
     }
 
-    SECTION("matrix - double")
+    SECTION("operator+=(double)")
     {
-        SECTION("valid")
+        SECTION("1x1 matrix")
         {
-            std::size_t n_max_dimension{ 10 };
+            Matr m1{ 1, 1, 1.0 };
 
-            for (std::size_t r = 1; r < n_max_dimension; r++)
-            {
-                for (std::size_t c = 1; c < n_max_dimension; c++)
-                {
-                    Matr lhs{ r, c, double(r + c) };
+            auto result = m1 - 6;
 
-                    Matr result = lhs - double(r * c);
+            REQUIRE(result(0, 0) == -5);
+        }
 
-                    for (std::size_t n_r = 0; n_r < result.n_rows(); n_r++)
-                    {
-                        for (std::size_t n_c = 0; n_c < result.n_cols(); n_c++)
-                        {
-                            REQUIRE(result(n_r, n_c) == lhs(n_r, n_c) - double(r * c));
-                        }
-                    }
-                }
-            }
+        SECTION("2x2 matrix")
+        {
+            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            m1(0, 0) = 1;
+            m1(0, 1) = 2;
+            m1(1, 0) = 3;
+            m1(1, 1) = 4;
+
+            auto result = m1 - 6;
+
+            REQUIRE(result(0, 0) == -5);
+            REQUIRE(result(0, 1) == -4);
+            REQUIRE(result(1, 0) == -3);
+            REQUIRE(result(1, 1) == -2);
+        }
+
+        SECTION("1x3 vector")
+        {
+            Matr m1{ 1, 3 }; // [1 2 3]
+            m1(0, 0) = 1;
+            m1(0, 1) = 2;
+            m1(0, 2) = 3;
+
+            auto result = m1 - 6;
+
+            REQUIRE(result(0, 0) == -5);
+            REQUIRE(result(0, 1) == -4);
+            REQUIRE(result(0, 2) == -3);
+        }
+
+        SECTION("3x1 vector")
+        {
+            Matr m1{ 3, 1 }; // [1;2;3]
+            m1(0, 0) = 1;
+            m1(1, 0) = 2;
+            m1(2, 0) = 3;
+
+            auto result = m1 - 6;
+
+            REQUIRE(result(0, 0) == -5);
+            REQUIRE(result(1, 0) == -4);
+            REQUIRE(result(2, 0) == -3);
         }
     }
 }
