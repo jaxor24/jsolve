@@ -1088,6 +1088,71 @@ TEST_CASE("matrix::operator-=", "[matrix]")
     }
 }
 
+TEST_CASE("matrix::operator/=", "[matrix]")
+{
+    SECTION("operator/=(double)")
+    {
+        SECTION("1x1 matrix")
+        {
+            Matr m1{ 1, 1, 6 };
+
+            m1 /= 6;
+
+            REQUIRE(m1(0, 0) == 1);
+        }
+
+        SECTION("2x2 matrix")
+        {
+            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            m1(0, 0) = -24;
+            m1(0, 1) = -18;
+            m1(1, 0) = -12;
+            m1(1, 1) = -3;
+
+            m1 /= 6;
+
+            REQUIRE(m1(0, 0) == -4);
+            REQUIRE(m1(0, 1) == -3);
+            REQUIRE(m1(1, 0) == -2);
+            REQUIRE(m1(1, 1) == -0.5);
+        }
+
+        SECTION("1x3 vector")
+        {
+            Matr m1{ 1, 3 }; // [1 2 3]
+            m1(0, 0) = 3;
+            m1(0, 1) = 9;
+            m1(0, 2) = 18;
+
+            m1 /= 6;
+
+            REQUIRE(m1(0, 0) == 0.5);
+            REQUIRE(m1(0, 1) == 1.5);
+            REQUIRE(m1(0, 2) == 3);
+        }
+
+        SECTION("3x1 vector")
+        {
+            Matr m1{ 3, 1 }; // [1;2;3]
+            m1(0, 0) = 3;
+            m1(1, 0) = 9;
+            m1(2, 0) = 18;
+
+            m1 /= 6;
+
+            REQUIRE(m1(0, 0) == 0.5);
+            REQUIRE(m1(1, 0) == 1.5);
+            REQUIRE(m1(2, 0) == 3);
+        }
+
+        SECTION("invalid - division by zero")
+        {
+            REQUIRE_THROWS_AS(Matr(2, 1) /= 0, MatrixError);
+            REQUIRE_THROWS_AS(Matr(5, 5) /= 0, MatrixError);
+        }
+    }
+}
+
 TEST_CASE("matrix::operator*=", "[matrix]")
 {
     SECTION("operator*=(Matrix)")
@@ -1750,72 +1815,61 @@ TEST_CASE("operator*", "[matrix]")
     }
 }
 
-TEST_CASE("matrix::operator/=", "[matrix]")
+TEST_CASE("operator/", "[matrix]")
 {
-    SECTION("matrix /= double")
+    SECTION("operator/=(double)")
     {
-        SECTION("valid")
+        SECTION("1x1 matrix")
         {
-            std::size_t n_max_dimension{ 10 };
+            Matr m1{ 1, 1, 6 };
 
-            for (std::size_t r = 1; r < n_max_dimension; r++)
-            {
-                for (std::size_t c = 1; c < n_max_dimension; c++)
-                {
-                    SECTION("unit case")
-                    {
-                        Matr lhs{ r, c, double(r + c) };
-                        auto rhs = double(r * c);
-                        lhs /= rhs;
+            auto result = m1 / 6;
 
-                        for (std::size_t n_r = 0; n_r < lhs.n_rows(); n_r++)
-                        {
-                            for (std::size_t n_c = 0; n_c < lhs.n_cols(); n_c++)
-                            {
-                                REQUIRE(lhs(n_r, n_c) == (r + c) / rhs);
-                            }
-                        }
-                    }
-                }
-            }
+            REQUIRE(result(0, 0) == 1);
         }
 
-        SECTION("invalid - division by zero")
+        SECTION("2x2 matrix")
         {
-            REQUIRE_THROWS_AS(Matr(2, 1) /= 0, MatrixError);
-            REQUIRE_THROWS_AS(Matr(5, 5) /= 0, MatrixError);
+            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            m1(0, 0) = -24;
+            m1(0, 1) = -18;
+            m1(1, 0) = -12;
+            m1(1, 1) = -3;
+
+            auto result = m1 / 6;
+
+            REQUIRE(result(0, 0) == -4);
+            REQUIRE(result(0, 1) == -3);
+            REQUIRE(result(1, 0) == -2);
+            REQUIRE(result(1, 1) == -0.5);
         }
-    }
-}
 
-TEST_CASE("matrix::operator/", "[matrix]")
-{
-    SECTION("matrix / double")
-    {
-        SECTION("valid")
+        SECTION("1x3 vector")
         {
-            std::size_t n_max_dimension{ 10 };
+            Matr m1{ 1, 3 }; // [1 2 3]
+            m1(0, 0) = 3;
+            m1(0, 1) = 9;
+            m1(0, 2) = 18;
 
-            for (std::size_t r = 1; r < n_max_dimension; r++)
-            {
-                for (std::size_t c = 1; c < n_max_dimension; c++)
-                {
-                    SECTION("unit case")
-                    {
-                        Matr lhs{ r, c, double(r + c) };
-                        auto rhs = double(r * c);
-                        lhs / rhs;
+            auto result = m1 / 6;
 
-                        for (std::size_t n_r = 0; n_r < lhs.n_rows(); n_r++)
-                        {
-                            for (std::size_t n_c = 0; n_c < lhs.n_cols(); n_c++)
-                            {
-                                REQUIRE(lhs(n_r, n_c) == (r + c) / rhs);
-                            }
-                        }
-                    }
-                }
-            }
+            REQUIRE(result(0, 0) == 0.5);
+            REQUIRE(result(0, 1) == 1.5);
+            REQUIRE(result(0, 2) == 3);
+        }
+
+        SECTION("3x1 vector")
+        {
+            Matr m1{ 3, 1 }; // [1;2;3]
+            m1(0, 0) = 3;
+            m1(1, 0) = 9;
+            m1(2, 0) = 18;
+
+            auto result = m1 / 6;
+
+            REQUIRE(result(0, 0) == 0.5);
+            REQUIRE(result(1, 0) == 1.5);
+            REQUIRE(result(2, 0) == 3);
         }
 
         SECTION("invalid - division by zero")

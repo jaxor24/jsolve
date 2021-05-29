@@ -355,6 +355,14 @@ Matrix<U> operator/(Matrix<U> lhs, double x)
 }
 
 template <typename U>
+Matrix<U> operator/(double x, Matrix<U> rhs)
+{
+	rhs /= x;
+	return rhs;
+}
+
+// Comparison
+template <typename U>
 bool operator==(const Matrix<U>& lhs, const Matrix<U>& rhs)
 {
 	if (lhs.n_rows() != rhs.n_rows())
