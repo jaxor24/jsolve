@@ -1088,9 +1088,9 @@ TEST_CASE("matrix::operator-=", "[matrix]")
     }
 }
 
-TEST_CASE("matrix::operator+", "[matrix]")
+TEST_CASE("operator+", "[matrix]")
 {
-    SECTION("operator+(Matrix)")
+    SECTION("operator+(Matrix, Matrix)")
     {
         SECTION("1x1 matrix")
         {
@@ -1169,7 +1169,7 @@ TEST_CASE("matrix::operator+", "[matrix]")
         }
     }
 
-    SECTION("operator+(double)")
+    SECTION("operator+(Matrix, double)")
     {
         SECTION("1x1 matrix")
         {
@@ -1226,9 +1226,9 @@ TEST_CASE("matrix::operator+", "[matrix]")
     }
 }
 
-TEST_CASE("matrix::operator-", "[matrix]")
+TEST_CASE("operator-", "[matrix]")
 {
-    SECTION("operator-(Matrix)")
+    SECTION("operator-(Matrix, Matrix)")
     {
         SECTION("1x1 matrix")
         {
@@ -1307,7 +1307,7 @@ TEST_CASE("matrix::operator-", "[matrix]")
         }
     }
 
-    SECTION("operator+=(double)")
+    SECTION("operator-(Matrix, double)")
     {
         SECTION("1x1 matrix")
         {
