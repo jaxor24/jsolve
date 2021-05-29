@@ -1031,7 +1031,7 @@ TEST_CASE("matrix::operator-=", "[matrix]")
         }
     }
 
-    SECTION("operator+=(double)")
+    SECTION("operator-=(double)")
     {
         SECTION("1x1 matrix")
         {
