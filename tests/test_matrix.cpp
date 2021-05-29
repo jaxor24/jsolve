@@ -818,28 +818,74 @@ TEST_CASE("matrix::operator+=", "[matrix]")
     {
         SECTION("valid")
         {
-            std::size_t n_max_dimension{ 10 };
-
-            for (std::size_t r = 1; r < n_max_dimension; r++)
+            SECTION("1x1 matrix")
             {
-                for (std::size_t c = 1; c < n_max_dimension; c++)
-                {
-                    SECTION("unit case")
-                    {
-                        Matr lhs{ r, c, double(r + c) };
-                        Matr rhs{ r, c, double(r - c) };
+                Matr m1{ 1, 1, 1.0 };
+                Matr m2{ 1, 1, -5.0 };
 
-                        lhs += rhs;
+                m1 += m2;
 
-                        for (std::size_t n_r = 0; n_r < lhs.n_rows(); n_r++)
-                        {
-                            for (std::size_t n_c = 0; n_c < lhs.n_cols(); n_c++)
-                            {
-                                REQUIRE(lhs(n_r, n_c) == (r + c) + (r - c));
-                            }
-                        }
-                    }
-                }
+                REQUIRE(m1(0, 0) == -4);
+            }
+
+            SECTION("2x2 matrix")
+            {
+                Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+                m1(0, 0) = 1;
+                m1(0, 1) = 2;
+                m1(1, 0) = 3;
+                m1(1, 1) = 4;
+
+                Matr m2{ 2, 2, 0.0 };  // [4 3; 2 1]
+                m2(0, 0) = 4;
+                m2(0, 1) = 3;
+                m2(1, 0) = 2;
+                m2(1, 1) = 1;
+
+                m1 += m2;
+
+                REQUIRE(m1(0, 0) == 5);
+                REQUIRE(m1(0, 1) == 5);
+                REQUIRE(m1(1, 0) == 5);
+                REQUIRE(m1(1, 1) == 5);
+            }
+
+            SECTION("1x3 vector")
+            {
+                Matr m1{ 1, 3 }; // [1 2 3]
+                m1(0, 0) = 1;
+                m1(0, 1) = 2;
+                m1(0, 2) = 3;
+
+                Matr m2{ 1, 3 }; // [-3 -2 -1]
+                m2(0, 0) = -3;
+                m2(0, 1) = -2;
+                m2(0, 2) = -1;
+
+                m1 += m2;
+
+                REQUIRE(m1(0, 0) == -2);
+                REQUIRE(m1(0, 1) == 0);
+                REQUIRE(m1(0, 2) == 2);
+            }
+
+            SECTION("3x1 vector")
+            {
+                Matr m1{ 3, 1 }; // [1;2;3]
+                m1(0, 0) = 1;
+                m1(1, 0) = 2;
+                m1(2, 0) = 3;
+
+                Matr m2{ 3, 1 }; // [-3;-2;-1]
+                m2(0, 0) = -3;
+                m2(1, 0) = -2;
+                m2(2, 0) = -1;
+
+                m1 += m2;
+
+                REQUIRE(m1(0, 0) == -2);
+                REQUIRE(m1(1, 0) == 0);
+                REQUIRE(m1(2, 0) == 2);
             }
         }
 
