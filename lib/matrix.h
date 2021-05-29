@@ -235,8 +235,7 @@ private:
 	}
 };
 
-// Range methods
-
+// Matrix::Range
 template <typename T>
 Matrix<T>::Range::Range(std::size_t start, std::size_t end) 
 	: 
@@ -294,26 +293,12 @@ Matrix<T>::Range::operator bool() const
 	return m_data.has_value(); 
 }
 
-
-// Free functions
+// Free functions - operators
+// Operator+
 template <typename U>
 Matrix<U> operator+(Matrix<U> lhs, const Matrix<U>& rhs)
 {
 	lhs += rhs;
-	return lhs;
-}
-
-template <typename U>
-Matrix<U> operator-(Matrix<U> lhs, const Matrix<U>& rhs)
-{
-	lhs -= rhs;
-	return lhs;
-}
-
-template <typename U>
-Matrix<U> operator*(Matrix<U> lhs, const Matrix<U>& rhs)
-{
-	lhs *= rhs;
 	return lhs;
 }
 
@@ -324,10 +309,26 @@ Matrix<U> operator+(Matrix<U> lhs, double x)
 	return lhs;
 }
 
+// Operator-
+template <typename U>
+Matrix<U> operator-(Matrix<U> lhs, const Matrix<U>& rhs)
+{
+	lhs -= rhs;
+	return lhs;
+}
+
 template <typename U>
 Matrix<U> operator-(Matrix<U> lhs, double x)
 {
 	lhs -= x;
+	return lhs;
+}
+
+// Operator*
+template <typename U>
+Matrix<U> operator*(Matrix<U> lhs, const Matrix<U>& rhs)
+{
+	lhs *= rhs;
 	return lhs;
 }
 
@@ -401,7 +402,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 	return os;
 }
 
-// Member functions
+// Matrix:: member functions
 template <typename T>
 Matrix<T>::Matrix(std::size_t r, std::size_t c) : Matrix(r, c, T{ 0 })
 {
@@ -593,7 +594,6 @@ std::pair<Matrix<T>, Matrix<std::size_t>> Matrix<T>::col_min() const
 
 	return { values, indices };
 }
-
 
 template <typename T>
 Matrix<T> Matrix<T>::make_transpose() const
