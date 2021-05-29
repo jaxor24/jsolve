@@ -1088,6 +1088,171 @@ TEST_CASE("matrix::operator-=", "[matrix]")
     }
 }
 
+TEST_CASE("matrix::operator*=", "[matrix]")
+{
+    SECTION("operator*=(Matrix)")
+    {
+        SECTION("[1x1] LHS")
+        {
+            Matr m1{ 1, 1, 1.0 };
+
+            SECTION("[1x1] RHS")
+            {
+                Matr m2{ 1, 1, -5.0 };
+
+                m1 *= m2;
+
+                REQUIRE(m1.n_rows() == 1);
+                REQUIRE(m1.n_cols() == 1);
+                REQUIRE(m1(0, 0) == -5);
+            }
+
+            SECTION("[1x4] RHS")
+            {
+                Matr m2{ 1, 4, 0.0 };
+                m2(0, 0) = 1;
+                m2(0, 0) = 2;
+                m2(0, 0) = 3;
+                m2(0, 0) = 4;
+
+                m1 *= m2;
+
+                REQUIRE(m1.n_rows() == 1);
+                REQUIRE(m1.n_cols() == 4);
+                m1(0, 0) = 1;
+                m1(0, 1) = 2;
+                m1(0, 2) = 3;
+                m1(0, 3) = 4;
+            }
+        }
+
+        SECTION("[2x2] LHS")
+        {
+            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            m1(0, 0) = 1;
+            m1(0, 1) = 2;
+            m1(1, 0) = 3;
+            m1(1, 1) = 4;
+
+            SECTION("[2x2] RHS")
+            {
+                Matr m2{ 2, 2, 0.0 };  // [4 3; 2 1]
+                m2(0, 0) = 4;
+                m2(0, 1) = 3;
+                m2(1, 0) = 2;
+                m2(1, 1) = 1;
+
+                m1 *= m2;
+
+                REQUIRE(m1.n_rows() == 2);
+                REQUIRE(m1.n_cols() == 2);
+                REQUIRE(m1(0, 0) == 8);
+                REQUIRE(m1(0, 1) == 5);
+                REQUIRE(m1(1, 0) == 20);
+                REQUIRE(m1(1, 1) == 13);
+            }
+
+            SECTION("[2x1] RHS")
+            {
+                Matr m2{ 2, 1, 0.0 };  // [-1; -2]
+                m2(0, 0) = -1;
+                m2(1, 0) = -2;
+
+                m1 *= m2;
+
+                REQUIRE(m1.n_rows() == 2);
+                REQUIRE(m1.n_cols() == 1);
+                REQUIRE(m1(0, 0) == -5);
+                REQUIRE(m1(1, 0) == -11);
+            }
+        }
+
+        SECTION("[1x3] LHS")
+        {
+            Matr m1{ 1, 3 }; // [1 2 3]
+            m1(0, 0) = 1;
+            m1(0, 1) = 2;
+            m1(0, 2) = 3;
+
+            SECTION("[3x1] RHS")
+            {
+                Matr m2{ 3, 1 }; // [3;2;1]
+                m2(0, 0) = 3;
+                m2(1, 0) = 2;
+                m2(2, 0) = 1;
+
+                m1 *= m2;
+
+                REQUIRE(m1.n_rows() == 1);
+                REQUIRE(m1.n_cols() == 1);
+                REQUIRE(m1(0, 0) == 10);
+            }
+        }
+
+        SECTION("invalid dimensions")
+        {
+            REQUIRE_THROWS_AS(Matr(2, 2) *= Matr(1, 2), MatrixError);
+            REQUIRE_THROWS_AS(Matr(2, 1) *= Matr(2, 1), MatrixError);
+        }
+    }
+
+    SECTION("operator*=(double)")
+    {
+        SECTION("1x1 matrix")
+        {
+            Matr m1{ 1, 1, 1.0 };
+
+            m1 *= 6;
+
+            REQUIRE(m1(0, 0) == 6);
+        }
+
+        SECTION("2x2 matrix")
+        {
+            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            m1(0, 0) = 1;
+            m1(0, 1) = 2;
+            m1(1, 0) = 3;
+            m1(1, 1) = 4;
+
+            m1 *= 6;
+
+            REQUIRE(m1(0, 0) == 6);
+            REQUIRE(m1(0, 1) == 12);
+            REQUIRE(m1(1, 0) == 18);
+            REQUIRE(m1(1, 1) == 24);
+        }
+
+        SECTION("1x3 vector")
+        {
+            Matr m1{ 1, 3 }; // [1 2 3]
+            m1(0, 0) = 1;
+            m1(0, 1) = 2;
+            m1(0, 2) = 3;
+
+            m1 *= 6;
+
+            REQUIRE(m1(0, 0) == 6);
+            REQUIRE(m1(0, 1) == 12);
+            REQUIRE(m1(0, 2) == 18);
+        }
+
+        SECTION("3x1 vector")
+        {
+            Matr m1{ 3, 1 }; // [1;2;3]
+            m1(0, 0) = 1;
+            m1(1, 0) = 2;
+            m1(2, 0) = 3;
+
+            m1 *= 6;
+
+            REQUIRE(m1(0, 0) == 6);
+            REQUIRE(m1(1, 0) == 12);
+            REQUIRE(m1(2, 0) == 18);
+        }
+    }
+}
+
 TEST_CASE("operator+", "[matrix]")
 {
     SECTION("operator+(Matrix, Matrix)")
@@ -1364,43 +1529,19 @@ TEST_CASE("operator-", "[matrix]")
     }
 }
 
-TEST_CASE("matrix::operator*=", "[matrix]")
+TEST_CASE("operator*", "[matrix]")
 {
-    // matrix *= double
-    SECTION("matrix *= double")
+    SECTION("operator*(Matrix, Matrix)")
     {
         SECTION("valid")
         {
-            std::size_t n_max_dimension{ 10 };
-
-            for (std::size_t r = 1; r < n_max_dimension; r++)
-            {
-                for (std::size_t c = 1; c < n_max_dimension; c++)
-                {
-                    SECTION("unit case")
-                    {
-                        Matr lhs{ r, c, double(r + c) };
-
-                        lhs *= double(r * c);
-
-                        for (std::size_t n_r = 0; n_r < lhs.n_rows(); n_r++)
-                        {
-                            for (std::size_t n_c = 0; n_c < lhs.n_cols(); n_c++)
-                            {
-                                REQUIRE(lhs(n_r, n_c) == (r + c) * (r * c));
-                            }
-                        }
-                    }
-                }
-            }
+            // TODO
         }
     }
-}
 
-TEST_CASE("matrix::operator*", "[matrix]")
-{
-    SECTION("matrix * double")
+    SECTION("operator*(Matrix, double)")
     {
+        // TODO
         SECTION("valid")
         {
             std::size_t n_max_dimension{ 10 };
@@ -1425,14 +1566,6 @@ TEST_CASE("matrix::operator*", "[matrix]")
                     }
                 }
             }
-        }
-    }
-
-    SECTION("matrix * matrix")
-    {
-        SECTION("valid")
-        {
-
         }
     }
 }
