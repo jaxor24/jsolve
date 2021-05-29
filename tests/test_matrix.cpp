@@ -795,6 +795,7 @@ TEST_CASE("matrix::operator--", "[matrix]")
 
     SECTION("postfix")
     {
+        int n_times{ 10 };
 
         for (auto i = 0; i < n_times; i++)
         {
