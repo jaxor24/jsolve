@@ -1880,6 +1880,88 @@ TEST_CASE("operator/", "[matrix]")
     }
 }
 
+TEST_CASE("operator<", "[matrix]")
+{
+    SECTION("operator<(Matrix, double)")
+    {
+        SECTION("1x1 matrix")
+        {
+            Matr m1{ 1, 1, 1.0 };
+
+            SECTION("less than 0")
+            {
+                auto result = m1 < 0;
+
+                REQUIRE(result.n_rows() == 1);
+                REQUIRE(result.n_cols() == 1);
+                REQUIRE(result(0, 0) == 0);
+            }
+
+            SECTION("less than 1")
+            {
+                auto result = m1 < 1;
+
+                REQUIRE(result.n_rows() == 1);
+                REQUIRE(result.n_cols() == 1);
+                REQUIRE(result(0, 0) == 0);
+            }
+
+            SECTION("less than 2")
+            {
+                auto result = m1 < 2;
+
+                REQUIRE(result.n_rows() == 1);
+                REQUIRE(result.n_cols() == 1);
+                REQUIRE(result(0, 0) == 1);
+            }
+        }
+
+        SECTION("2x2 matrix")
+        {
+            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            m1(0, 0) = 0.5;
+            m1(0, 1) = 1;
+            m1(1, 0) = 1.5;
+            m1(1, 1) = 2;
+
+            SECTION("less than 1")
+            {
+                auto result = m1 < 1;
+
+                REQUIRE(result.n_rows() == 2);
+                REQUIRE(result.n_cols() == 2);
+                REQUIRE(result(0, 0) == 1);
+                REQUIRE(result(0, 1) == 0);
+                REQUIRE(result(1, 0) == 0);
+                REQUIRE(result(1, 1) == 0);
+            }
+
+            SECTION("less than 1.5")
+            {
+                auto result = m1 < 1.5;
+
+                REQUIRE(result.n_rows() == 2);
+                REQUIRE(result.n_cols() == 2);
+                REQUIRE(result(0, 0) == 1);
+                REQUIRE(result(0, 1) == 1);
+                REQUIRE(result(1, 0) == 0);
+                REQUIRE(result(1, 1) == 0);
+            }
+
+            SECTION("less than 2")
+            {
+                auto result = m1 < 2;
+
+                REQUIRE(result.n_rows() == 2);
+                REQUIRE(result.n_cols() == 2);
+                REQUIRE(result(0, 0) == 1);
+                REQUIRE(result(0, 1) == 1);
+                REQUIRE(result(1, 0) == 1);
+                REQUIRE(result(1, 1) == 0);
+            }
+        }        
+    }
+}
 TEST_CASE("matrix::Range", "[matrix::Range]")
 {
     SECTION("Range()")
