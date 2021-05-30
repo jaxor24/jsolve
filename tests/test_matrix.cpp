@@ -1176,18 +1176,18 @@ TEST_CASE("matrix::operator*=", "[matrix]")
             {
                 Matr m2{ 1, 4, 0.0 };
                 m2(0, 0) = 1;
-                m2(0, 0) = 2;
-                m2(0, 0) = 3;
-                m2(0, 0) = 4;
+                m2(0, 1) = 2;
+                m2(0, 2) = 3;
+                m2(0, 3) = 4;
 
                 m1 *= m2;
 
                 REQUIRE(m1.n_rows() == 1);
                 REQUIRE(m1.n_cols() == 4);
-                m1(0, 0) = 1;
-                m1(0, 1) = 2;
-                m1(0, 2) = 3;
-                m1(0, 3) = 4;
+                REQUIRE(m1(0, 0) == 1);
+                REQUIRE(m1(0, 1) == 2);
+                REQUIRE(m1(0, 2) == 3);
+                REQUIRE(m1(0, 3) == 4);
             }
         }
 
