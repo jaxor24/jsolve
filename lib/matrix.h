@@ -412,6 +412,25 @@ Matrix<U> operator<(const Matrix<U>& lhs, double x)
 
 	return result;
 }
+
+template <typename U>
+Matrix<U> operator>(const Matrix<U>& lhs, double x)
+{
+	// Element-wise e > x
+
+	Matrix<U> result{ lhs.n_rows(), lhs.n_cols(), false };
+
+	for (std::size_t n_row = 0; n_row < lhs.n_rows(); n_row++)
+	{
+		for (std::size_t n_col = 0; n_col < lhs.n_cols(); n_col++)
+		{
+			result(n_row, n_col) = lhs(n_row, n_col) > x;
+		}
+	}
+
+	return result;
+}
+
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 {
