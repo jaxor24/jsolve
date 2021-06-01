@@ -246,6 +246,10 @@ Matrix<T>::Range::Range(std::size_t start, std::size_t end)
 		throw MatrixError{ "Invalid range: start > end" };
 	}
 }
+template <typename T>
+Matrix<T>::Range::Range(std::size_t value) : Range(value, value) 
+{
+}
 
 template <typename T>
 std::size_t Matrix<T>::Range::start() const

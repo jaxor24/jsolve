@@ -2196,6 +2196,24 @@ TEST_CASE("matrix::Range", "[matrix::Range]")
         REQUIRE_THROWS_AS(r.end(), MatrixError);
     }
 
+    SECTION("Range(value)")
+    {
+        SECTION("valid")
+        {
+            Matr::Range r{ 1 };
+            REQUIRE(r);
+            REQUIRE(r.size() == 1);
+            REQUIRE(r.start() == 1);
+            REQUIRE(r.end() == 1);
+        }
+
+
+        SECTION("invalid")
+        {
+            // todo     
+        }
+    }
+
     SECTION("Range(start, end)")
     {
         SECTION("valid")
