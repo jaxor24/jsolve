@@ -10,7 +10,7 @@
 
 #include "logging.h"
 
-namespace jsolve::simplex
+namespace jsolve
 {
 	using Mat = Matrix<double>;
 
@@ -32,6 +32,81 @@ namespace jsolve::simplex
 		{
 			throw SolveError("matrix model A col count and b row count different");
 		}
+	}
+
+	MatrixModel to_component_form(const Model& user_model)
+	{
+		// Returns A, b and c such that:
+		// Constraints are converted to <=
+		// Objectives are converted to maximisation.
+		// A = n_cons * n_vars
+		// b = n_cons * 1,
+		// c = 1 * n_vars
+
+		auto n_user_vars = user_model.get_variables().size();
+		auto n_user_cons = user_model.get_constraints().size();
+
+		// Shield against equal constraints
+		std::for_each(
+			std::begin(user_model.get_constraints()),
+			std::end(user_model.get_constraints()),
+			[](const auto& constraint)
+			{
+				if (constraint->type() == Constraint::Type::EQUAL) { throw SolveError("EQUAL constraints unsupported"); }
+			}
+		);
+
+		// Objective vector
+		Mat objective{ 1, n_user_vars, 0.0 };
+
+		for (const auto& [n_var, var] : enumerate(user_model.get_variables()))
+		{
+			objective(0, n_var) = var->cost();
+		}
+
+		if (user_model.sense() == Model::Sense::MIN)
+		{
+			objective *= -1;
+		}
+
+		// b (RHS) vector
+		Mat rhs{ n_user_cons, 1, 0.0 };
+		for (const auto& [n_cons, cons] : enumerate(user_model.get_constraints()))
+		{
+			if (cons->type() == Constraint::Type::GREAT)
+			{
+				// 7x + 2y >= 5 becomes -7x - 2y <= -5
+				rhs(n_cons, 0) = -1 * cons->rhs();
+			}
+			else
+			{
+				rhs(n_cons, 0) = cons->rhs();
+			}
+		}
+
+		// A matrix
+		Mat a{ n_user_cons, n_user_vars, 0.0 };
+
+		for (const auto& [n_cons, cons] : enumerate(user_model.get_constraints()))
+		{
+			auto scale = cons->type() == Constraint::Type::GREAT ? -1.0 : 1.0;
+
+			// Add original constraint entries
+			for (const auto& [n_var, var] : enumerate(user_model.get_variables()))
+			{
+				auto found_entry = cons->get_entries().find(var.get());
+
+				if (found_entry != std::end(cons->get_entries()))
+				{
+					a(n_cons, n_var) = scale * found_entry->second;
+				}
+			}
+		}
+
+		//log()->info(objective);
+		//log()->info(rhs);
+		//log()->info(a);
+		return { objective, a, rhs };
 	}
 
 	MatrixModel to_matrix_form(const Model& user_model)
@@ -108,25 +183,99 @@ namespace jsolve::simplex
 		return { objective, a, rhs };
 	}
 
-	void simplex_solve(const MatrixModel& model)
+	void primal_simplex_solve(const Model& user_model)
 	{
-		// Follows chapter 6 of "Linear Programming" 2014.
+		// Follows the implementation in Chapter 4 p46. of "Linear Programming" 2014.
 
-		// Split A into B (basic section) and N (non-basic section)
-		// auto n_cons = model.A.n_rows();
-		model.A;
+		auto model = to_component_form(user_model);
+
+		log()->info("Primal Simplex Algorithm (component form)");
+
+		// Make our own copies of the model
+		auto c = model.c;
+		auto A = -1 * model.A;  // -1 to model rearrange for slack vars
+		auto b = model.b;
+		double eps = 1e-4;
+
+		int iter = 1;
+		double obj = 0;
+		
+		while (c.row_max().first(0,0) > eps)
+		{
+			log()->info("---------------------------------------");
+			log()->info("Iteration: {}", iter);
+			//log()->info("c = {}", c);
+			//log()->info("A = {}", A);
+			//log()->info("b = {}", b);
+
+			// Pick largest objective coefficient
+			auto [c_max, c_max_index] = c.row_max();
+
+			auto col_idx = c_max_index(0, 0);
+			log()->info("Entering variable:");
+			log()->info("Objective max coeff {} at col {}", c_max(0, 0), col_idx);
+			// Grab the corresponding A column
+			auto Acol = A.slice({}, { col_idx, col_idx });
+
+			// Select leaving variable
+			// Pick i such that: a[i,k]/b[i] is maximised
+			auto [t, leaving_row_index] = div_elem(-1.0 * Acol, b).col_max();
+			auto leaving_ratio = t(0, 0);
+			auto row_idx = leaving_row_index(0, 0);
+
+			log()->info("Leaving variable:");
+			log()->info("With a max ratio value {} at row {}", t(0,0), row_idx);
+
+			// Test for unbounded-ness
+			// Leaving ratio is non-positive
+			if (leaving_ratio < eps)
+			{
+				// Unbounded
+				log()->info("unbounded");
+				return;
+			}
+
+			log()->info("Pivot on element {} at {},{}", A(row_idx, col_idx), row_idx, col_idx);
+
+			auto Arow = A.slice({ row_idx }, {});
+			auto a = A(row_idx, col_idx);
+
+			// Pivot A
+			A = A - ((Acol * Arow) / a);
+			A.update(row_idx, {}, -1 * Arow / a);
+			A.update({}, col_idx, +1 * Acol / a);
+			A(row_idx, col_idx) = 1 / a;
+
+			// Pivot b
+			auto brow = b(row_idx, 0);
+			b = b - brow * Acol / a;
+			b(row_idx, 0) = -1.0 * brow / a;
+
+			// Pivot c
+			auto ccol = c(0, col_idx);
+			auto s = ccol * Arow / a;
+			c = c - ccol * Arow / a;
+			c(0, col_idx) = ccol / a;
+
+			// Update objective
+			obj = obj - ccol * brow / a;
+
+			iter++;
+			if (iter == 10) 
+			{ 
+				log()->info("Iteration limit ({}) reached.", iter);
+				break; 
+			}
+		}
+		log()->info("---------------------------------------");
+		log()->info("Optimal solution = {}", obj);
 	}
 }
-
 
 namespace jsolve
 {
 	void solve(const Model& user_model)
 	{
-		using namespace jsolve::simplex;
-
-		auto matrix_model = to_matrix_form(user_model);
-		verify_matrix_model(matrix_model);
-		simplex_solve(matrix_model);
+		primal_simplex_solve(user_model);
 	}
 }
