@@ -1,9 +1,23 @@
 #pragma once
+#include <tuple>
+#include <limits>
+#include <cmath>
+
+// Numeric tools
+
+inline bool approx_equal(double a, double b)
+{
+    int factor = 2;
+    double min_a = a - (a - std::nextafter(a, std::numeric_limits<double>::lowest())) * factor;
+    double max_a = a + (std::nextafter(a, std::numeric_limits<double>::max()) - a) * factor;
+    return min_a <= b && max_a >= b;
+}
+
 
 // Python-like enumerate()
 // Ref: http://reedbeta.com/blog/python-like-enumerate-in-cpp17/
 
-#include <tuple>
+
 
 template <typename T,
 typename TIter = decltype(std::begin(std::declval<T>())),
