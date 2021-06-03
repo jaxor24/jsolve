@@ -201,7 +201,7 @@ public:
 	}
 	Matrix operator/=(double x)
 	{
-		if (x == 0)
+		if (approx_equal(x, 0.0))
 		{
 			throw MatrixError("Scalar division by zero");
 		}
@@ -478,7 +478,7 @@ Matrix<U> div_elem(const Matrix<U>& lhs, const Matrix<U>& rhs)
 	{
 		for (std::size_t n_col = 0; n_col < lhs.n_cols(); n_col++)
 		{
-			if (rhs(n_row, n_col) == 0)
+			if (approx_equal(rhs(n_row, n_col), 0.0))
 			{
 				throw MatrixError("Cannot element-wise divide by matrix with zero element");
 			}
