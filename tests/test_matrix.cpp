@@ -2239,7 +2239,142 @@ TEST_CASE("matrix::Range", "[matrix::Range]")
 
         SECTION("invalid")
         {
-            REQUIRE_THROWS_AS(Matr::Range( 2, 1 ), MatrixError);            
+              // todo     
+        }
+    }
+}
+
+TEST_CASE("matrix::update", "[matrix]")
+{
+    SECTION("update entire matrix")
+    {
+        Matr m1{ 2, 2, 0 };
+
+        Matr sub{ 2, 2, 0 };
+
+        sub(0, 0) = 1;
+        sub(0, 1) = 2;
+        sub(1, 0) = 3;
+        sub(1, 1) = 4;
+
+        m1.update({}, {}, sub);
+
+        REQUIRE(m1 == sub);
+    }
+
+    SECTION("update 4x4 matrix")
+    {
+        Matr m1{ 4, 4, 0 };
+
+        SECTION("with 2x2 matrix")
+        {
+            Matr sub{ 2, 2, 0 };
+            sub(0, 0) = 1;
+            sub(0, 1) = 2;
+            sub(1, 0) = 3;
+            sub(1, 1) = 4;
+
+            SECTION("in the top left")
+            {
+                m1.update({ 0, 1 }, { 0, 1 }, sub);
+
+                REQUIRE(m1.n_cols() == 4);
+                REQUIRE(m1.n_rows() == 4);
+                REQUIRE(m1(0, 0) == 1);
+                REQUIRE(m1(0, 1) == 2);
+                REQUIRE(m1(0, 2) == 0);
+                REQUIRE(m1(0, 3) == 0);
+                REQUIRE(m1(1, 0) == 3);
+                REQUIRE(m1(1, 1) == 4);
+                REQUIRE(m1(1, 2) == 0);
+                REQUIRE(m1(1, 3) == 0);
+                REQUIRE(m1(2, 0) == 0);
+                REQUIRE(m1(2, 1) == 0);
+                REQUIRE(m1(2, 2) == 0);
+                REQUIRE(m1(2, 3) == 0);
+                REQUIRE(m1(3, 0) == 0);
+                REQUIRE(m1(3, 1) == 0);
+                REQUIRE(m1(3, 2) == 0);
+                REQUIRE(m1(3, 3) == 0);
+            }
+
+
+            SECTION("in the top right")
+            {
+                m1.update({ 0, 1 }, { 2, 3 }, sub);
+
+                REQUIRE(m1.n_cols() == 4);
+                REQUIRE(m1.n_rows() == 4);
+                REQUIRE(m1(0, 0) == 0);
+                REQUIRE(m1(0, 1) == 0);
+                REQUIRE(m1(0, 2) == 1);
+                REQUIRE(m1(0, 3) == 2);
+                REQUIRE(m1(1, 0) == 0);
+                REQUIRE(m1(1, 1) == 0);
+                REQUIRE(m1(1, 2) == 3);
+                REQUIRE(m1(1, 3) == 4);
+                REQUIRE(m1(2, 0) == 0);
+                REQUIRE(m1(2, 1) == 0);
+                REQUIRE(m1(2, 2) == 0);
+                REQUIRE(m1(2, 3) == 0);
+                REQUIRE(m1(3, 0) == 0);
+                REQUIRE(m1(3, 1) == 0);
+                REQUIRE(m1(3, 2) == 0);
+                REQUIRE(m1(3, 3) == 0);
+            }
+        }
+    }
+
+    SECTION("invalid inputs")
+    {
+        Matr m1{ 10, 10, 0 };
+
+        SECTION("more range rows than sub matrix")
+        {
+            Matr sub{ 1, 1, 0 };
+            REQUIRE_THROWS_AS(m1.update({0, 1}, {1, 1}, sub), MatrixError);
+        }
+
+        SECTION("more range cols than sub matrix")
+        {
+            Matr sub{ 1, 1, 0 };
+            REQUIRE_THROWS_AS(m1.update({ 1, 1 }, { 0, 1 }, sub), MatrixError);
+        }
+
+        SECTION("less range rows than sub matrix")
+        {
+            Matr sub{ 2, 2, 0 };
+            REQUIRE_THROWS_AS(m1.update({ 0, 0 }, { 0, 1 }, sub), MatrixError);
+        }
+
+        SECTION("less range cols than sub matrix")
+        {
+            Matr sub{ 2, 2, 0 };
+            REQUIRE_THROWS_AS(m1.update({ 0, 1 }, { 0, 0 }, sub), MatrixError);
+        }  
+
+        SECTION("sub matrix more rows than target matrix")
+        {
+            Matr sub{ 11, 10, 0 };
+            REQUIRE_THROWS_AS(m1.update({}, {}, sub), MatrixError);
+        }
+
+        SECTION("sub matrix more cols than target matrix")
+        {
+            Matr sub{ 10, 11, 0 };
+            REQUIRE_THROWS_AS(m1.update({}, {}, sub), MatrixError);
+        }
+
+        SECTION("sub matrix less rows than target matrix")
+        {
+            Matr sub{ 2, 10, 0 };
+            REQUIRE_THROWS_AS(m1.update({}, {}, sub), MatrixError);
+        }
+
+        SECTION("sub matrix less cols than target matrix")
+        {
+            Matr sub{ 10, 2, 0 };
+            REQUIRE_THROWS_AS(m1.update({}, {}, sub), MatrixError);
         }
     }
 }

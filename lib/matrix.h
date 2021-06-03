@@ -62,6 +62,8 @@ public:
 	Matrix make_transpose() const;
 	Matrix slice(Range rows, Range cols) const;
 
+	void update(Range rows, Range cols, Matrix values);
+
 	// Operators -------------------------------------------------------------------------------
 	// Put-to
 	template <typename U>
@@ -755,4 +757,71 @@ Matrix<T> Matrix<T>::slice(Range rows, Range cols) const
 	}
 
 	return result;
+}
+
+template <typename T>
+void Matrix<T>::update(Range rows, Range cols, Matrix sub)
+{
+	// Update the specified range with the values in the provided sub matrix.
+
+	// Check inputs
+	if (rows)
+	{
+		// Rows must match sub matrix size
+		if (rows.size() != sub.n_rows())
+		{
+			throw MatrixError("Row range of size is inconsistent with sub matrix", rows.size(), sub.n_rows());
+		}
+	}
+	else
+	{
+		// Rows must match target matrix size
+		if (n_rows() != sub.n_rows())
+		{
+			throw MatrixError("Cannot update all {} rows with a sub-matrix of {} rows", n_rows(), sub.n_rows());
+		}
+	}
+
+	if (cols)
+	{
+		// Cols must match sub matrix size
+		if (cols.size() != sub.n_cols())
+		{
+			throw MatrixError("Col range of size is inconsistent with sub matrix", cols.size(), sub.n_cols());
+		}
+	}
+	else
+	{
+		// Cols must match target matrix size
+		if (n_cols() != sub.n_cols())
+		{
+			throw MatrixError("Cannot update all {} cols with a sub-matrix of {} cols", n_cols(), sub.n_cols());
+		}
+	}
+
+	// Shortcut for replacing entire matrix
+	if (!rows && !cols)
+	{
+		*this = sub;
+		return;
+	}
+
+	// Update matrix with sub matrix
+	std::size_t result_row{ 0 };
+	for (const auto& [n_row, row] : enumerate(m_data))
+	{
+		if (!rows || ((n_row >= rows.start()) && (n_row <= rows.end())))
+		{
+			std::size_t result_col{ 0 };
+			for (const auto& [n_col, elem] : enumerate(row))
+			{
+				if (!cols || ((n_col >= cols.start()) && (n_col <= cols.end())))
+				{
+					elem = sub(result_row, result_col);
+					result_col++;
+				}
+			}
+			result_row++;
+		}
+	}
 }
