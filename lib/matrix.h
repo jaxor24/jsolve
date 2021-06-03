@@ -30,6 +30,7 @@ public:
 	{
 	public:
 		Range() = default;
+		Range(std::size_t value);
 		Range(std::size_t start, std::size_t end);
 
 		std::size_t start() const;
