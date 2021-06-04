@@ -34,11 +34,13 @@ namespace jsolve
 		}
 	}
 
-	MatrixModel to_component_form(const Model& user_model)
+	MatrixModel to_standard_form(const Model& user_model)
 	{
 		// Returns A, b and c such that:
-		// Constraints are converted to <=
-		// Objectives are converted to maximisation.
+		// - objective is maximisation
+		// - constaints are LHS <= RHS
+		// - vars are non-negative
+		// With:
 		// A = n_cons * n_vars
 		// b = n_cons * 1,
 		// c = 1 * n_vars
@@ -187,7 +189,7 @@ namespace jsolve
 	{
 		// Follows the implementation in Chapter 4 p46. of "Linear Programming" 2014.
 
-		auto model = to_component_form(user_model);
+		auto model = to_standard_form(user_model);
 
 		log()->info("Primal Simplex Algorithm (component form)");
 
