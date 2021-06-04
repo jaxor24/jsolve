@@ -5,6 +5,9 @@ namespace models
 {
 	jsolve::Model make_model_1()
 	{
+		// Model from:
+		// p11. Linear Programming (2014) Vanderbei.
+
 		auto m = jsolve::Model(jsolve::Model::Sense::MAX, "Example");
 
 		auto* v1 = m.make_variable(jsolve::Variable::Type::LINEAR, "ItemA");
