@@ -6,7 +6,7 @@ int main()
 {
 	logging::init_logging();
 	log()->info("Starting jsolve...");
-	do_work();
+	go();
 	log()->info("Done.");
 	return 0;
 }

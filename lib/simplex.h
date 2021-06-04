@@ -2,7 +2,7 @@
 
 #include "model.h"
 
-namespace jsolve
+namespace jsolve::simplex
 {
-	void solve(const Model& model);
+	void primal_solve(const Model& model);
 }
