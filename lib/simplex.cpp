@@ -192,12 +192,11 @@ namespace jsolve::simplex
 	void primal_solve(const Model& user_model)
 	{
 		// Follows the implementation in Chapter 4 p46. of "Linear Programming" 2014.
+		
+		log()->info("Primal Simplex Algorithm (component form)");
 
 		auto model = to_standard_form(user_model);
 
-		log()->info("Primal Simplex Algorithm (component form)");
-
-		// Make our own copies of the model
 		auto c = model.c;
 		auto A = -1 * model.A;  // -1 to model rearrange for slack vars
 		auto b = model.b;
