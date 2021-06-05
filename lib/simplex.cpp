@@ -3,6 +3,7 @@
 #include "variable.h"
 #include "constraint.h"
 
+
 #include "solver_error.h"
 
 #include "tools.h"
@@ -192,8 +193,8 @@ namespace jsolve::simplex
 	std::optional<Solution> primal_solve(const Model& user_model)
 	{
 		// Follows the implementation in Chapter 4 p46. of "Linear Programming" 2014.
-		
-		log()->info("Primal Simplex Algorithm (component form)");
+
+		Timer timer{ get_logger(),  "Primal Simplex Algorithm" };
 
 		auto model = to_standard_form(user_model);
 
@@ -202,8 +203,8 @@ namespace jsolve::simplex
 		auto b = model.b;
 		double eps = 1e-4;
 
-		int iter = 1;
 		int max_iter = 20;
+		int iter = 0;
 		double obj = 0;
 
 		// Keep track of variables
@@ -221,8 +222,8 @@ namespace jsolve::simplex
 
 		while (c.row_max().first(0, 0) > eps)
 		{
-			log()->info("---------------------------------------");
-			log()->info("Iteration: {}", iter);
+			log()->debug("---------------------------------------");
+			log()->debug("Iteration: {}", iter);
 			//log()->info("c = {}", c);
 			//log()->info("A = {}", A);
 			//log()->info("b = {}", b);
@@ -231,8 +232,8 @@ namespace jsolve::simplex
 			auto [c_max, c_max_index] = c.row_max();
 
 			auto col_idx = c_max_index(0, 0);
-			log()->info("Entering variable:");
-			log()->info("Objective max coeff {} at col {}", c_max(0, 0), col_idx);
+			log()->debug("Entering variable:");
+			log()->debug("Objective max coeff {} at col {}", c_max(0, 0), col_idx);
 			// Grab the corresponding A column
 			auto Acol = A.slice({}, { col_idx, col_idx });
 
@@ -242,19 +243,17 @@ namespace jsolve::simplex
 			auto leaving_ratio = t(0, 0);
 			auto row_idx = leaving_row_index(0, 0);
 
-			log()->info("Leaving variable:");
-			log()->info("With a max ratio value {} at row {}", t(0, 0), row_idx);
+			log()->debug("Leaving variable:");
+			log()->debug("With a max ratio value {} at row {}", t(0, 0), row_idx);
 
-			// Test for unbounded-ness
-			// Leaving ratio is non-positive
 			if (leaving_ratio < eps)
 			{
-				// Unbounded
-				log()->info("unbounded");
+				// Leaving ratio is non-positive
+				log()->warn("Model is unbounded");
 				return {};
 			}
 
-			log()->info("Pivot on element {} at {},{}", A(row_idx, col_idx), row_idx, col_idx);
+			log()->debug("Pivot on element {} at {},{}", A(row_idx, col_idx), row_idx, col_idx);
 
 			auto Arow = A.slice({ row_idx }, {});
 			auto a = A(row_idx, col_idx);
@@ -288,8 +287,10 @@ namespace jsolve::simplex
 			iter++;
 			if (iter == max_iter)
 			{
-				log()->info("Iteration limit ({}) reached.", iter);
+				log()->warn("Iteration limit ({}) reached.", iter);
 				return {};
+			}
+		}
 
 		log()->debug("---------------------------------------");
 		log()->info("Optimal solution = {} ({} iterations)", obj, iter);
