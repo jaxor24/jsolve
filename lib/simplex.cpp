@@ -203,6 +203,7 @@ namespace jsolve::simplex
 		double eps = 1e-4;
 
 		int iter = 1;
+		int max_iter = 20;
 		double obj = 0;
 
 		while (c.row_max().first(0, 0) > eps)
@@ -266,7 +267,7 @@ namespace jsolve::simplex
 			obj = obj - ccol * brow / a;
 
 			iter++;
-			if (iter == 10)
+			if (iter == max_iter)
 			{
 				log()->info("Iteration limit ({}) reached.", iter);
 				break;
