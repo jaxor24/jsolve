@@ -12,3 +12,8 @@ inline auto log()
 {
     return spdlog::get("logger");
 }
+
+inline auto get_logger()
+{
+	return [](auto&&... args) { log()->info(std::forward<decltype(args)>(args)...); };
+}
