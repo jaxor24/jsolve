@@ -1,7 +1,39 @@
 #pragma once
+
 #include <tuple>
 #include <limits>
 #include <cmath>
+#include <chrono>
+#include <string>
+
+// Basic RAII timer
+
+template <typename Log>
+class Timer
+{
+public:
+    using Clock = std::chrono::high_resolution_clock;
+    Timer(Log log, const std::string& msg) 
+        : 
+        m_start{ Clock::now() },
+        m_log{ log },
+        m_msg{ msg }
+    {
+        m_log("(Start) {}", m_msg);
+    }
+
+    ~Timer()
+    {
+        auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - m_start).count();
+        m_log("(End) {} ({} ms)", m_msg, dur);
+    }
+
+private:
+    const Clock::time_point m_start;
+    Log m_log;
+    const std::string m_msg;
+
+};
 
 // Numeric tools
 
@@ -16,8 +48,6 @@ inline bool approx_equal(double a, double b)
 
 // Python-like enumerate()
 // Ref: http://reedbeta.com/blog/python-like-enumerate-in-cpp17/
-
-
 
 template <typename T,
 typename TIter = decltype(std::begin(std::declval<T>())),
