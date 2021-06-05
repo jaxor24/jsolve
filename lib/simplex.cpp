@@ -189,7 +189,7 @@ namespace jsolve::simplex
 		return { objective, a, rhs };
 	}
 
-	void primal_solve(const Model& user_model)
+	std::optional<Solution> primal_solve(const Model& user_model)
 	{
 		// Follows the implementation in Chapter 4 p46. of "Linear Programming" 2014.
 		
@@ -251,7 +251,7 @@ namespace jsolve::simplex
 			{
 				// Unbounded
 				log()->info("unbounded");
-				return;
+				return {};
 			}
 
 			log()->info("Pivot on element {} at {},{}", A(row_idx, col_idx), row_idx, col_idx);
@@ -289,10 +289,31 @@ namespace jsolve::simplex
 			if (iter == max_iter)
 			{
 				log()->info("Iteration limit ({}) reached.", iter);
-				break;
+				return {};
+
+		log()->debug("---------------------------------------");
+		log()->info("Optimal solution = {} ({} iterations)", obj, iter);
+
+		// Extract solution
+		Solution sol;
+		sol.objective = obj;
+
+		for (auto& [idx, var] : basics)
+		{ 
+			if (!var.slack)
+			{
+				sol.variables[user_model.get_variables().at(idx).get()] = b(idx, 0);
 			}
 		}
-		log()->info("---------------------------------------");
-		log()->info("Optimal solution = {}", obj);
+
+		for (auto& [idx, var] : non_basics)
+		{ 
+			if (!var.slack)
+			{
+				sol.variables[user_model.get_variables().at(idx).get()] = 0;
+			}
+		}
+
+		return sol;
 	}
 }
