@@ -17,3 +17,8 @@ inline auto info_logger()
 {
 	return [](auto&&... args) { log()->info(std::forward<decltype(args)>(args)...); };
 }
+
+inline auto debug_logger()
+{
+	return [](auto&&... args) { log()->debug(std::forward<decltype(args)>(args)...); };
+}
