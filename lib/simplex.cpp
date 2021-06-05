@@ -194,7 +194,7 @@ namespace jsolve::simplex
 	{
 		// Follows the implementation in Chapter 4 p46. of "Linear Programming" 2014.
 
-		Timer timer{ get_logger(),  "Primal Simplex Algorithm" };
+		Timer timer{ info_logger(),  "Primal Simplex Algorithm" };
 
 		auto model = to_standard_form(user_model);
 
