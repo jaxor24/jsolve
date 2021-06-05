@@ -206,6 +206,19 @@ namespace jsolve::simplex
 		int max_iter = 20;
 		double obj = 0;
 
+		// Keep track of variables
+		struct Var
+		{
+			std::size_t index;
+			bool slack{ false };
+		};
+
+		std::map<std::size_t, Var> basics;
+		for (std::size_t i = 0; i < A.n_rows(); i++) { basics[i] = { i, true }; }
+
+		std::map<std::size_t, Var> non_basics;
+		for (std::size_t i = 0; i < A.n_cols(); i++) { non_basics[i] = { i, false }; }
+
 		while (c.row_max().first(0, 0) > eps)
 		{
 			log()->info("---------------------------------------");
@@ -265,6 +278,12 @@ namespace jsolve::simplex
 
 			// Update objective
 			obj = obj - ccol * brow / a;
+
+			// Update var location
+			auto tmp = basics[row_idx];
+			auto tmp1 = non_basics[col_idx];
+			basics[row_idx] = tmp1;
+			non_basics[col_idx] = tmp;
 
 			iter++;
 			if (iter == max_iter)
