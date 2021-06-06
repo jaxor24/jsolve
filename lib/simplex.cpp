@@ -3,7 +3,6 @@
 #include "variable.h"
 #include "constraint.h"
 
-
 #include "solver_error.h"
 
 #include "tools.h"
