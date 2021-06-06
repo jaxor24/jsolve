@@ -8,6 +8,7 @@ project ("jsolver_v0")
 add_subdirectory ("external/spdlog")
 add_subdirectory ("app")
 add_subdirectory ("lib")
+add_subdirectory ("data")
 add_subdirectory ("tests")
 
 if(NOT TARGET spdlog)
