@@ -6,7 +6,7 @@
 
 namespace logging
 {
-    void init_logging()
+    void init_logging(bool mute)
     {
         auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
         console_sink->set_level(spdlog::level::trace);
@@ -17,7 +17,16 @@ namespace logging
         std::vector<spdlog::sink_ptr> sinks{ console_sink, file_sink };
 
         auto logger = std::make_shared<spdlog::logger>("logger", sinks.begin(), sinks.end());
-        logger->set_level(spdlog::level::trace);
+
+        if (mute)
+        {
+            logger->set_level(spdlog::level::off);
+        }
+        else
+        {
+            logger->set_level(spdlog::level::trace);
+        }
+        
         spdlog::register_logger(logger);
     }
 }

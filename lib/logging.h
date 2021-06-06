@@ -5,7 +5,7 @@
 
 namespace logging
 {
-	void init_logging();
+	void init_logging(bool mute = false);
 }
 
 inline auto log()
