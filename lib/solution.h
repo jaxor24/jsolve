@@ -10,7 +10,7 @@ namespace jsolve
 	struct Solution
 	{
 		double objective;
-		std::map<Variable*, double, Variable::CompareNames> variables;
+		std::map<std::string, double> variables;
 	};
 
 	template <typename Log>
@@ -18,9 +18,9 @@ namespace jsolve
 	{
 		log("Optimal solution = {}", sol.objective);
 		log("Variable values:");
-		for (const auto& [var, value] : sol.variables)
+		for (const auto& [name, value] : sol.variables)
 		{
-			log("{} = {}", *var, value);
+			log("{} = {}", name, value);
 		}
 	}
 }

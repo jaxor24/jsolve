@@ -308,7 +308,7 @@ namespace jsolve::simplex
 		{ 
 			if (!var.slack)
 			{
-				sol.variables[user_model.get_variables().at(var.index).get()] = b(idx, 0);
+				sol.variables[user_model.get_variables().at(var.index)->name()] = b(idx, 0);
 			}
 		}
 
@@ -316,7 +316,7 @@ namespace jsolve::simplex
 		{ 
 			if (!var.slack)
 			{
-				sol.variables[user_model.get_variables().at(var.index).get()] = 0;
+				sol.variables[user_model.get_variables().at(var.index)->name()] = 0;
 			}
 		}
 
