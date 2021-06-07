@@ -7,12 +7,13 @@ namespace models
 	{
 		// Model from:
 		// p11. Linear Programming (2014) Vanderbei.
+		// Model is solveable in 2 interations.
 
 		auto m = jsolve::Model(jsolve::Model::Sense::MAX, "Example");
 
-		auto* v1 = m.make_variable(jsolve::Variable::Type::LINEAR, "ItemA");
-		auto* v2 = m.make_variable(jsolve::Variable::Type::LINEAR, "ItemB");
-		auto* v3 = m.make_variable(jsolve::Variable::Type::LINEAR, "ItemC");
+		auto* v1 = m.make_variable(jsolve::Variable::Type::LINEAR, "x1");
+		auto* v2 = m.make_variable(jsolve::Variable::Type::LINEAR, "x2");
+		auto* v3 = m.make_variable(jsolve::Variable::Type::LINEAR, "x3");
 
 		// Objective
 		v1->cost() = 5;
