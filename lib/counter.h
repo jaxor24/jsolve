@@ -27,6 +27,21 @@ public:
     static int n_created() { return m_n_created; }
     static int n_alive() { return m_n_alive; }
 
+    struct CompareNames
+    {
+        template <typename T>
+        bool operator()(const Counter<T>& lhs, const Counter<T>& rhs) const
+        {
+            return lhs.name() < rhs.name();
+        }
+
+        template <typename T>
+        bool operator()(Counter<T>* lhs, Counter<T>* rhs) const
+        {
+            return lhs->name() < rhs->name();
+        }
+    };
+
 protected:
     ~Counter()
     {
