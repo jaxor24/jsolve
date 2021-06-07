@@ -36,7 +36,7 @@ namespace jsolve
 		add_to_lhs(-1 * coeff, var);
 	}
 
-	const std::map<Variable*, double>& Constraint::get_entries() const
+	const std::map<Variable*, double, Variable::CompareNames>& Constraint::get_entries() const
 	{ 
 		return m_entries; 
 	}
