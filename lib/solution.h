@@ -10,7 +10,7 @@ namespace jsolve
 	struct Solution
 	{
 		double objective;
-		std::map<Variable*, double> variables;
+		std::map<Variable*, double, Variable::CompareNames> variables;
 	};
 
 	template <typename Log>
