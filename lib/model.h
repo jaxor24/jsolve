@@ -6,9 +6,22 @@
 
 #include <vector>
 #include <memory>
+#include <stdexcept>
 
 namespace jsolve
 {
+	class ModelError : public std::runtime_error
+	{
+	public:
+		template <typename... Args>
+		explicit ModelError(Args&&... args)
+			:
+			std::runtime_error(fmt::format(std::forward<Args>(args)...))
+		{}
+		virtual ~ModelError() throw () {}
+	};
+
+
 	class Model : public Counter<Model>
 	{ 
 	public:
