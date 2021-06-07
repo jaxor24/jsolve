@@ -29,13 +29,11 @@ public:
 
     struct CompareNames
     {
-        template <typename T>
         bool operator()(const Counter<T>& lhs, const Counter<T>& rhs) const
         {
             return lhs.name() < rhs.name();
         }
 
-        template <typename T>
         bool operator()(Counter<T>* lhs, Counter<T>* rhs) const
         {
             return lhs->name() < rhs->name();
