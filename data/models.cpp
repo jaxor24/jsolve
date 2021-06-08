@@ -180,4 +180,74 @@ namespace models
 
 		return m;
 	}
+
+	jsolve::Model make_model_6()
+	{
+		// Model from:
+		// Problem 2.8 from Linear Programming (2014) Vanderbei.
+
+		auto m = jsolve::Model(jsolve::Model::Sense::MAX, "P2.8 LP 2014");
+
+		auto* v1 = m.make_variable(jsolve::Variable::Type::LINEAR, "x1");
+		auto* v2 = m.make_variable(jsolve::Variable::Type::LINEAR, "x2");
+
+		v1->cost() = 3;
+		v2->cost() = 2;
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C1");
+			c->rhs() = 1;
+			c->add_to_lhs(+1, v1);
+			c->add_to_lhs(-2, v2);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C2");
+			c->rhs() = 2;
+			c->add_to_lhs(+1, v1);
+			c->add_to_lhs(-1, v2);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C3");
+			c->rhs() = 6;
+			c->add_to_lhs(+2, v1);
+			c->add_to_lhs(-1, v2);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C4");
+			c->rhs() = 5;
+			c->add_to_lhs(+1, v1);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C5");
+			c->rhs() = 16;
+			c->add_to_lhs(+2, v1);
+			c->add_to_lhs(+1, v2);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C6");
+			c->rhs() = 12;
+			c->add_to_lhs(+1, v1);
+			c->add_to_lhs(+1, v2);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C7");
+			c->rhs() = 21;
+			c->add_to_lhs(+1, v1);
+			c->add_to_lhs(+2, v2);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C8");
+			c->rhs() = 10;
+			c->add_to_lhs(+1, v2);
+		}
+
+		return m;
+	}
 }

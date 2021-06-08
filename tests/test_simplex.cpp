@@ -39,4 +39,15 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
         REQUIRE(solution.value().variables.at("x1") == 1.0);
         REQUIRE(solution.value().variables.at("x2") == 0.0);
     }
+
+    SECTION("model 6")
+    {
+        auto model = models::make_model_6();
+        auto solution = jsolve::simplex::primal_solve(model);
+
+        REQUIRE(solution.has_value());
+        REQUIRE(solution.value().objective == 28.0);
+        REQUIRE(solution.value().variables.at("x1") == 4.0);
+        REQUIRE(solution.value().variables.at("x2") == 8.0);
+    }
 }
