@@ -173,7 +173,7 @@ namespace models
 		c1->add_to_lhs(-1, v3);
 
 		auto* c2 = m.make_constraint(jsolve::Constraint::Type::LESS, "C2");
-		c2->rhs() = 3;
+		c2->rhs() = 1;
 		c2->add_to_lhs(2, v1);
 		c2->add_to_lhs(-1, v2);
 		c2->add_to_lhs(1, v3);
