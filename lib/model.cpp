@@ -47,14 +47,10 @@ namespace jsolve
 			const auto& variable = *it;
 			if (variable->cost() != 0)
 			{
+				s.append(" + ");
 				s.append(fmt::format("{}*{}", variable->cost(), variable->name()));
-				it++;
-				if (it != std::end(m_variables))
-				{
-					s.append(" + ");
-				}
 			}
-
+			it++;
 		}
 		s.append("\n");
 		s.append("Subject to:");
