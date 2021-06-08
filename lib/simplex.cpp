@@ -203,7 +203,7 @@ namespace jsolve::simplex
 		double eps = 1e-4;
 
 		int max_iter = 20;
-		int iter = 0;
+		int iter = 1;
 		double obj = 0;
 
 		// Keep track of variables
@@ -291,7 +291,7 @@ namespace jsolve::simplex
 			}
 		}
 
-		if (iter == 0)
+		if (iter == 1)
 		{
 			log()->warn("Zero iterations. Error in model.", iter);
 			return {};
