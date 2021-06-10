@@ -16,7 +16,9 @@ public:
         ++m_n_alive;
     }
 
-    Counter(const Counter&)
+    Counter(const Counter& other)
+        :
+        m_name{ other.m_name }
     {
         ++m_n_created;
         ++m_n_alive;
