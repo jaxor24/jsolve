@@ -189,6 +189,53 @@ namespace jsolve::simplex
 		return { objective, a, rhs };
 	}
 
+	struct Var
+	{
+		std::size_t index;
+		bool slack{ false };
+	};
+
+	struct Locations
+	{
+		std::map<std::size_t, Var> basics;
+		std::map<std::size_t, Var> non_basics;
+	};
+
+	void pivot(std::size_t pivot_row, std::size_t pivot_col, Locations& locations, double& obj, Mat& A, Mat& b, Mat& c)
+	{
+		// Extract rows and cols from A
+		auto Acol = A.slice({}, { pivot_col });
+		auto Arow = A.slice({ pivot_row }, {});
+		auto a = A(pivot_row, pivot_col);
+
+		// Pivot A
+		A = A - ((Acol * Arow) / a);
+		A.update(pivot_row, {}, -1 * Arow / a);
+		A.update({}, pivot_col, +1 * Acol / a);
+		A(pivot_row, pivot_col) = 1 / a;
+
+		// Pivot b
+		auto brow = b(pivot_row, 0);
+		b = b - brow * Acol / a;
+		b(pivot_row, 0) = -1.0 * brow / a;
+
+		// Pivot c
+		auto ccol = c(0, pivot_col);
+		auto s = ccol * Arow / a;
+		c = c - ccol * Arow / a;
+		c(0, pivot_col) = ccol / a;
+
+		// Update objective
+		obj = obj - ccol * brow / a;
+
+		// Update var location
+		auto tmp = locations.basics[pivot_row];
+		auto tmp1 = locations.non_basics[pivot_col];
+
+		locations.basics[pivot_row] = tmp1;
+		locations.non_basics[pivot_col] = tmp;
+	}
+
 	std::optional<Solution> primal_solve(const Model& user_model)
 	{
 		// Follows the implementation in Chapter 4 p46. of "Linear Programming" 2014.
@@ -206,18 +253,10 @@ namespace jsolve::simplex
 		int iter = 1;
 		double obj = 0;
 
-		// Keep track of variables
-		struct Var
-		{
-			std::size_t index;
-			bool slack{ false };
-		};
-
-		std::map<std::size_t, Var> basics;
-		for (std::size_t i = 0; i < A.n_rows(); i++) { basics[i] = { i, true }; }
-
-		std::map<std::size_t, Var> non_basics;
-		for (std::size_t i = 0; i < A.n_cols(); i++) { non_basics[i] = { i, false }; }
+		// Keep track of variables so we can recover solutions at the end
+		Locations locations;
+		for (std::size_t i = 0; i < A.n_rows(); i++) { locations.basics[i] = { i, true }; }
+		for (std::size_t i = 0; i < A.n_cols(); i++) { locations.non_basics[i] = { i, false }; }
 
 		while (c.row_max().first(0, 0) > eps)
 		{
@@ -254,34 +293,7 @@ namespace jsolve::simplex
 
 			log()->debug("Pivot on element {} at {},{}", A(row_idx, col_idx), row_idx, col_idx);
 
-			auto Arow = A.slice({ row_idx }, {});
-			auto a = A(row_idx, col_idx);
-
-			// Pivot A
-			A = A - ((Acol * Arow) / a);
-			A.update(row_idx, {}, -1 * Arow / a);
-			A.update({}, col_idx, +1 * Acol / a);
-			A(row_idx, col_idx) = 1 / a;
-
-			// Pivot b
-			auto brow = b(row_idx, 0);
-			b = b - brow * Acol / a;
-			b(row_idx, 0) = -1.0 * brow / a;
-
-			// Pivot c
-			auto ccol = c(0, col_idx);
-			auto s = ccol * Arow / a;
-			c = c - ccol * Arow / a;
-			c(0, col_idx) = ccol / a;
-
-			// Update objective
-			obj = obj - ccol * brow / a;
-
-			// Update var location
-			auto tmp = basics[row_idx];
-			auto tmp1 = non_basics[col_idx];
-			basics[row_idx] = tmp1;
-			non_basics[col_idx] = tmp;
+			pivot(row_idx, col_idx, locations, obj, A, b, c);
 
 			iter++;
 			if (iter == max_iter)
@@ -304,7 +316,7 @@ namespace jsolve::simplex
 		Solution sol;
 		sol.objective = obj;
 
-		for (auto& [idx, var] : basics)
+		for (auto& [idx, var] : locations.basics)
 		{ 
 			if (!var.slack)
 			{
@@ -312,7 +324,7 @@ namespace jsolve::simplex
 			}
 		}
 
-		for (auto& [idx, var] : non_basics)
+		for (auto& [idx, var] : locations.non_basics)
 		{ 
 			if (!var.slack)
 			{
