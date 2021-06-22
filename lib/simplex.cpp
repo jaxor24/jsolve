@@ -273,7 +273,7 @@ namespace jsolve::simplex
 			log()->debug("Entering variable:");
 			log()->debug("Objective max coeff {} at col {}", c_max(0, 0), col_idx);
 			// Grab the corresponding A column
-			auto Acol = A.slice({}, { col_idx, col_idx });
+			auto Acol = A.slice({}, { col_idx });
 
 			// Select leaving variable
 			// Pick i such that: a[i,k]/b[i] is maximised
