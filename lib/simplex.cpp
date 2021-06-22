@@ -193,6 +193,7 @@ namespace jsolve::simplex
 	{
 		std::size_t index;
 		bool slack{ false };
+		bool dummy{ false };
 	};
 
 	struct Locations
@@ -236,6 +237,32 @@ namespace jsolve::simplex
 		locations.non_basics[pivot_col] = tmp;
 	}
 
+	Locations init_locations(const Mat& A, bool phase_1_dummy)
+	{
+		Locations locations;
+
+		// Initially, rows of A are the slack vars
+		for (std::size_t i = 0; i < A.n_rows(); i++)
+		{
+			locations.basics[i] = { i, true, false };
+		}
+
+		// Initially, cols of A are the user vars
+		for (std::size_t i = 0; i < A.n_cols(); i++)
+		{
+			locations.non_basics[i] = { i, false, false };
+		}
+		
+		// Assume phase 1 dummy
+		if (phase_1_dummy)
+		{
+			std::size_t idx = A.n_cols() - 1;
+			locations.non_basics[idx] = { idx, false, true };
+		}
+
+		return locations;
+	}
+
 	std::optional<Solution> primal_solve(const Model& user_model)
 	{
 		// Follows the implementation in Chapter 4 p46. of "Linear Programming" 2014.
@@ -252,6 +279,7 @@ namespace jsolve::simplex
 		Locations locations;
 		for (std::size_t i = 0; i < A.n_rows(); i++) { locations.basics[i] = { i, true }; }
 		for (std::size_t i = 0; i < A.n_cols(); i++) { locations.non_basics[i] = { i, false }; }
+		auto locations = init_locations(A, in_phase_1);
 
 		int max_iter = 20;
 		int iter = 1;
