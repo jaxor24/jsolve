@@ -276,9 +276,6 @@ namespace jsolve::simplex
 		auto b = model.b;
 		
 		// Keep track of variables so we can recover solutions at the end
-		Locations locations;
-		for (std::size_t i = 0; i < A.n_rows(); i++) { locations.basics[i] = { i, true }; }
-		for (std::size_t i = 0; i < A.n_cols(); i++) { locations.non_basics[i] = { i, false }; }
 		auto locations = init_locations(A, in_phase_1);
 
 		int max_iter = 20;
