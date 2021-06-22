@@ -247,16 +247,16 @@ namespace jsolve::simplex
 		auto c = model.c;
 		auto A = -1 * model.A;  // -1 to model rearrange for slack vars
 		auto b = model.b;
-		double eps = 1e-4;
-
-		int max_iter = 20;
-		int iter = 1;
-		double obj = 0;
-
+		
 		// Keep track of variables so we can recover solutions at the end
 		Locations locations;
 		for (std::size_t i = 0; i < A.n_rows(); i++) { locations.basics[i] = { i, true }; }
 		for (std::size_t i = 0; i < A.n_cols(); i++) { locations.non_basics[i] = { i, false }; }
+
+		int max_iter = 20;
+		int iter = 1;
+		double obj = 0;
+		double eps = 1e-4;
 
 		while (c.row_max().first(0, 0) > eps)
 		{
