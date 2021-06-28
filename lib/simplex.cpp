@@ -315,6 +315,27 @@ namespace jsolve::simplex
 		// Keep track of variables so we can recover solutions at the end
 		auto locations = init_locations(A, true);
 
+		double obj_phase_1 = 0;
+		double obj_phase_2 = 0;
+
+		// Do first pivot of phase 1 variable and most negative RHS row
+		if (in_phase_1)
+		{
+			auto [row_min, row_min_idx] = b.col_min();
+			auto col_idx = c_phase_1.n_cols() - 1;
+			pivot(
+				row_min_idx(0,0),
+				col_idx, 
+				locations, 
+				obj_phase_1, 
+				obj_phase_2, 
+				A, 
+				b, 
+				c_phase_1, 
+				c_phase_2
+			);
+		}
+
 		int max_iter = 20;
 		int iter = 1;
 		double obj = 0;
