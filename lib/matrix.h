@@ -212,6 +212,8 @@ public:
 
 private:
 	std::vector<T> m_data; // [row 1 | row 2 | ... | row n]
+	std::size_t m_n_rows{ 0 };
+	std::size_t m_n_cols{ 0 };
 
 	template <typename F>
 	void for_each_element(F f)
@@ -522,7 +524,7 @@ Matrix<T>::Matrix(std::size_t r, std::size_t c) : Matrix(r, c, T{ 0 })
 }
 
 template <typename T>
-Matrix<T>::Matrix(std::size_t r, std::size_t c, T initial)
+Matrix<T>::Matrix(std::size_t r, std::size_t c, T initial) : m_n_rows{ r }, m_n_cols{ c }
 {
 	if ((r == 0) || (c == 0))
 	{
@@ -567,13 +569,13 @@ T Matrix<T>::operator()(const std::size_t row, const std::size_t col) const
 template <typename T>
 std::size_t Matrix<T>::n_rows() const
 {
-	return m_data.size();
+	return m_n_rows;
 }
 
 template <typename T>
 std::size_t Matrix<T>::n_cols() const
 {
-	return m_data.front().size();
+	return m_n_cols;
 }
 
 template <typename T>
