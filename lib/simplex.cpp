@@ -10,6 +10,8 @@
 
 #include "logging.h"
 
+#include <algorithm>
+
 namespace jsolve
 {
 	using Mat = Matrix<double>;
@@ -381,25 +383,28 @@ namespace jsolve::simplex
 			);
 		}
 
+		// Pick the objective we need to use
+		auto& c = in_phase_1 ? c_phase_1 : c_phase_2;
+		
 		int max_iter = 20;
 		int iter = 1;
-		double obj = 0;
 		double eps = 1e-4;
 
-		while (c.row_max().first(0, 0) > eps)
+		auto entering_idx = get_entering_variable(c, in_phase_1, locations, eps);
+
+		while (entering_idx)
 		{
 			log()->debug("---------------------------------------");
 			log()->debug("Iteration: {}", iter);
-			//log()->info("c = {}", c);
-			//log()->info("A = {}", A);
-			//log()->info("b = {}", b);
+			log()->info("Phase 1 obj = {} {}", obj_phase_1, in_phase_1 ? "***" : "");
+			log()->info("Phase 2 obj = {} {}", obj_phase_2, in_phase_1 ? "" : "***");
+			log()->info("c = {}", c);
+			log()->info("A = {}", A);
+			log()->info("b = {}", b);
 
-			// Pick largest objective coefficient
-			auto [c_max, c_max_index] = c.row_max();
-
-			auto col_idx = c_max_index(0, 0);
+			auto col_idx = entering_idx.value();
 			log()->debug("Entering variable:");
-			log()->debug("Objective max coeff {} at col {}", c_max(0, 0), col_idx);
+			log()->debug("Objective max coeff {} at col {}", c(0, col_idx), col_idx);
 			// Grab the corresponding A column
 			auto Acol = A.slice({}, { col_idx });
 
@@ -421,7 +426,28 @@ namespace jsolve::simplex
 
 			log()->debug("Pivot on element {} at {},{}", A(row_idx, col_idx), row_idx, col_idx);
 
-			pivot(row_idx, col_idx, locations, obj, A, b, c);
+			pivot(
+				row_idx, 
+				col_idx, 
+				locations, 
+				obj_phase_1, 
+				obj_phase_2, 
+				A, 
+				b, 
+				c_phase_1, 
+				c_phase_2
+			);
+
+			// Update our loop vars
+			entering_idx = get_entering_variable(c, in_phase_1, locations, eps);
+
+			// Switch to phase 2 objective
+			if (in_phase_1 && !entering_idx)
+			{
+				in_phase_1 = false;
+				c = c_phase_2;
+				entering_idx = get_entering_variable(c, in_phase_1, locations, eps);
+			}
 
 			iter++;
 			if (iter == max_iter)
@@ -438,15 +464,15 @@ namespace jsolve::simplex
 		}
 
 		log()->debug("---------------------------------------");
-		log()->info("Optimal solution = {} ({} iterations)", obj, iter);
+		log()->info("Optimal solution = {} ({} iterations)", obj_phase_2, iter);
 
 		// Extract solution
 		Solution sol;
-		sol.objective = obj;
+		sol.objective = obj_phase_2;
 
 		for (auto& [idx, var] : locations.basics)
 		{ 
-			if (!var.slack)
+			if (!var.slack && !var.dummy)
 			{
 				sol.variables[user_model.get_variables().at(var.index)->name()] = b(idx, 0);
 			}
@@ -454,7 +480,7 @@ namespace jsolve::simplex
 
 		for (auto& [idx, var] : locations.non_basics)
 		{ 
-			if (!var.slack)
+			if (!var.slack && !var.dummy)
 			{
 				sol.variables[user_model.get_variables().at(var.index)->name()] = 0;
 			}
