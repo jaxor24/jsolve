@@ -301,7 +301,7 @@ namespace jsolve::simplex
 		}
 
 		// Keep track of variables so we can recover solutions at the end
-		auto locations = init_locations(A, in_phase_1);
+		auto locations = init_locations(A, true);
 
 		int max_iter = 20;
 		int iter = 1;
