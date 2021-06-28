@@ -271,8 +271,24 @@ namespace jsolve::simplex
 
 		auto model = to_standard_form(user_model);
 
-		auto c = model.c;
-		auto A = -1 * model.A;  // -1 to model rearrange for slack vars
+		// Assume we need both phase 1 and 2 objectives
+
+		// Add dummy variable as variable n + 1 (extra column on A and c)
+		// 
+		// Phase 1 objective is = max [ 0 | -1]
+		auto c_phase_1 = Mat{ model.c.n_rows(), model.c.n_cols() + 1, 0.0 };
+		c_phase_1(0, c_phase_1.n_cols() - 1) = -1;
+
+		// Phase 2 objective  = [ c | 0 ]
+		auto c_phase_2 = Mat{ model.c.n_rows(), model.c.n_cols() + 1, 0.0 };
+		c_phase_2.update({}, { 0, model.c.n_cols() - 1 }, model.c);
+
+		// Add dummy variable to all constraints
+		auto A_phase_1 = Mat{ model.A.n_rows(), model.A.n_cols() + 1, 0.0 };
+		A_phase_1.update({ 0, model.A.n_rows() - 1 }, { 0, model.A.n_cols() - 1 }, model.A);
+		A_phase_1.update({}, { model.A.n_cols() }, Mat{ model.A.n_rows(), 1, -1.0 });
+
+		auto A = -1 * A_phase_1;  // -1 to model rearranging for slack vars
 		auto b = model.b;
 		
 		// Keep track of variables so we can recover solutions at the end
