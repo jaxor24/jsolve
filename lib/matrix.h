@@ -536,12 +536,7 @@ Matrix<T>::Matrix(std::size_t r, std::size_t c, T initial) : m_n_rows{ r }, m_n_
 		throw MatrixError("Cannot construct matrix with negative row/col count");
 	}
 
-	m_data.resize(r);
-
-	for (auto& row : m_data)
-	{
-		row.resize(c, initial);
-	}
+	m_data.resize(r*c, initial);
 }
 
 template <typename T>
