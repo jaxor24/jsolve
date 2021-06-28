@@ -202,8 +202,11 @@ namespace jsolve::simplex
 		std::map<std::size_t, Var> non_basics;
 	};
 
-	void pivot(std::size_t pivot_row, std::size_t pivot_col, Locations& locations, double& obj, Mat& A, Mat& b, Mat& c)
+	void pivot(std::size_t pivot_row, std::size_t pivot_col, Locations& locations, double& obj_phase_1, double& obj_phase_2, Mat& A, Mat& b, Mat& c_phase_1, Mat& c_phase_2)
 	{
+		// We can optionally pivot on 2 objectives at the same time
+		// If a phase 1 objective is passed, the objective will be updated using it.
+		
 		// Extract rows and cols from A
 		auto Acol = A.slice({}, { pivot_col });
 		auto Arow = A.slice({ pivot_row }, {});
@@ -220,14 +223,23 @@ namespace jsolve::simplex
 		b = b - brow * Acol / a;
 		b(pivot_row, 0) = -1.0 * brow / a;
 
-		// Pivot c
-		auto ccol = c(0, pivot_col);
-		auto s = ccol * Arow / a;
-		c = c - ccol * Arow / a;
-		c(0, pivot_col) = ccol / a;
+		// Pivot phase 1 objective
+		{
+			auto ccol = c_phase_1(0, pivot_col);
+			auto s = ccol * Arow / a;
+			c_phase_1 = c_phase_1 - ccol * Arow / a;
+			c_phase_1(0, pivot_col) = ccol / a;
+			obj_phase_1 = obj_phase_1 - ccol * brow / a;
+		}
 
-		// Update objective
-		obj = obj - ccol * brow / a;
+		// Pivot phase 2 objective
+		{
+			auto ccol = c_phase_2(0, pivot_col);
+			auto s = ccol * Arow / a;
+			c_phase_2 = c_phase_2 - ccol * Arow / a;
+			c_phase_2(0, pivot_col) = ccol / a;
+			obj_phase_2 = obj_phase_2 - ccol * brow / a;
+		}
 
 		// Update var location
 		auto tmp = locations.basics[pivot_row];
