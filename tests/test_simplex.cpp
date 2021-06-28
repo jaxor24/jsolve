@@ -1,6 +1,7 @@
 #include "test_includes.h"
 
 #include "models.h"
+#include "tools.h"
 
 TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
 {
@@ -14,6 +15,17 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
         REQUIRE(solution.value().variables.at("x1") == 2.0);
         REQUIRE(solution.value().variables.at("x2") == 0.0);
         REQUIRE(solution.value().variables.at("x3") == 1.0);
+    }
+
+    SECTION("model 2")
+    {
+        auto model = models::make_model_2();
+        auto solution = jsolve::simplex::primal_solve(model);
+
+        REQUIRE(solution.has_value());
+        REQUIRE(approx_equal(solution.value().objective, -3.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x1"), 4.0 / 3.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x2"), 1.0 / 3.0));
     }
 
     SECTION("model 3")
