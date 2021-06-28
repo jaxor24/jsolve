@@ -290,7 +290,16 @@ namespace jsolve::simplex
 
 		auto A = -1 * A_phase_1;  // -1 to model rearranging for slack vars
 		auto b = model.b;
-		
+
+		bool in_phase_1 = false;
+
+		// Determine if phase 1 is needed
+		auto [b_mins, b_min_indices] = model.b.col_min();
+		if (b_mins(0, 0) < 0)
+		{
+			in_phase_1 = true;
+		}
+
 		// Keep track of variables so we can recover solutions at the end
 		auto locations = init_locations(A, in_phase_1);
 
