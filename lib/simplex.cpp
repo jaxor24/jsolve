@@ -275,6 +275,51 @@ namespace jsolve::simplex
 		return locations;
 	}
 
+	std::optional<std::size_t> get_entering_variable(Mat& c, bool in_phase_1, Locations& locations, double eps)
+	{
+		// Return the index in c of the entering variable.
+		
+		if (in_phase_1)
+		{
+			// In phase 1 we can pivot on any variable in c
+			auto [c_max, c_max_index] = c.row_max();
+			if (c_max(0, 0) > eps)
+			{
+				return c_max_index(0, 0);
+			}
+			else
+			{
+				return {};
+			}
+		}
+		else
+		{
+			// In phase 2 we can only pivot on the non-dummy variables
+			// TODO - Write Matrix::iterator then replace with enumerate or range() code
+			
+			std::size_t c_max_index{ 0 };
+			Mat::value_type c_max_value{ eps };
+
+			for (std::size_t curr_idx = 0; curr_idx < c.n_cols(); curr_idx++)
+			{
+				if (!locations.non_basics.at(curr_idx).dummy && (c(0, curr_idx) > c_max_value))
+				{
+					c_max_value = c(0, curr_idx);
+					c_max_index = curr_idx;
+				}
+			}
+
+			if (c_max_value > eps)
+			{
+				return c_max_index;
+			}
+			else
+			{
+				return {};
+			}
+		}
+	}
+
 	std::optional<Solution> primal_solve(const Model& user_model)
 	{
 		// Follows the implementation in Chapter 4 p46. of "Linear Programming" 2014.
