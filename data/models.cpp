@@ -48,7 +48,7 @@ namespace models
 	{
 		// Model from:
 		// p17. Linear Programming (2014) Vanderbei.
-		// Model has initial infeasible dictionary.
+		// Model has initial infeasible dictionary, requiring a 2 phase algorithm.
 
 		auto m = jsolve::Model(jsolve::Model::Sense::MAX, "Example");
 
