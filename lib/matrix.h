@@ -211,7 +211,7 @@ public:
 	}
 
 private:
-	std::vector<std::vector<T>> m_data; // vector of rows
+	std::vector<T> m_data; // [row 1 | row 2 | ... | row n]
 
 	template <typename F>
 	void for_each_element(F f)
