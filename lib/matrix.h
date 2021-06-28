@@ -218,24 +218,18 @@ private:
 	template <typename F>
 	void for_each_element(F f)
 	{
-		for (auto& row : m_data)
+		for (auto& elem : m_data)
 		{
-			for (auto& elem : row)
-			{
-				f(elem);
-			}
+			f(elem);
 		}
 	}
 
 	template <typename F>
 	void for_each_element(F f) const
 	{
-		for (const auto& row : m_data)
+		for (const auto& elem : m_data)
 		{
-			for (const auto& elem : row)
-			{
-				f(elem);
-			}
+			f(elem);
 		}
 	}
 };
