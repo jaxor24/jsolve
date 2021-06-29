@@ -64,6 +64,38 @@ public:
 
 	void update(Range rows, Range cols, Matrix values);
 
+	// Iterators -------------------------------------------------------------------------------
+	class Iterator
+	{
+	public:
+		using base_t = typename std::vector<T>::iterator;
+		using iterator_category = std::forward_iterator_tag;
+		using difference_type = std::ptrdiff_t;
+		using value_type = T;
+		using pointer = T*;
+		using reference = T&;
+
+		Iterator(base_t curr, base_t end, std::size_t cols) : m_curr{ curr }, m_end{ end }, m_n_cols{ cols } {}
+
+		reference operator*() const { return *m_curr; }
+		pointer operator->() { return m_curr; }
+
+		Iterator& operator++() { m_curr++; return *this; }
+		Iterator operator++(int) { const auto tmp = *this; ++(*this); return tmp; }
+
+		bool operator== (const Iterator& other) const { return m_curr == other.m_curr; }
+		bool operator!= (const Iterator& other) const { return !(*this == other); }
+
+	private:
+		base_t m_curr;
+		base_t m_end;
+		std::size_t m_n_cols;
+
+	};
+
+	Iterator begin() { return Iterator{ std::begin(m_data), std::end(m_data), n_cols() }; }
+	Iterator end() { return Iterator{ std::end(m_data), std::end(m_data), n_cols() }; }
+
 	// Operators -------------------------------------------------------------------------------
 	// Put-to
 	template <typename U>

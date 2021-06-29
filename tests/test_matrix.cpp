@@ -2184,7 +2184,6 @@ TEST_CASE("div_elem", "[matrix]")
     }
 }
 
-
 TEST_CASE("matrix::Range", "[matrix::Range]")
 {
     SECTION("Range()")
@@ -2376,5 +2375,72 @@ TEST_CASE("matrix::update", "[matrix]")
             Matr sub{ 10, 2, 0 };
             REQUIRE_THROWS_AS(m1.update({}, {}, sub), MatrixError);
         }
+    }
+}
+
+TEST_CASE("matrix::iterator", "[matrix::Iterator]")
+{
+    SECTION("1x1 matrix")
+    {
+        Matr m1{ 1, 1, 1.0 };
+
+        auto it = std::begin(m1);
+        REQUIRE(*it == 1.0);
+        it++;
+        REQUIRE(it == std::end(m1));
+    }
+
+    SECTION("2x2 matrix")
+    {
+        Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+        m1(0, 0) = 1;
+        m1(0, 1) = 2;
+        m1(1, 0) = 3;
+        m1(1, 1) = 4;
+
+        auto it = std::begin(m1);
+        REQUIRE(*it == 1);
+        it++;
+        REQUIRE(*it == 2);
+        it++;
+        REQUIRE(*it == 3);
+        it++;
+        REQUIRE(*it == 4);
+        it++;
+        REQUIRE(it == std::end(m1));
+    }
+
+    SECTION("1x3 vector")
+    {
+        Matr m1{ 1, 3 }; // [1 2 3]
+        m1(0, 0) = 1;
+        m1(0, 1) = 2;
+        m1(0, 2) = 3;
+
+        auto it = std::begin(m1);
+        REQUIRE(*it == 1);
+        it++;
+        REQUIRE(*it == 2);
+        it++;
+        REQUIRE(*it == 3);
+        it++;
+        REQUIRE(it == std::end(m1));
+    }
+
+    SECTION("3x1 vector")
+    {
+        Matr m1{ 3, 1 }; // [1;2;3]
+        m1(0, 0) = 1;
+        m1(1, 0) = 2;
+        m1(2, 0) = 3;
+
+        auto it = std::begin(m1);
+        REQUIRE(*it == 1);
+        it++;
+        REQUIRE(*it == 2);
+        it++;
+        REQUIRE(*it == 3);
+        it++;
+        REQUIRE(it == std::end(m1));
     }
 }
