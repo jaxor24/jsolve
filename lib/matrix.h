@@ -573,7 +573,7 @@ T& Matrix<T>::operator()(const std::size_t row, const std::size_t col)
 		throw MatrixError("Cannot access out of bounds");
 	}
 
-	return m_data[row][col];
+	return m_data[row * n_cols() + col];
 }
 
 template <typename T>
@@ -584,7 +584,7 @@ T Matrix<T>::operator()(const std::size_t row, const std::size_t col) const
 		throw MatrixError("Cannot access out of bounds");
 	}
 
-	return m_data[row][col];
+	return m_data[row * n_cols() + col];
 }
 
 template <typename T>
