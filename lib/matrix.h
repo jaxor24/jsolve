@@ -4,6 +4,7 @@
 #include "logging.h"
 
 #include <vector>
+#include <numeric>
 #include <optional>
 #include <iostream>
 #include <stdexcept>
