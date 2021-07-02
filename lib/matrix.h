@@ -86,6 +86,32 @@ public:
 		bool operator== (const Iterator& other) const { return m_curr == other.m_curr; }
 		bool operator!= (const Iterator& other) const { return !(*this == other); }
 
+		Iterator& next_row()
+		{
+			if (std::distance(m_curr, m_end) >= difference_type(m_n_cols))
+			{
+				std::advance(m_curr, m_n_cols);
+			}
+			else
+			{
+				m_curr = m_end;
+			}
+			return *this;
+		}
+
+		Iterator& next_col()
+		{
+			if ((std::distance(m_curr, m_end) - 1) % m_n_cols == 0)
+			{
+				m_curr = m_end;
+			}
+			else
+			{
+				++m_curr;
+			}
+			return *this;
+		}
+
 	private:
 		base_t m_curr;
 		base_t m_end;

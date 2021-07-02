@@ -2384,10 +2384,29 @@ TEST_CASE("matrix::iterator", "[matrix::Iterator]")
     {
         Matr m1{ 1, 1, 1.0 };
 
-        auto it = std::begin(m1);
-        REQUIRE(*it == 1.0);
-        it++;
-        REQUIRE(it == std::end(m1));
+        SECTION("++")
+        {
+            auto it = std::begin(m1);
+            REQUIRE(*it == 1.0);
+            it++;
+            REQUIRE(it == std::end(m1));
+        }
+
+        SECTION("next_row()")
+        {
+            auto it = std::begin(m1);
+            REQUIRE(*it == 1.0);
+            it.next_row();
+            REQUIRE(it == std::end(m1));
+        }
+
+        SECTION("next_col()")
+        {
+            auto it = std::begin(m1);
+            REQUIRE(*it == 1.0);
+            it.next_col();
+            REQUIRE(it == std::end(m1));
+        }
     }
 
     SECTION("2x2 matrix")
@@ -2398,16 +2417,39 @@ TEST_CASE("matrix::iterator", "[matrix::Iterator]")
         m1(1, 0) = 3;
         m1(1, 1) = 4;
 
-        auto it = std::begin(m1);
-        REQUIRE(*it == 1);
-        it++;
-        REQUIRE(*it == 2);
-        it++;
-        REQUIRE(*it == 3);
-        it++;
-        REQUIRE(*it == 4);
-        it++;
-        REQUIRE(it == std::end(m1));
+        SECTION("++")
+        {
+            auto it = std::begin(m1);
+            REQUIRE(*it == 1);
+            it++;
+            REQUIRE(*it == 2);
+            it++;
+            REQUIRE(*it == 3);
+            it++;
+            REQUIRE(*it == 4);
+            it++;
+            REQUIRE(it == std::end(m1));
+        }
+
+        SECTION("next_row()")
+        {
+            auto it = std::begin(m1);
+            REQUIRE(*it == 1);
+            it.next_row();
+            REQUIRE(*it == 3);
+            it.next_row();
+            REQUIRE(it == std::end(m1));
+        }
+
+        SECTION("next_col()")
+        {
+            auto it = std::begin(m1);
+            REQUIRE(*it == 1);
+            it.next_col();
+            REQUIRE(*it == 2);
+            it.next_col();
+            REQUIRE(it == std::end(m1));
+        }
     }
 
     SECTION("1x3 vector")
@@ -2417,14 +2459,37 @@ TEST_CASE("matrix::iterator", "[matrix::Iterator]")
         m1(0, 1) = 2;
         m1(0, 2) = 3;
 
-        auto it = std::begin(m1);
-        REQUIRE(*it == 1);
-        it++;
-        REQUIRE(*it == 2);
-        it++;
-        REQUIRE(*it == 3);
-        it++;
-        REQUIRE(it == std::end(m1));
+        SECTION("++")
+        {
+            auto it = std::begin(m1);
+            REQUIRE(*it == 1);
+            it++;
+            REQUIRE(*it == 2);
+            it++;
+            REQUIRE(*it == 3);
+            it++;
+            REQUIRE(it == std::end(m1));
+        }
+
+        SECTION("next_row()")
+        {
+            auto it = std::begin(m1);
+            REQUIRE(*it == 1);
+            it.next_row();
+            REQUIRE(it == std::end(m1));
+        }
+
+        SECTION("next_col()")
+        {
+            auto it = std::begin(m1);
+            REQUIRE(*it == 1);
+            it.next_col();
+            REQUIRE(*it == 2);
+            it.next_col();
+            REQUIRE(*it == 3);
+            it.next_col();
+            REQUIRE(it == std::end(m1));
+        }
     }
 
     SECTION("3x1 vector")
@@ -2434,13 +2499,36 @@ TEST_CASE("matrix::iterator", "[matrix::Iterator]")
         m1(1, 0) = 2;
         m1(2, 0) = 3;
 
-        auto it = std::begin(m1);
-        REQUIRE(*it == 1);
-        it++;
-        REQUIRE(*it == 2);
-        it++;
-        REQUIRE(*it == 3);
-        it++;
-        REQUIRE(it == std::end(m1));
+        SECTION("++")
+        {
+            auto it = std::begin(m1);
+            REQUIRE(*it == 1);
+            it++;
+            REQUIRE(*it == 2);
+            it++;
+            REQUIRE(*it == 3);
+            it++;
+            REQUIRE(it == std::end(m1));
+        }
+
+        SECTION("next_row()")
+        {
+            auto it = std::begin(m1);
+            REQUIRE(*it == 1);
+            it.next_row();
+            REQUIRE(*it == 2);
+            it.next_row();
+            REQUIRE(*it == 3);
+            it.next_row();
+            REQUIRE(it == std::end(m1));
+        }
+
+        SECTION("next_col()")
+        {
+            auto it = std::begin(m1);
+            REQUIRE(*it == 1);
+            it.next_col();
+            REQUIRE(it == std::end(m1));
+        }
     }
 }
