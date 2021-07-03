@@ -1,5 +1,6 @@
 #pragma once
 
+#include "matrix_error.h"
 #include "tools.h"
 #include "logging.h"
 
@@ -7,20 +8,6 @@
 #include <numeric>
 #include <optional>
 #include <iostream>
-#include <stdexcept>
-
-
-class MatrixError : public std::runtime_error
-{
-public:
-	template <typename... Args>
-	explicit MatrixError(Args&&... args) 
-		: 
-		std::runtime_error(fmt::format(std::forward<Args>(args)...)) 
-	{}
-	virtual ~MatrixError() throw () {}
-};
-
 template <typename T>
 class MatrixIterator
 {
