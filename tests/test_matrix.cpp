@@ -2001,7 +2001,7 @@ TEST_CASE("operator>", "[matrix]")
 
         SECTION("2x2 matrix")
         {
-            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            Matr m1{ 2, 2, 0.0 };  // [0.5 2; 1.5 2]
             m1(0, 0) = 0.5;
             m1(0, 1) = 1;
             m1(1, 0) = 1.5;
@@ -2449,6 +2449,19 @@ TEST_CASE("matrix::iterator", "[matrix::Iterator]")
             REQUIRE(*it == 2);
             it.next_col();
             REQUIRE(it == std::end(m1));
+        }
+
+        SECTION("next_row() + next_col()")
+        {
+            Matr::value_type curr = 1;
+            for (auto it_row = std::begin(m1); it_row != std::end(m1); it_row.next_row())
+            {
+                for (auto it_col = it_row; it_col != std::end(m1); it_col.next_col())
+                {
+                    REQUIRE(*it_col == curr);
+                    curr++;
+                }
+            }
         }
     }
 

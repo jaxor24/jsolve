@@ -25,14 +25,20 @@ template <typename T>
 class MatrixIterator
 {
 public:
-	using base_t = typename std::vector<T>::iterator;
-	using iterator_category = std::forward_iterator_tag;
-	using difference_type = std::ptrdiff_t;
 	using value_type = T;
+	using value_type_no_const = typename std::remove_const<value_type>::type;
 	using pointer = T*;
 	using reference = T&;
+	using iterator_category = std::forward_iterator_tag;
+	using difference_type = std::ptrdiff_t;
 
-	MatrixIterator(base_t curr, base_t end, std::size_t cols) : m_curr{ curr }, m_end{ end }, m_n_cols{ cols } {}
+	using base_iterator_t = typename std::conditional<
+		std::is_const<T>::value, 
+		typename std::vector<value_type_no_const>::const_iterator, 
+		typename std::vector<value_type_no_const>::iterator
+	>::type;
+
+	MatrixIterator(base_iterator_t curr, base_iterator_t end, std::size_t cols) : m_curr{ curr }, m_end{ end }, m_n_cols{ cols } {}
 
 	reference operator*() const { return *m_curr; }
 	pointer operator->() { return m_curr; }
@@ -70,10 +76,9 @@ public:
 	}
 
 private:
-	base_t m_curr;
-	base_t m_end;
+	base_iterator_t m_curr;
+	base_iterator_t m_end;
 	std::size_t m_n_cols;
-
 };
 
 
@@ -83,6 +88,7 @@ class Matrix
 public:
 	typedef T value_type;
 	typedef MatrixIterator<T> iterator_t;
+	typedef MatrixIterator<const T> const_iterator_t;
 
 	class Range
 	{
@@ -126,9 +132,8 @@ public:
 	iterator_t begin() { return { std::begin(m_data), std::end(m_data), n_cols() }; }
 	iterator_t end() { return { std::end(m_data), std::end(m_data), n_cols() }; }
 
-
-	Iterator begin() { return Iterator{ std::begin(m_data), std::end(m_data), n_cols() }; }
-	Iterator end() { return Iterator{ std::end(m_data), std::end(m_data), n_cols() }; }
+	const_iterator_t cbegin() const { return { std::begin(m_data), std::end(m_data), n_cols() }; }
+	const_iterator_t cend() const { return { std::end(m_data), std::end(m_data), n_cols() }; }
 
 	// Operators -------------------------------------------------------------------------------
 	// Put-to
