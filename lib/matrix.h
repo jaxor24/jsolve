@@ -658,17 +658,7 @@ T Matrix<T>::min() const
 template <typename T>
 T Matrix<T>::sum() const
 {
-	std::optional<T> result;
-
-	for (const auto& [n_row, row] : enumerate(m_data))
-	{
-		for (const auto& [n_col, elem] : enumerate(row))
-		{
-			result = result.has_value() ? result.value() += elem : elem;
-		}
-	}
-
-	return result.value();
+	return std::accumulate(std::begin(m_data), std::end(m_data), T{ 0 });
 }
 
 template <typename T>
