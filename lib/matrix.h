@@ -82,7 +82,7 @@ class Matrix
 {
 public:
 	typedef T value_type;
-	typedef MatrixIterator<T> iterator_type;
+	typedef MatrixIterator<T> iterator_t;
 
 	class Range
 	{
@@ -123,8 +123,8 @@ public:
 	void update(Range rows, Range cols, Matrix values);
 
 	// Iterators
-	iterator_type begin() { return iterator_type{ std::begin(m_data), std::end(m_data), n_cols() }; }
-	iterator_type end() { return iterator_type{ std::end(m_data), std::end(m_data), n_cols() }; }
+	iterator_t begin() { return { std::begin(m_data), std::end(m_data), n_cols() }; }
+	iterator_t end() { return { std::end(m_data), std::end(m_data), n_cols() }; }
 
 
 	Iterator begin() { return Iterator{ std::begin(m_data), std::end(m_data), n_cols() }; }
