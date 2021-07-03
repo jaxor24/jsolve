@@ -22,6 +22,62 @@ public:
 };
 
 template <typename T>
+class MatrixIterator
+{
+public:
+	using base_t = typename std::vector<T>::iterator;
+	using iterator_category = std::forward_iterator_tag;
+	using difference_type = std::ptrdiff_t;
+	using value_type = T;
+	using pointer = T*;
+	using reference = T&;
+
+	MatrixIterator(base_t curr, base_t end, std::size_t cols) : m_curr{ curr }, m_end{ end }, m_n_cols{ cols } {}
+
+	reference operator*() const { return *m_curr; }
+	pointer operator->() { return m_curr; }
+
+	MatrixIterator& operator++() { m_curr++; return *this; }
+	MatrixIterator operator++(int) { const auto tmp = *this; ++(*this); return tmp; }
+
+	bool operator== (const MatrixIterator& other) const { return m_curr == other.m_curr; }
+	bool operator!= (const MatrixIterator& other) const { return !(*this == other); }
+
+	MatrixIterator& next_row()
+	{
+		if (std::distance(m_curr, m_end) >= difference_type(m_n_cols))
+		{
+			std::advance(m_curr, m_n_cols);
+		}
+		else
+		{
+			m_curr = m_end;
+		}
+		return *this;
+	}
+
+	MatrixIterator& next_col()
+	{
+		if ((std::distance(m_curr, m_end) - 1) % m_n_cols == 0)
+		{
+			m_curr = m_end;
+		}
+		else
+		{
+			++m_curr;
+		}
+		return *this;
+	}
+
+private:
+	base_t m_curr;
+	base_t m_end;
+	std::size_t m_n_cols;
+
+};
+
+
+template <typename T>
 class Matrix
 {
 public:
@@ -65,60 +121,7 @@ public:
 
 	void update(Range rows, Range cols, Matrix values);
 
-	// Iterators -------------------------------------------------------------------------------
-	class Iterator
-	{
-	public:
-		using base_t = typename std::vector<T>::iterator;
-		using iterator_category = std::forward_iterator_tag;
-		using difference_type = std::ptrdiff_t;
-		using value_type = T;
-		using pointer = T*;
-		using reference = T&;
 
-		Iterator(base_t curr, base_t end, std::size_t cols) : m_curr{ curr }, m_end{ end }, m_n_cols{ cols } {}
-
-		reference operator*() const { return *m_curr; }
-		pointer operator->() { return m_curr; }
-
-		Iterator& operator++() { m_curr++; return *this; }
-		Iterator operator++(int) { const auto tmp = *this; ++(*this); return tmp; }
-
-		bool operator== (const Iterator& other) const { return m_curr == other.m_curr; }
-		bool operator!= (const Iterator& other) const { return !(*this == other); }
-
-		Iterator& next_row()
-		{
-			if (std::distance(m_curr, m_end) >= difference_type(m_n_cols))
-			{
-				std::advance(m_curr, m_n_cols);
-			}
-			else
-			{
-				m_curr = m_end;
-			}
-			return *this;
-		}
-
-		Iterator& next_col()
-		{
-			if ((std::distance(m_curr, m_end) - 1) % m_n_cols == 0)
-			{
-				m_curr = m_end;
-			}
-			else
-			{
-				++m_curr;
-			}
-			return *this;
-		}
-
-	private:
-		base_t m_curr;
-		base_t m_end;
-		std::size_t m_n_cols;
-
-	};
 
 	Iterator begin() { return Iterator{ std::begin(m_data), std::end(m_data), n_cols() }; }
 	Iterator end() { return Iterator{ std::end(m_data), std::end(m_data), n_cols() }; }
