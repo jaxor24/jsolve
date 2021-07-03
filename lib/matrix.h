@@ -49,6 +49,11 @@ public:
 	const_iterator_t cend() const { return { std::end(m_data), std::end(m_data), n_cols() }; }
 
 	// Operators -------------------------------------------------------------------------------
+	
+	// Access
+	T& operator()(const std::size_t row, const std::size_t col);
+	T operator()(const std::size_t row, const std::size_t col) const;
+	
 	// Put-to
 	template <typename U>
 	friend std::ostream& operator<<(std::ostream& os, const Matrix<U>& m);
@@ -58,10 +63,6 @@ public:
 	friend bool operator==(const Matrix<U>& lhs, const Matrix<U>& rhs);
 	template <typename U>
 	friend bool operator!=(const Matrix<U>& lhs, const Matrix<U>& rhs);
-
-	// Access
-	T& operator()(const std::size_t row, const std::size_t col);
-	T operator()(const std::size_t row, const std::size_t col) const;
 
 	// Unary
 	Matrix& operator++()
