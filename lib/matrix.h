@@ -1,6 +1,7 @@
 #pragma once
 
 #include "matrix_error.h"
+#include "matrix_range.h"
 #include "matrix_iterator.h"
 
 #include "tools.h"
@@ -18,23 +19,6 @@ public:
 	typedef T value_type;
 	typedef MatrixIterator<T> iterator_t;
 	typedef MatrixIterator<const T> const_iterator_t;
-
-	class Range
-	{
-	public:
-		Range() = default;
-		Range(std::size_t value);
-		Range(std::size_t start, std::size_t end);
-
-		std::size_t start() const;
-		std::size_t end() const;
-		std::size_t size() const;
-
-		operator bool() const;
-
-	private:
-		std::optional<std::pair<std::size_t, std::size_t>> m_data;
-	};
 
 	explicit Matrix(std::size_t r, std::size_t c);
 	explicit Matrix(std::size_t r, std::size_t c, T initial);
@@ -233,68 +217,6 @@ private:
 		}
 	}
 };
-
-// Matrix::Range
-template <typename T>
-Matrix<T>::Range::Range(std::size_t start, std::size_t end) 
-	: 
-	m_data{ { start, end } }
-{
-	if (start > end)	
-	{ 
-		throw MatrixError{ "Invalid range: start > end" };
-	}
-}
-template <typename T>
-Matrix<T>::Range::Range(std::size_t value) : Range(value, value) 
-{
-}
-
-template <typename T>
-std::size_t Matrix<T>::Range::start() const
-{
-	if (!m_data)
-	{
-		throw MatrixError{ "Invalid range: Empty" };
-	}
-	else
-	{
-		return m_data.value().first;
-	}
-}
-
-template <typename T>
-std::size_t Matrix<T>::Range::end() const
-{
-	if (!m_data)
-	{
-		throw MatrixError{ "Invalid range: Empty" };
-	}
-	else
-	{
-		return m_data.value().second;
-	}
-}
-
-template <typename T>
-std::size_t Matrix<T>::Range::size() const
-{
-	if (!m_data)
-	{
-		return 0;
-	}
-	else
-	{
-		// Range from 4 to 5 includes rows 4 and 5, hence size + 1
-		return m_data.value().second - m_data.value().first + 1;
-	}
-}
-
-template <typename T>
-Matrix<T>::Range::operator bool() const 
-{ 
-	return m_data.has_value(); 
-}
 
 // Free functions - operators
 // Operator+

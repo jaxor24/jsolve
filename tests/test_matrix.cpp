@@ -2188,7 +2188,7 @@ TEST_CASE("matrix::Range", "[matrix::Range]")
 {
     SECTION("Range()")
     {
-        Matr::Range r{};
+        Range r{};
         REQUIRE(!r);
         REQUIRE(r.size() == 0);
         REQUIRE_THROWS_AS(r.start(), MatrixError);
@@ -2199,7 +2199,7 @@ TEST_CASE("matrix::Range", "[matrix::Range]")
     {
         SECTION("valid")
         {
-            Matr::Range r{ 1 };
+            Range r{ 1 };
             REQUIRE(r);
             REQUIRE(r.size() == 1);
             REQUIRE(r.start() == 1);
@@ -2219,7 +2219,7 @@ TEST_CASE("matrix::Range", "[matrix::Range]")
         {
             SECTION("same start/end")
             {
-                Matr::Range r{ 0, 0 };
+                Range r{ 0, 0 };
                 REQUIRE(r);
                 REQUIRE(r.size() == 1);
                 REQUIRE(r.start() == 0);
@@ -2228,7 +2228,7 @@ TEST_CASE("matrix::Range", "[matrix::Range]")
 
             SECTION("different start/end")
             {
-                Matr::Range r{ 2, 5 };
+                Range r{ 2, 5 };
                 REQUIRE(r);
                 REQUIRE(r.size() == 4);
                 REQUIRE(r.start() == 2);
