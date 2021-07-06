@@ -414,22 +414,26 @@ Matrix<U> div_elem(const Matrix<U>& lhs, const Matrix<U>& rhs)
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 {
-	auto log_row = [&os](const auto& row)
+	os << "[";
+	for (const auto& [n_elem, elem]: enumerate(m.m_data))
 	{
-		os << "[";
-		for (const auto& elem : row)
+		os << elem;
+
+		if (n_elem + 1 != m.m_data.size())
 		{
-			os << elem << ",";
+			if ((n_elem + 1) % m.n_cols() == 0)
+			{
+				os << ";";
+			}
+			else
+			{
+				os << ",";
+			}
 		}
-		os << "]" << '\n';
-	};
-
-	os << '\n';
-
-	for (const auto& row : m.m_data)
-	{
-		log_row(row);
 	}
+
+	os << "]" << '\n';
+	os << '\n';
 
 	return os;
 }
