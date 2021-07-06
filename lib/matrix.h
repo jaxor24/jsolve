@@ -17,8 +17,11 @@ class Matrix
 {
 public:
 	typedef T value_type;
-	typedef MatrixIterator<T> iterator_t;
-	typedef MatrixIterator<const T> const_iterator_t;
+	typedef MatrixIterator<T> matrix_iterator;
+	typedef MatrixIterator<const T> const_matrix_iterator;
+
+	typedef RowIterator<T> row_iterator;
+	typedef ColIterator<T> col_iterator;
 
 	explicit Matrix(std::size_t r, std::size_t c);
 	explicit Matrix(std::size_t r, std::size_t c, T initial);
@@ -42,11 +45,42 @@ public:
 	void update(Range rows, Range cols, Matrix values);
 
 	// Iterators
-	iterator_t begin() { return { std::begin(m_data), std::end(m_data), n_cols() }; }
-	iterator_t end() { return { std::end(m_data), std::end(m_data), n_cols() }; }
+	matrix_iterator begin() { return { std::begin(m_data), std::end(m_data), n_cols() }; }
+	matrix_iterator end() { return { std::end(m_data), std::end(m_data), n_cols() }; }
 
-	const_iterator_t cbegin() const { return { std::begin(m_data), std::end(m_data), n_cols() }; }
-	const_iterator_t cend() const { return { std::end(m_data), std::end(m_data), n_cols() }; }
+	const_matrix_iterator cbegin() const { return { std::begin(m_data), std::end(m_data), n_cols() }; }
+	const_matrix_iterator cend() const { return { std::end(m_data), std::end(m_data), n_cols() }; }
+
+	auto enumerate_rows(std::size_t col = 0)
+	{
+		auto start = row_iterator{ std::begin(m_data), std::end(m_data), n_cols() };
+		for (std::size_t i = 0; i < col; ++i) { start.next_col(); };
+		auto end = row_iterator{ std::end(m_data), std::end(m_data), n_cols() };
+		return IterableWrapper<row_iterator>{ start, end };
+	}
+
+	auto enumerate_cols(std::size_t row = 0)
+	{
+		auto start = col_iterator{ std::begin(m_data), std::end(m_data), n_cols() };
+		for (std::size_t i = 0; i < row; ++i) { start.next_row(); };
+		auto end = col_iterator{ std::end(m_data), std::end(m_data), n_cols() };
+		return IterableWrapper<col_iterator>{ start, end };
+	}
+
+	void foo()
+	{
+		log()->info(*this);
+
+		for (auto [n_row, row_element] : enumerate_rows())
+		{
+			for (auto [n_col, col_element] : enumerate_cols(n_row))
+			{
+				log()->info("({},{}) = {}", n_row, n_col, col_element);
+			}
+		}
+
+	}
+
 
 	// Operators -------------------------------------------------------------------------------
 	
