@@ -12,11 +12,11 @@ public:
 	using iterator_category = std::forward_iterator_tag;
 	using difference_type = std::ptrdiff_t;
 
-	using base_iterator_t = typename std::conditional<
+	using base_iterator_t = typename std::conditional_t<
 		std::is_const<T>::value,
 		typename std::vector<value_type_no_const>::const_iterator,
 		typename std::vector<value_type_no_const>::iterator
-	>::type;
+	>;
 
 	MatrixIterator(base_iterator_t curr, base_iterator_t end, std::size_t cols) 
 		: 
