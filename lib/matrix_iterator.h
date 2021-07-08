@@ -1,7 +1,7 @@
 #include <vector>
 
 
-template <typename T>
+template <typename Increment, typename T>
 class MatrixIterator
 {
 public:
@@ -28,7 +28,12 @@ public:
 	reference operator*() const { return *m_curr; }
 	pointer operator->() { return m_curr; }
 
-	MatrixIterator& operator++() { m_curr++; return *this; }
+	MatrixIterator& operator++()
+	{ 
+		static_cast<Increment*>(this)->increment();
+		return *this;
+	}
+
 	MatrixIterator operator++(int) { const auto tmp = *this; ++(*this); return tmp; }
 
 	bool operator== (const MatrixIterator& other) const { return m_curr == other.m_curr; }
@@ -46,7 +51,6 @@ public:
 		}
 		return *this;
 	}
-
 	MatrixIterator& next_col()
 	{
 		if ((std::distance(m_curr, m_end) - 1) % m_n_cols == 0)
@@ -60,160 +64,47 @@ public:
 		return *this;
 	}
 
-private:
+protected:
 	base_iterator_t m_curr;
 	base_iterator_t m_end;
 	std::size_t m_n_cols;
+
 };
 
 template <typename T>
-class RowIterator
+class AllIterator : public MatrixIterator<AllIterator<T>, T>
 {
+	// Alias needed to avoid name-hiding:
+	// https://www.reddit.com/r/cpp_questions/comments/5vtoej/overloading_parents_template_function_in_child/
+
+	using MatrixIterator<AllIterator<T>, T>::MatrixIterator;
 public:
-	using value_type = T;
-	using value_type_no_const = typename std::remove_const<value_type>::type;
-	using pointer = T*;
-	using reference = T&;
-	using iterator_category = std::forward_iterator_tag;
-	using difference_type = std::ptrdiff_t;
-
-	using base_iterator_t = typename std::conditional<
-		std::is_const<T>::value,
-		typename std::vector<value_type_no_const>::const_iterator,
-		typename std::vector<value_type_no_const>::iterator
-	>::type;
-
-	RowIterator(base_iterator_t curr, base_iterator_t end, std::size_t cols)
-		:
-		m_curr{ curr },
-		m_end{ end },
-		m_n_cols{ cols }
-	{}
-
-	reference operator*() const { return *m_curr; }
-	pointer operator->() { return m_curr; }
-
-	RowIterator& operator++()
-	{ 
-		next_row(); 
-		return *this; 
-	}
-
-	RowIterator operator++(int)
-	{ 
-		const auto tmp = *this; 
-		++(*this); 
-		return tmp; 
-	}
-
-	bool operator== (const RowIterator& other) const { return m_curr == other.m_curr; }
-	bool operator!= (const RowIterator& other) const { return !(*this == other); }
-
-	RowIterator& next_row()
+	void increment()
 	{
-		if (std::distance(m_curr, m_end) >= difference_type(m_n_cols))
-		{
-			std::advance(m_curr, m_n_cols);
-		}
-		else
-		{
-			m_curr = m_end;
-		}
-		return *this;
+		this->m_curr++;
 	}
-
-	RowIterator& next_col()
-	{
-		if ((std::distance(m_curr, m_end) - 1) % m_n_cols == 0)
-		{
-			m_curr = m_end;
-		}
-		else
-		{
-			++m_curr;
-		}
-		return *this;
-	}
-
-private:
-	base_iterator_t m_curr;
-	base_iterator_t m_end;
-	std::size_t m_n_cols;
 };
 
 template <typename T>
-class ColIterator
+class RowIterator : public MatrixIterator<RowIterator<T>, T>
 {
+	using MatrixIterator<RowIterator<T>, T>::MatrixIterator;
 public:
-	using value_type = T;
-	using value_type_no_const = typename std::remove_const<value_type>::type;
-	using pointer = T*;
-	using reference = T&;
-	using iterator_category = std::forward_iterator_tag;
-	using difference_type = std::ptrdiff_t;
-
-	using base_iterator_t = typename std::conditional<
-		std::is_const<T>::value,
-		typename std::vector<value_type_no_const>::const_iterator,
-		typename std::vector<value_type_no_const>::iterator
-	>::type;
-
-	ColIterator(base_iterator_t curr, base_iterator_t end, std::size_t cols)
-		:
-		m_curr{ curr },
-		m_end{ end },
-		m_n_cols{ cols }
-	{}
-
-	reference operator*() const { return *m_curr; }
-	pointer operator->() { return m_curr; }
-
-	ColIterator& operator++()
+	void increment()
 	{
-		next_col();
-		return *this;
+		this->next_row();
 	}
+};
 
-	ColIterator operator++(int)
+template <typename T>
+class ColIterator : public MatrixIterator<ColIterator<T>, T>
+{
+	using MatrixIterator<ColIterator<T>, T>::MatrixIterator;
+public:
+	void increment()
 	{
-		const auto tmp = *this;
-		++(*this);
-		return tmp;
+		this->next_col();
 	}
-
-	bool operator== (const ColIterator& other) const { return m_curr == other.m_curr; }
-	bool operator!= (const ColIterator& other) const { return !(*this == other); }
-
-	ColIterator& next_row()
-	{
-		if (std::distance(m_curr, m_end) >= difference_type(m_n_cols))
-		{
-			std::advance(m_curr, m_n_cols);
-		}
-		else
-		{
-			m_curr = m_end;
-		}
-		return *this;
-	}
-
-	ColIterator& next_col()
-	{
-		if ((std::distance(m_curr, m_end) - 1) % m_n_cols == 0)
-		{
-			m_curr = m_end;
-		}
-		else
-		{
-			++m_curr;
-		}
-		return *this;
-	}
-
-private:
-	base_iterator_t m_curr;
-	base_iterator_t m_end;
-	std::size_t m_n_cols;
 };
 
 template <typename It>
