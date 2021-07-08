@@ -17,8 +17,8 @@ class Matrix
 {
 public:
 	typedef T value_type;
-	typedef MatrixIterator<T> matrix_iterator;
-	typedef MatrixIterator<const T> const_matrix_iterator;
+	typedef AllIterator<T> matrix_iterator;
+	typedef AllIterator<const T> const_matrix_iterator;
 
 	typedef RowIterator<T> row_iterator;
 	typedef ColIterator<T> col_iterator;
