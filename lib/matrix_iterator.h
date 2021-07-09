@@ -110,29 +110,24 @@ public:
 template <typename It>
 struct IterableWrapper
 {
-	// Provide an iterable object.
-
-	struct Enumerator
-	{
-		// Wrap an interator and a counter.
-		std::size_t m_counter;
-		It m_iterator;
-
-		bool operator!=(const Enumerator& other) const { return m_iterator != other.m_iterator; }
-		void operator++() { ++m_counter; ++m_iterator; }
-		auto operator*() const { return std::tie(m_counter, *m_iterator); }
-	};
-
 	It m_begin;
 	It m_end;
 
-	auto begin()
-	{
-		return Enumerator{ 0, m_begin };
-	}
+	auto begin() { return m_begin; }
+	auto end() { return m_end; }
+};
 
-	auto end()
-	{
-		return Enumerator{ 0, m_end };
-	}
+template <typename It>
+class Enumerator
+{
+public:
+	Enumerator(It iterator) : m_iterator{ std::move(iterator) } {}
+
+	bool operator!=(const Enumerator& other) const { return m_iterator != other.m_iterator; }
+	void operator++() { ++m_counter; ++m_iterator; }
+	auto operator*() const { return std::tie(m_counter, *m_iterator); }
+
+private:
+	std::size_t m_counter{ 0 };
+	It m_iterator;
 };
