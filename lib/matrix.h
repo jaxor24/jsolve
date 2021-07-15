@@ -463,12 +463,16 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 
 // Matrix:: member functions
 template <typename T>
-Matrix<T>::Matrix(std::size_t r, std::size_t c) : Matrix(r, c, T{ 0 })
-{
-}
+Matrix<T>::Matrix(std::size_t r, std::size_t c) 
+	: 
+	Matrix(r, c, T{ 0 })
+{}
 
 template <typename T>
-Matrix<T>::Matrix(std::size_t r, std::size_t c, T initial) : m_n_rows{ r }, m_n_cols{ c }
+Matrix<T>::Matrix(std::size_t r, std::size_t c, T initial) 
+	: 
+	m_n_rows{ r }, 
+	m_n_cols{ c }
 {
 	if ((r == 0) || (c == 0))
 	{
