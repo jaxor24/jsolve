@@ -71,23 +71,6 @@ public:
 		return IterableWrapper<ColEnumerator<const_matrix_iterator>>{ cbegin(), cend() };
 	}
 
-	void foo()
-	{
-		log()->info(*this);
-
-		for (auto [n_row, row_element] : enumerate_rows())
-		{
-			auto curr_row = row(n_row);
-
-			auto it = std::max_element(std::begin(curr_row), std::end(curr_row));
-
-			log()->info("Row {} max = {}", n_row, *it);
-
-		}
-
-	}
-
-
 	// Operators -------------------------------------------------------------------------------
 	
 	// Access
