@@ -1,5 +1,7 @@
 #include <vector>
 
+template <typename It>
+struct IteratorConverter;
 
 template <typename Increment, typename T>
 class MatrixIterator
@@ -34,10 +36,22 @@ public:
 		return *this;
 	}
 
-	MatrixIterator operator++(int) { const auto tmp = *this; ++(*this); return tmp; }
+	MatrixIterator operator++(int) 
+	{ 
+		const auto tmp = *this; 
+		++(*this); 
+		return tmp; 
+	}
 
-	bool operator== (const MatrixIterator& other) const { return m_curr == other.m_curr; }
-	bool operator!= (const MatrixIterator& other) const { return !(*this == other); }
+	bool operator==(const MatrixIterator& other) const
+	{ 
+		return m_curr == other.m_curr; 
+	}
+
+	bool operator!=(const MatrixIterator& other) const 
+	{ 
+		return !(*this == other); 
+	}
 
 	MatrixIterator& next_row()
 	{
@@ -51,6 +65,7 @@ public:
 		}
 		return *this;
 	}
+
 	MatrixIterator& next_col()
 	{
 		if ((std::distance(m_curr, m_end) - 1) % m_n_cols == 0)
@@ -64,10 +79,14 @@ public:
 		return *this;
 	}
 
+
 protected:
 	base_iterator_t m_curr;
 	base_iterator_t m_end;
 	std::size_t m_n_cols;
+
+	template<typename Input, typename Output>
+	friend Output make_iterator(const Input& it, bool move_to_end);
 
 };
 
@@ -107,6 +126,12 @@ public:
 	}
 };
 
+template<typename Input, typename Output>
+Output make_iterator(const Input& it, bool move_to_end = false)
+{
+	return Output{ move_to_end ? it.m_end : it.m_curr, it.m_end, it.m_n_cols };
+}
+
 template <typename It>
 struct IterableWrapper
 {
@@ -121,11 +146,100 @@ template <typename It>
 class Enumerator
 {
 public:
-	Enumerator(It iterator) : m_iterator{ std::move(iterator) } {}
+	Enumerator(It iterator) 
+		: 
+		m_iterator{ std::move(iterator) } 
+	{}
 
-	bool operator!=(const Enumerator& other) const { return m_iterator != other.m_iterator; }
-	void operator++() { ++m_counter; ++m_iterator; }
-	auto operator*() const { return std::tie(m_counter, *m_iterator); }
+	bool operator!=(const Enumerator& other) const
+	{ 
+		return m_iterator != other.m_iterator; 
+	}
+
+	void operator++() 
+	{
+		++m_counter; 
+		++m_iterator; 
+	}
+
+	auto operator*() const 
+	{ 
+		return std::tie(m_counter, *m_iterator); 
+	}
+
+private:
+	std::size_t m_counter{ 0 };
+	It m_iterator;
+};
+
+template <typename It>
+class RowEnumerator
+{
+public:
+	RowEnumerator(It iterator) 
+		: 
+		m_iterator{ std::move(iterator) } 
+	{}
+
+	bool operator!=(const RowEnumerator& other) const 
+	{ 
+		return m_iterator != other.m_iterator;
+	}
+
+	void operator++() 
+	{ 
+		++m_counter; 
+		m_iterator.next_row(); 
+	}
+
+	auto operator*() const 
+	{ 
+		using col_iterator_t = ColIterator<typename It::value_type>;
+		return std::make_tuple(
+			m_counter, 
+			IterableWrapper<col_iterator_t>{ 
+				make_iterator<It, col_iterator_t>(m_iterator), 
+				make_iterator<It, col_iterator_t>(m_iterator, true) 
+			}
+		);
+	}
+
+private:
+	std::size_t m_counter{ 0 };
+	It m_iterator;
+};
+
+template <typename It>
+class ColEnumerator
+{
+public:
+	ColEnumerator(It iterator)
+		:
+		m_iterator{ std::move(iterator) }
+	{}
+
+	bool operator!=(const ColEnumerator& other) const
+	{
+		return m_iterator != other.m_iterator;
+	}
+
+	void operator++()
+	{
+		++m_counter;
+		m_iterator.next_col();
+	}
+
+	auto operator*() const
+	{
+		using row_iterator_t = RowIterator<typename It::value_type>;
+		return std::make_tuple(
+			m_counter,
+			IterableWrapper<row_iterator_t>{
+				make_iterator<It, row_iterator_t>(m_iterator),
+				make_iterator<It, row_iterator_t>(m_iterator, true)
+			}
+		);
+	}
 
 private:
 	std::size_t m_counter{ 0 };
