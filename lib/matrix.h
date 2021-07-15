@@ -594,16 +594,11 @@ std::pair<Matrix<T>, Matrix<std::size_t>> Matrix<T>::col_min() const
 	Matrix<T> values{ 1, n_cols(), std::numeric_limits<T>::max() };
 	Matrix<std::size_t> indices{ 1, n_cols(), 0 };
 
-	for (const auto& [n_row, row] : enumerate(m_data))
+	for (auto [n_col, col] : enumerate_cols())
 	{
-		for (const auto& [n_col, elem] : enumerate(row))
-		{
-			if (elem < values(0, n_col))
-			{
-				values(0, n_col) = elem;
-				indices(0, n_col) = n_row;
-			}
-		}
+		auto it = std::min_element(std::begin(col), std::end(col));
+		values(0, n_col) = *it;
+		indices(0, n_col) = std::distance(std::begin(col), it);
 	}
 
 	return { values, indices };
