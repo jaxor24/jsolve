@@ -608,9 +608,9 @@ Matrix<T> Matrix<T>::make_transpose() const
 {
 	Matrix result{ n_cols(), n_rows()};
 
-	for (const auto& [n_row, row] : enumerate(m_data))
+	for (auto [n_row, row] : enumerate_rows())
 	{
-		for (const auto& [n_col, elem] : enumerate(row))
+		for (auto [n_col, elem] : enumerate(row))
 		{
 			result(n_col, n_row) = elem;
 		}
