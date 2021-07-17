@@ -666,12 +666,12 @@ void Matrix<T>::update(Range rows, Range cols, Matrix sub)
 
 	// Update matrix with sub matrix
 	std::size_t result_row{ 0 };
-	for (const auto& [n_row, row] : enumerate(m_data))
+	for (auto [n_row, row] : enumerate_rows())
 	{
 		if (!rows || ((n_row >= rows.start()) && (n_row <= rows.end())))
 		{
 			std::size_t result_col{ 0 };
-			for (const auto& [n_col, elem] : enumerate(row))
+			for (auto [n_col, elem] : enumerate(row))
 			{
 				if (!cols || ((n_col >= cols.start()) && (n_col <= cols.end())))
 				{
