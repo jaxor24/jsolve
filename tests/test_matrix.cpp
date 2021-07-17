@@ -376,7 +376,7 @@ TEST_CASE("matrix::row_max", "[matrix]")
 }
 
 
-TEST_CASE("matrix::col_min, matrix::col_max", "[matrix]")
+TEST_CASE("matrix::col_min", "[matrix]")
 {
     SECTION("1x1 matrix")
     {
@@ -386,18 +386,6 @@ TEST_CASE("matrix::col_min, matrix::col_max", "[matrix]")
         SECTION("col_min")
         {
             auto [result, indices] = m.col_min();
-            REQUIRE(result.n_cols() == 1);
-            REQUIRE(result.n_rows() == 1);
-            REQUIRE(result(0, 0) == 5);
-
-            REQUIRE(indices.n_cols() == 1);
-            REQUIRE(indices.n_rows() == 1);
-            REQUIRE(indices(0, 0) == 0);
-        }
-
-        SECTION("col_max")
-        {
-            auto [result, indices] = m.col_max();
             REQUIRE(result.n_cols() == 1);
             REQUIRE(result.n_rows() == 1);
             REQUIRE(result(0, 0) == 5);
@@ -419,22 +407,6 @@ TEST_CASE("matrix::col_min, matrix::col_max", "[matrix]")
         SECTION("col_min")
         {
             auto [result, indices] = m.col_min();
-            REQUIRE(result.n_cols() == 3);
-            REQUIRE(result.n_rows() == 1);
-            REQUIRE(result(0, 0) == 1);
-            REQUIRE(result(0, 1) == 2);
-            REQUIRE(result(0, 2) == 0);
-
-            REQUIRE(indices.n_cols() == 3);
-            REQUIRE(indices.n_rows() == 1);
-            REQUIRE(indices(0, 0) == 0);
-            REQUIRE(indices(0, 1) == 0);
-            REQUIRE(indices(0, 2) == 0);
-        }
-
-        SECTION("col_max")
-        {
-            auto [result, indices] = m.col_max();
             REQUIRE(result.n_cols() == 3);
             REQUIRE(result.n_rows() == 1);
             REQUIRE(result(0, 0) == 1);
@@ -470,18 +442,6 @@ TEST_CASE("matrix::col_min, matrix::col_max", "[matrix]")
             REQUIRE(indices.n_rows() == 1);
             REQUIRE(indices(0, 0) == 2);
         }
-
-        SECTION("col_max")
-        {
-            auto [result, indices] = m.col_max();
-            REQUIRE(result.n_cols() == 1);
-            REQUIRE(result.n_rows() == 1);
-            REQUIRE(result(0, 0) == 2);
-
-            REQUIRE(indices.n_cols() == 1);
-            REQUIRE(indices.n_rows() == 1);
-            REQUIRE(indices(0, 0) == 1);
-        }
     }
 
     SECTION("2x3 matrix")
@@ -515,6 +475,91 @@ TEST_CASE("matrix::col_min, matrix::col_max", "[matrix]")
             REQUIRE(indices(0, 2) == 1);
             REQUIRE(indices(0, 3) == 0);
         }
+    }
+}
+
+
+TEST_CASE("matrix::col_max", "[matrix]")
+{
+    SECTION("1x1 matrix")
+    {
+        Matr m{ 1, 1, 5.0 };
+        // [5]
+
+        SECTION("col_max")
+        {
+            auto [result, indices] = m.col_max();
+            REQUIRE(result.n_cols() == 1);
+            REQUIRE(result.n_rows() == 1);
+            REQUIRE(result(0, 0) == 5);
+
+            REQUIRE(indices.n_cols() == 1);
+            REQUIRE(indices.n_rows() == 1);
+            REQUIRE(indices(0, 0) == 0);
+        }
+    }
+
+    SECTION("1x3 matrix")
+    {
+        Matr m{ 1, 3, 0.0 };
+        m(0, 0) = 1;
+        m(0, 1) = 2;
+        m(0, 2) = 0;
+        // [1,2,0]
+
+        SECTION("col_max")
+        {
+            auto [result, indices] = m.col_max();
+            REQUIRE(result.n_cols() == 3);
+            REQUIRE(result.n_rows() == 1);
+            REQUIRE(result(0, 0) == 1);
+            REQUIRE(result(0, 1) == 2);
+            REQUIRE(result(0, 2) == 0);
+
+            REQUIRE(indices.n_cols() == 3);
+            REQUIRE(indices.n_rows() == 1);
+            REQUIRE(indices(0, 0) == 0);
+            REQUIRE(indices(0, 1) == 0);
+            REQUIRE(indices(0, 2) == 0);
+        }
+    }
+
+    SECTION("3x1 matrix")
+    {
+        Matr m{ 3, 1, 0.0 };
+        m(0, 0) = 1;
+        m(1, 0) = 2;
+        m(2, 0) = 0;
+        // [1]
+        // [2]
+        // [0]
+
+        SECTION("col_max")
+        {
+            auto [result, indices] = m.col_max();
+            REQUIRE(result.n_cols() == 1);
+            REQUIRE(result.n_rows() == 1);
+            REQUIRE(result(0, 0) == 2);
+
+            REQUIRE(indices.n_cols() == 1);
+            REQUIRE(indices.n_rows() == 1);
+            REQUIRE(indices(0, 0) == 1);
+        }
+    }
+
+    SECTION("2x3 matrix")
+    {
+        Matr m{ 2, 4, 0.0 };
+        m(0, 0) = 1;
+        m(1, 0) = 4;
+        m(0, 1) = 9;
+        m(1, 1) = 5;
+        m(0, 2) = 2;
+        m(1, 2) = -5;
+        m(0, 3) = 3;
+        m(1, 3) = 7;
+        // [1,9,2,3]
+        // [4,5,-5,7]
 
         SECTION("col_max")
         {
@@ -535,6 +580,7 @@ TEST_CASE("matrix::col_min, matrix::col_max", "[matrix]")
         }
     }
 }
+
 
 TEST_CASE("matrix::make_transpose", "[matrix]")
 {
