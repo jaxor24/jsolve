@@ -4,7 +4,7 @@
 
 using Matr = Matrix<double>;
 
-TEST_CASE("matrix::iterator", "[matrix::Iterator]")
+TEST_CASE("matrix::iterator", "[matrix]")
 {
     SECTION("1x1 matrix")
     {
@@ -172,7 +172,7 @@ TEST_CASE("matrix::iterator", "[matrix::Iterator]")
     }
 }
 
-TEST_CASE("matrix::const_iterator", "[matrix::Iterator]")
+TEST_CASE("matrix::const_iterator", "[matrix]")
 {
     SECTION("1x1 matrix")
     {

@@ -3,7 +3,7 @@
 #include "matrix_range.h"
 #include "matrix_error.h"
 
-TEST_CASE("Range", "[Range]")
+TEST_CASE("Range", "[matrix]")
 {
     SECTION("Range()")
     {
