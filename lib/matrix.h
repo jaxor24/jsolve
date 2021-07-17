@@ -316,28 +316,7 @@ Matrix<U> operator/(double x, Matrix<U> rhs)
 template <typename U>
 bool operator==(const Matrix<U>& lhs, const Matrix<U>& rhs)
 {
-	if (lhs.n_rows() != rhs.n_rows())
-	{
-		return false;
-	}
-
-	if (lhs.n_cols() != rhs.n_cols())
-	{
-		return false;
-	}
-
-	for (const auto& [n_row, lhs_row] : enumerate(lhs.m_data))
-	{
-		for (const auto& [n_col, lhs_elem] : enumerate(lhs_row))
-		{
-			if (lhs(n_row, n_col) != rhs(n_row, n_col))
-			{
-				return false;
-			}
-		}
-	}
-
-	return true;
+	return lhs.m_data == rhs.m_data;
 }
 
 template <typename U>
