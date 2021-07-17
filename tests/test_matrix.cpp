@@ -36,7 +36,7 @@ TEST_CASE("matrix::matrix(row,col,val)", "[matrix]")
     }
 }
 
-TEST_CASE("matrix::n_rows, matrix::n_cols", "[matrix]")
+TEST_CASE("matrix::n_rows", "[matrix]")
 {
     SECTION("non-zero rows")
     {
@@ -46,7 +46,6 @@ TEST_CASE("matrix::n_rows, matrix::n_cols", "[matrix]")
         auto m = Matr{ n_rows, n_cols };
 
         REQUIRE(m.n_rows() == n_rows);
-        REQUIRE(m.n_cols() == n_cols);
     }
 
     SECTION("zero rows")
@@ -57,6 +56,28 @@ TEST_CASE("matrix::n_rows, matrix::n_cols", "[matrix]")
         auto m = Matr{ n_rows, n_cols };
 
         REQUIRE(m.n_rows() == n_rows);
+    }
+}
+
+TEST_CASE("matrix::n_cols", "[matrix]")
+{
+    SECTION("non-zero rows")
+    {
+        unsigned n_rows{ 10 };
+        unsigned n_cols{ 5 };
+
+        auto m = Matr{ n_rows, n_cols };
+
+        REQUIRE(m.n_cols() == n_cols);
+    }
+
+    SECTION("zero rows")
+    {
+        unsigned n_rows{ 1 };
+        unsigned n_cols{ 5 };
+
+        auto m = Matr{ n_rows, n_cols };
+
         REQUIRE(m.n_cols() == n_cols);
     }
 }
