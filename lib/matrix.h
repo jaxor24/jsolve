@@ -40,34 +40,23 @@ public:
 	std::pair<Matrix<T>, Matrix<std::size_t>> col_min() const;
 
 	Matrix make_transpose() const;
+
 	Matrix slice(Range rows, Range cols) const;
 
 	void update(Range rows, Range cols, Matrix values);
 
-	// Iterators
-	matrix_iterator begin() { return { std::begin(m_data), std::end(m_data), n_cols() }; }
-	matrix_iterator end() { return { std::end(m_data), std::end(m_data), n_cols() }; }
+	// Iterators -------------------------------------------------------------------------------
+	matrix_iterator begin();
+	matrix_iterator end();
 
-	const_matrix_iterator cbegin() const { return { std::begin(m_data), std::end(m_data), n_cols() }; }
-	const_matrix_iterator cend() const { return { std::end(m_data), std::end(m_data), n_cols() }; }
+	const_matrix_iterator cbegin() const;
+	const_matrix_iterator cend() const;
 
-	auto enumerate_rows()
-	{
-		return IterableWrapper<RowEnumerator<matrix_iterator>>{ begin(), end() };
-	}
-	auto enumerate_rows() const
-	{
-		return IterableWrapper<RowEnumerator<const_matrix_iterator>>{ cbegin(), cend() };
-	}
+	auto enumerate_rows();
+	auto enumerate_rows() const;
 
-	auto enumerate_cols()
-	{
-		return IterableWrapper<ColEnumerator<matrix_iterator>>{ begin(), end() };
-	}
-	auto enumerate_cols() const
-	{
-		return IterableWrapper<ColEnumerator<const_matrix_iterator>>{ cbegin(), cend() };
-	}
+	auto enumerate_cols();
+	auto enumerate_cols() const;
 
 	// Operators -------------------------------------------------------------------------------
 	
@@ -347,4 +336,52 @@ void Matrix<T>::update(Range rows, Range cols, Matrix sub)
 			result_row++;
 		}
 	}
+}
+
+template <typename T>
+typename Matrix<T>::matrix_iterator Matrix<T>::begin()
+{ 
+	return { std::begin(m_data), std::end(m_data), n_cols() };
+}
+
+template <typename T>
+typename Matrix<T>::matrix_iterator Matrix<T>::end()
+{ 
+	return { std::end(m_data), std::end(m_data), n_cols() };
+}
+
+template <typename T>
+typename Matrix<T>::const_matrix_iterator Matrix<T>::cbegin() const
+{
+	return { std::begin(m_data), std::end(m_data), n_cols() };
+}
+
+template <typename T>
+typename Matrix<T>::const_matrix_iterator Matrix<T>::cend() const
+{ 
+	return { std::end(m_data), std::end(m_data), n_cols() };
+}
+
+template <typename T>
+auto Matrix<T>::enumerate_rows()
+{
+	return IterableWrapper<RowEnumerator<matrix_iterator>>{ begin(), end() };
+}
+
+template <typename T>
+auto Matrix<T>::enumerate_rows() const
+{
+	return IterableWrapper<RowEnumerator<const_matrix_iterator>>{ cbegin(), cend() };
+}
+
+template <typename T>
+auto Matrix<T>::enumerate_cols()
+{
+	return IterableWrapper<ColEnumerator<matrix_iterator>>{ begin(), end() };
+}
+
+template <typename T>
+auto Matrix<T>::enumerate_cols() const
+{
+	return IterableWrapper<ColEnumerator<const_matrix_iterator>>{ cbegin(), cend() };
 }
