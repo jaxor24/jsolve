@@ -188,6 +188,8 @@ public:
 		}
 
 		m_data = result.m_data;
+		m_n_cols = result.m_n_cols;
+		m_n_rows = result.m_n_rows;
 		return *this;
 	}
 	
