@@ -634,12 +634,12 @@ Matrix<T> Matrix<T>::slice(Range rows, Range cols) const
 	};
 
 	std::size_t result_row{ 0 };
-	for (const auto& [n_row, row] : enumerate(m_data))
+	for (auto [n_row, curr_row] : enumerate_rows())
 	{
 		if (!rows || ((n_row >= rows.start()) && (n_row <= rows.end())))
 		{
 			std::size_t result_col{ 0 };
-			for (const auto& [n_col, elem] : enumerate(row))
+			for (const auto& [n_col, elem] : enumerate(curr_row))
 			{
 				if (!cols || ((n_col >= cols.start()) && (n_col <= cols.end())))
 				{
