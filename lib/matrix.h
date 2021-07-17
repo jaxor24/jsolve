@@ -124,12 +124,12 @@ public:
 			throw MatrixError("Cannot add matrices with different col count");
 		}
 
-		for (const auto& [n_row, row] : enumerate(m_data))
+		auto it1 = std::begin(m_data);
+		auto it2 = std::begin(rhs.m_data);
+		
+		for (; it1 != std::end(m_data) && it2 != std::end(rhs.m_data); ++it1, ++it2)
 		{
-			for (const auto& [n_col, elem] : enumerate(row))
-			{
-				elem += rhs(n_row, n_col);
-			}
+			*(it1) += *(it2);
 		}
 
 		return *this;
@@ -146,12 +146,12 @@ public:
 			throw MatrixError("Cannot subtract matrices with different col count");
 		}
 
-		for (const auto& [n_row, row] : enumerate(m_data))
+		auto it1 = std::begin(m_data);
+		auto it2 = std::begin(rhs.m_data);
+
+		for (; it1 != std::end(m_data) && it2 != std::end(rhs.m_data); ++it1, ++it2)
 		{
-			for (const auto& [n_col, elem] : enumerate(row))
-			{
-				elem -= rhs(n_row, n_col);
-			}
+			*(it1) -= *(it2);
 		}
 
 		return *this;
