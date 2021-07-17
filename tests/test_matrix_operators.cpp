@@ -123,6 +123,11 @@ TEST_CASE("matrix::operator++", "[matrix]")
             }
         }
     }
+}
+
+TEST_CASE("matrix::operator++(int)", "[matrix]")
+{
+    Matr m{ 2, 3 };
 
     SECTION("postfix")
     {
@@ -164,6 +169,11 @@ TEST_CASE("matrix::operator--", "[matrix]")
             }
         }
     }
+}
+
+TEST_CASE("matrix::operator--(int)", "[matrix]")
+{
+    Matr m{ 2, 3 };
 
     SECTION("postfix")
     {

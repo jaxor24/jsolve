@@ -179,7 +179,6 @@ TEST_CASE("matrix::max", "[matrix]")
     }
 }
 
-
 TEST_CASE("matrix::sum", "[matrix]")
 {
     SECTION("1x1 matrix")
