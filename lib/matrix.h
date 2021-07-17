@@ -1,47 +1,27 @@
 #pragma once
 
+#include "matrix_error.h"
+#include "matrix_range.h"
+#include "matrix_iterator.h"
+
 #include "tools.h"
 #include "logging.h"
 
 #include <vector>
+#include <numeric>
 #include <optional>
 #include <iostream>
-#include <stdexcept>
-
-
-class MatrixError : public std::runtime_error
-{
-public:
-	template <typename... Args>
-	explicit MatrixError(Args&&... args) 
-		: 
-		std::runtime_error(fmt::format(std::forward<Args>(args)...)) 
-	{}
-	virtual ~MatrixError() throw () {}
-};
 
 template <typename T>
 class Matrix
 {
 public:
 	typedef T value_type;
+	typedef AllIterator<T> matrix_iterator;
+	typedef AllIterator<const T> const_matrix_iterator;
 
-	class Range
-	{
-	public:
-		Range() = default;
-		Range(std::size_t value);
-		Range(std::size_t start, std::size_t end);
-
-		std::size_t start() const;
-		std::size_t end() const;
-		std::size_t size() const;
-
-		operator bool() const;
-
-	private:
-		std::optional<std::pair<std::size_t, std::size_t>> m_data;
-	};
+	typedef RowIterator<T> row_iterator;
+	typedef ColIterator<T> col_iterator;
 
 	explicit Matrix(std::size_t r, std::size_t c);
 	explicit Matrix(std::size_t r, std::size_t c, T initial);
@@ -64,7 +44,39 @@ public:
 
 	void update(Range rows, Range cols, Matrix values);
 
+	// Iterators
+	matrix_iterator begin() { return { std::begin(m_data), std::end(m_data), n_cols() }; }
+	matrix_iterator end() { return { std::end(m_data), std::end(m_data), n_cols() }; }
+
+	const_matrix_iterator cbegin() const { return { std::begin(m_data), std::end(m_data), n_cols() }; }
+	const_matrix_iterator cend() const { return { std::end(m_data), std::end(m_data), n_cols() }; }
+
+	auto enumerate_rows()
+	{
+		return IterableWrapper<RowEnumerator<matrix_iterator>>{ begin(), end() };
+	}
+
+	auto enumerate_rows() const
+	{
+		return IterableWrapper<RowEnumerator<const_matrix_iterator>>{ cbegin(), cend() };
+	}
+
+	auto enumerate_cols()
+	{
+		return IterableWrapper<ColEnumerator<matrix_iterator>>{ begin(), end() };
+	}
+
+	auto enumerate_cols() const
+	{
+		return IterableWrapper<ColEnumerator<const_matrix_iterator>>{ cbegin(), cend() };
+	}
+
 	// Operators -------------------------------------------------------------------------------
+	
+	// Access
+	T& operator()(const std::size_t row, const std::size_t col);
+	T operator()(const std::size_t row, const std::size_t col) const;
+	
 	// Put-to
 	template <typename U>
 	friend std::ostream& operator<<(std::ostream& os, const Matrix<U>& m);
@@ -75,14 +87,10 @@ public:
 	template <typename U>
 	friend bool operator!=(const Matrix<U>& lhs, const Matrix<U>& rhs);
 
-	// Access
-	T& operator()(const std::size_t row, const std::size_t col);
-	T operator()(const std::size_t row, const std::size_t col) const;
-
 	// Unary
 	Matrix& operator++()
 	{
-		for_each_element([](value_type& elem) { elem++; });
+		std::for_each(std::begin(m_data), std::end(m_data), [](auto& elem) { elem++; });
 		return *this;
 	}
 	Matrix operator++(int)
@@ -93,7 +101,7 @@ public:
 	}
 	Matrix& operator--()
 	{
-		for_each_element([](value_type& elem) { elem--; });
+		std::for_each(std::begin(m_data), std::end(m_data), [](auto& elem) { elem--; });
 		return *this;
 	}
 	Matrix operator--(int)
@@ -116,12 +124,12 @@ public:
 			throw MatrixError("Cannot add matrices with different col count");
 		}
 
-		for (const auto& [n_row, row] : enumerate(m_data))
+		auto it1 = std::begin(m_data);
+		auto it2 = std::begin(rhs.m_data);
+		
+		for (; it1 != std::end(m_data) && it2 != std::end(rhs.m_data); ++it1, ++it2)
 		{
-			for (const auto& [n_col, elem] : enumerate(row))
-			{
-				elem += rhs(n_row, n_col);
-			}
+			*(it1) += *(it2);
 		}
 
 		return *this;
@@ -138,12 +146,12 @@ public:
 			throw MatrixError("Cannot subtract matrices with different col count");
 		}
 
-		for (const auto& [n_row, row] : enumerate(m_data))
+		auto it1 = std::begin(m_data);
+		auto it2 = std::begin(rhs.m_data);
+
+		for (; it1 != std::end(m_data) && it2 != std::end(rhs.m_data); ++it1, ++it2)
 		{
-			for (const auto& [n_col, elem] : enumerate(row))
-			{
-				elem -= rhs(n_row, n_col);
-			}
+			*(it1) -= *(it2);
 		}
 
 		return *this;
@@ -180,23 +188,25 @@ public:
 		}
 
 		m_data = result.m_data;
+		m_n_cols = result.m_n_cols;
+		m_n_rows = result.m_n_rows;
 		return *this;
 	}
 	
 	// Binary - Scalar
 	Matrix operator+=(double x)
 	{
-		for_each_element([x](value_type& elem) { elem += x; });
+		std::for_each(std::begin(m_data), std::end(m_data), [x](auto& elem) { elem += x; });
 		return *this;
 	}
 	Matrix operator-=(double x)
 	{
-		for_each_element([x](value_type& elem) { elem -= x; });
+		std::for_each(std::begin(m_data), std::end(m_data), [x](auto& elem) { elem -= x; });
 		return *this;
 	}
 	Matrix operator*=(double x)
 	{
-		for_each_element([x](value_type& elem) { elem *= x; });
+		std::for_each(std::begin(m_data), std::end(m_data), [x](auto& elem) { elem *= x; });
 		return *this;
 	}
 	Matrix operator/=(double x)
@@ -206,99 +216,15 @@ public:
 			throw MatrixError("Scalar division by zero");
 		}
 
-		for_each_element([x](value_type& elem) { elem /= x; });
+		std::for_each(std::begin(m_data), std::end(m_data), [x](auto& elem) { elem /= x; });
 		return *this;
 	}
 
 private:
-	std::vector<std::vector<T>> m_data; // vector of rows
-
-	template <typename F>
-	void for_each_element(F f)
-	{
-		for (auto& row : m_data)
-		{
-			for (auto& elem : row)
-			{
-				f(elem);
-			}
-		}
-	}
-
-	template <typename F>
-	void for_each_element(F f) const
-	{
-		for (const auto& row : m_data)
-		{
-			for (const auto& elem : row)
-			{
-				f(elem);
-			}
-		}
-	}
+	std::vector<T> m_data; // [row 1 | row 2 | ... | row n]
+	std::size_t m_n_rows{ 0 };
+	std::size_t m_n_cols{ 0 };
 };
-
-// Matrix::Range
-template <typename T>
-Matrix<T>::Range::Range(std::size_t start, std::size_t end) 
-	: 
-	m_data{ { start, end } }
-{
-	if (start > end)	
-	{ 
-		throw MatrixError{ "Invalid range: start > end" };
-	}
-}
-template <typename T>
-Matrix<T>::Range::Range(std::size_t value) : Range(value, value) 
-{
-}
-
-template <typename T>
-std::size_t Matrix<T>::Range::start() const
-{
-	if (!m_data)
-	{
-		throw MatrixError{ "Invalid range: Empty" };
-	}
-	else
-	{
-		return m_data.value().first;
-	}
-}
-
-template <typename T>
-std::size_t Matrix<T>::Range::end() const
-{
-	if (!m_data)
-	{
-		throw MatrixError{ "Invalid range: Empty" };
-	}
-	else
-	{
-		return m_data.value().second;
-	}
-}
-
-template <typename T>
-std::size_t Matrix<T>::Range::size() const
-{
-	if (!m_data)
-	{
-		return 0;
-	}
-	else
-	{
-		// Range from 4 to 5 includes rows 4 and 5, hence size + 1
-		return m_data.value().second - m_data.value().first + 1;
-	}
-}
-
-template <typename T>
-Matrix<T>::Range::operator bool() const 
-{ 
-	return m_data.has_value(); 
-}
 
 // Free functions - operators
 // Operator+
@@ -372,28 +298,7 @@ Matrix<U> operator/(double x, Matrix<U> rhs)
 template <typename U>
 bool operator==(const Matrix<U>& lhs, const Matrix<U>& rhs)
 {
-	if (lhs.n_rows() != rhs.n_rows())
-	{
-		return false;
-	}
-
-	if (lhs.n_cols() != rhs.n_cols())
-	{
-		return false;
-	}
-
-	for (const auto& [n_row, lhs_row] : enumerate(lhs.m_data))
-	{
-		for (const auto& [n_col, lhs_elem] : enumerate(lhs_row))
-		{
-			if (lhs(n_row, n_col) != rhs(n_row, n_col))
-			{
-				return false;
-			}
-		}
-	}
-
-	return true;
+	return lhs.m_data == rhs.m_data;
 }
 
 template <typename U>
@@ -495,34 +400,42 @@ Matrix<U> div_elem(const Matrix<U>& lhs, const Matrix<U>& rhs)
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 {
-	auto log_row = [&os](const auto& row)
+	os << "[";
+	for (const auto& [n_elem, elem]: enumerate(m.m_data))
 	{
-		os << "[";
-		for (const auto& elem : row)
+		os << elem;
+
+		if (n_elem + 1 != m.m_data.size())
 		{
-			os << elem << ",";
+			if ((n_elem + 1) % m.n_cols() == 0)
+			{
+				os << ";";
+			}
+			else
+			{
+				os << ",";
+			}
 		}
-		os << "]" << '\n';
-	};
-
-	os << '\n';
-
-	for (const auto& row : m.m_data)
-	{
-		log_row(row);
 	}
+
+	os << "]" << '\n';
+	os << '\n';
 
 	return os;
 }
 
 // Matrix:: member functions
 template <typename T>
-Matrix<T>::Matrix(std::size_t r, std::size_t c) : Matrix(r, c, T{ 0 })
-{
-}
+Matrix<T>::Matrix(std::size_t r, std::size_t c) 
+	: 
+	Matrix(r, c, T{ 0 })
+{}
 
 template <typename T>
-Matrix<T>::Matrix(std::size_t r, std::size_t c, T initial)
+Matrix<T>::Matrix(std::size_t r, std::size_t c, T initial) 
+	: 
+	m_n_rows{ r }, 
+	m_n_cols{ c }
 {
 	if ((r == 0) || (c == 0))
 	{
@@ -534,12 +447,7 @@ Matrix<T>::Matrix(std::size_t r, std::size_t c, T initial)
 		throw MatrixError("Cannot construct matrix with negative row/col count");
 	}
 
-	m_data.resize(r);
-
-	for (auto& row : m_data)
-	{
-		row.resize(c, initial);
-	}
+	m_data.resize(r*c, initial);
 }
 
 template <typename T>
@@ -550,7 +458,7 @@ T& Matrix<T>::operator()(const std::size_t row, const std::size_t col)
 		throw MatrixError("Cannot access out of bounds");
 	}
 
-	return m_data[row][col];
+	return m_data[row * n_cols() + col];
 }
 
 template <typename T>
@@ -561,67 +469,37 @@ T Matrix<T>::operator()(const std::size_t row, const std::size_t col) const
 		throw MatrixError("Cannot access out of bounds");
 	}
 
-	return m_data[row][col];
+	return m_data[row * n_cols() + col];
 }
 
 template <typename T>
 std::size_t Matrix<T>::n_rows() const
 {
-	return m_data.size();
+	return m_n_rows;
 }
 
 template <typename T>
 std::size_t Matrix<T>::n_cols() const
 {
-	return m_data.front().size();
+	return m_n_cols;
 }
 
 template <typename T>
 T Matrix<T>::max() const
 {
-	std::optional<T> result;
-
-	for (const auto& [n_row, row] : enumerate(m_data))
-	{
-		for (const auto& [n_col, elem] : enumerate(row))
-		{
-			result = result.has_value() ? std::max(result.value(), elem) : elem;
-		}
-	}
-
-	return result.value();
+	return *std::max_element(std::begin(m_data), std::end(m_data));
 }
 
 template <typename T>
 T Matrix<T>::min() const
 {
-	std::optional<T> result;
-
-	for (const auto& [n_row, row] : enumerate(m_data))
-	{
-		for (const auto& [n_col, elem] : enumerate(row))
-		{
-			result = result.has_value() ? std::min(result.value(), elem) : elem;
-		}
-	}
-
-	return result.value();
+	return* std::min_element(std::begin(m_data), std::end(m_data));
 }
 
 template <typename T>
 T Matrix<T>::sum() const
 {
-	std::optional<T> result;
-
-	for (const auto& [n_row, row] : enumerate(m_data))
-	{
-		for (const auto& [n_col, elem] : enumerate(row))
-		{
-			result = result.has_value() ? result.value() += elem : elem;
-		}
-	}
-
-	return result.value();
+	return std::accumulate(std::begin(m_data), std::end(m_data), T{ 0 });
 }
 
 template <typename T>
@@ -630,16 +508,11 @@ std::pair<Matrix<T>, Matrix<std::size_t>> Matrix<T>::row_max() const
 	Matrix<T> values{ n_rows(), 1, std::numeric_limits<T>::lowest() };
 	Matrix<std::size_t> indices{ n_rows(), 1, 0 };
 
-	for (const auto& [n_row, row] : enumerate(m_data))
+	for (auto [n_row, row] : enumerate_rows())
 	{
-		for (const auto& [n_col, elem] : enumerate(row))
-		{
-			if (elem > values(n_row, 0))
-			{
-				values(n_row, 0) = elem;
-				indices(n_row, 0) = n_col;
-			}
-		}
+		auto it = std::max_element(std::begin(row), std::end(row));
+		values(n_row, 0) = *it;
+		indices(n_row, 0) = std::distance(std::begin(row), it);
 	}
 
 	return { values, indices };
@@ -651,16 +524,11 @@ std::pair<Matrix<T>, Matrix<std::size_t>> Matrix<T>::row_min() const
 	Matrix<T> values{ n_rows(), 1, std::numeric_limits<T>::max() };
 	Matrix<std::size_t> indices{ n_rows(), 1, 0 };
 
-	for (const auto& [n_row, row] : enumerate(m_data))
+	for (auto [n_row, row] : enumerate_rows())
 	{
-		for (const auto& [n_col, elem] : enumerate(row))
-		{
-			if (elem < values(n_row, 0))
-			{
-				values(n_row, 0) = elem;
-				indices(n_row, 0) = n_col;
-			}
-		}
+		auto it = std::min_element(std::begin(row), std::end(row));
+		values(n_row, 0) = *it;
+		indices(n_row, 0) = std::distance(std::begin(row), it);
 	}
 
 	return { values, indices };
@@ -672,16 +540,11 @@ std::pair<Matrix<T>, Matrix<std::size_t>> Matrix<T>::col_max() const
 	Matrix<T> values{ 1, n_cols(), std::numeric_limits<T>::lowest() };
 	Matrix<std::size_t> indices{ 1, n_cols(), 0 };
 
-	for (const auto& [n_row, row] : enumerate(m_data))
+	for (auto [n_col, col] : enumerate_cols())
 	{
-		for (const auto& [n_col, elem] : enumerate(row))
-		{
-			if (elem > values(0, n_col))
-			{
-				values(0, n_col) = elem;
-				indices(0, n_col) = n_row;
-			}
-		}
+		auto it = std::max_element(std::begin(col), std::end(col));
+		values(0, n_col) = *it;
+		indices(0, n_col) = std::distance(std::begin(col), it);
 	}
 
 	return { values, indices };
@@ -693,16 +556,11 @@ std::pair<Matrix<T>, Matrix<std::size_t>> Matrix<T>::col_min() const
 	Matrix<T> values{ 1, n_cols(), std::numeric_limits<T>::max() };
 	Matrix<std::size_t> indices{ 1, n_cols(), 0 };
 
-	for (const auto& [n_row, row] : enumerate(m_data))
+	for (auto [n_col, col] : enumerate_cols())
 	{
-		for (const auto& [n_col, elem] : enumerate(row))
-		{
-			if (elem < values(0, n_col))
-			{
-				values(0, n_col) = elem;
-				indices(0, n_col) = n_row;
-			}
-		}
+		auto it = std::min_element(std::begin(col), std::end(col));
+		values(0, n_col) = *it;
+		indices(0, n_col) = std::distance(std::begin(col), it);
 	}
 
 	return { values, indices };
@@ -713,9 +571,9 @@ Matrix<T> Matrix<T>::make_transpose() const
 {
 	Matrix result{ n_cols(), n_rows()};
 
-	for (const auto& [n_row, row] : enumerate(m_data))
+	for (auto [n_row, row] : enumerate_rows())
 	{
-		for (const auto& [n_col, elem] : enumerate(row))
+		for (auto [n_col, elem] : enumerate(row))
 		{
 			result(n_col, n_row) = elem;
 		}
@@ -739,12 +597,12 @@ Matrix<T> Matrix<T>::slice(Range rows, Range cols) const
 	};
 
 	std::size_t result_row{ 0 };
-	for (const auto& [n_row, row] : enumerate(m_data))
+	for (auto [n_row, curr_row] : enumerate_rows())
 	{
 		if (!rows || ((n_row >= rows.start()) && (n_row <= rows.end())))
 		{
 			std::size_t result_col{ 0 };
-			for (const auto& [n_col, elem] : enumerate(row))
+			for (const auto& [n_col, elem] : enumerate(curr_row))
 			{
 				if (!cols || ((n_col >= cols.start()) && (n_col <= cols.end())))
 				{
@@ -808,12 +666,12 @@ void Matrix<T>::update(Range rows, Range cols, Matrix sub)
 
 	// Update matrix with sub matrix
 	std::size_t result_row{ 0 };
-	for (const auto& [n_row, row] : enumerate(m_data))
+	for (auto [n_row, row] : enumerate_rows())
 	{
 		if (!rows || ((n_row >= rows.start()) && (n_row <= rows.end())))
 		{
 			std::size_t result_col{ 0 };
-			for (const auto& [n_col, elem] : enumerate(row))
+			for (auto [n_col, elem] : enumerate(row))
 			{
 				if (!cols || ((n_col >= cols.start()) && (n_col <= cols.end())))
 				{

@@ -396,11 +396,11 @@ namespace jsolve::simplex
 		{
 			log()->debug("---------------------------------------");
 			log()->debug("Iteration: {}", iter);
-			log()->info("Phase 1 obj = {} {}", obj_phase_1, in_phase_1 ? "***" : "");
-			log()->info("Phase 2 obj = {} {}", obj_phase_2, in_phase_1 ? "" : "***");
-			log()->info("c = {}", c);
-			log()->info("A = {}", A);
-			log()->info("b = {}", b);
+			log()->debug("Phase 1 obj = {} {}", obj_phase_1, in_phase_1 ? "***" : "");
+			log()->debug("Phase 2 obj = {} {}", obj_phase_2, in_phase_1 ? "" : "***");
+			log()->debug("c = {}", c);
+			log()->debug("A = {}", A);
+			log()->debug("b = {}", b);
 
 			auto col_idx = entering_idx.value();
 			log()->debug("Entering variable:");

@@ -5,6 +5,8 @@
 
 #include "jsolve.h"
 
+#include "matrix.h"
+
 void go()
 {
 	auto model = models::make_model_1();
