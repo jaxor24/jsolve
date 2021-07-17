@@ -90,7 +90,7 @@ public:
 	// Unary
 	Matrix& operator++()
 	{
-		for_each_element([](value_type& elem) { elem++; });
+		std::for_each(std::begin(m_data), std::end(m_data), [](auto& elem) { elem++; });
 		return *this;
 	}
 	Matrix operator++(int)
@@ -101,7 +101,7 @@ public:
 	}
 	Matrix& operator--()
 	{
-		for_each_element([](value_type& elem) { elem--; });
+		std::for_each(std::begin(m_data), std::end(m_data), [](auto& elem) { elem--; });
 		return *this;
 	}
 	Matrix operator--(int)
@@ -196,17 +196,17 @@ public:
 	// Binary - Scalar
 	Matrix operator+=(double x)
 	{
-		for_each_element([x](value_type& elem) { elem += x; });
+		std::for_each(std::begin(m_data), std::end(m_data), [x](auto& elem) { elem += x; });
 		return *this;
 	}
 	Matrix operator-=(double x)
 	{
-		for_each_element([x](value_type& elem) { elem -= x; });
+		std::for_each(std::begin(m_data), std::end(m_data), [x](auto& elem) { elem -= x; });
 		return *this;
 	}
 	Matrix operator*=(double x)
 	{
-		for_each_element([x](value_type& elem) { elem *= x; });
+		std::for_each(std::begin(m_data), std::end(m_data), [x](auto& elem) { elem *= x; });
 		return *this;
 	}
 	Matrix operator/=(double x)
@@ -216,7 +216,7 @@ public:
 			throw MatrixError("Scalar division by zero");
 		}
 
-		for_each_element([x](value_type& elem) { elem /= x; });
+		std::for_each(std::begin(m_data), std::end(m_data), [x](auto& elem) { elem /= x; });
 		return *this;
 	}
 
@@ -224,24 +224,6 @@ private:
 	std::vector<T> m_data; // [row 1 | row 2 | ... | row n]
 	std::size_t m_n_rows{ 0 };
 	std::size_t m_n_cols{ 0 };
-
-	template <typename F>
-	void for_each_element(F f)
-	{
-		for (auto& elem : m_data)
-		{
-			f(elem);
-		}
-	}
-
-	template <typename F>
-	void for_each_element(F f) const
-	{
-		for (const auto& elem : m_data)
-		{
-			f(elem);
-		}
-	}
 };
 
 // Free functions - operators
