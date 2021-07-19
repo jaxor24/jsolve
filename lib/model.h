@@ -92,6 +92,17 @@ namespace jsolve
 			return c;
 		}
 
+		Variable* get_variable(const std::string& name)
+		{
+			auto found = std::find_if(
+				std::begin(m_variables),
+				std::end(m_variables),
+				[name](const auto& var)
+				{ return var->name() == name; }
+			);
+			return found == std::end(m_variables) ? nullptr : found->get();
+		}
+
 		std::string to_string() const;
 
 		const std::vector<std::unique_ptr<Variable>>& get_variables() const;
