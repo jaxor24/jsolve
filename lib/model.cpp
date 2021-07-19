@@ -18,7 +18,7 @@ namespace jsolve
 
 		if (m_variables.empty())
 		{
-			s.append("Model is empty.");
+			s.append(" Model is empty.");
 			return s;
 		}
 
