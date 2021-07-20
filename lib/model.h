@@ -106,6 +106,17 @@ namespace jsolve
 			return found == std::end(m_variables) ? nullptr : found->get();
 		}
 
+		Constraint* get_constraint(const std::string& name)
+		{
+			auto found = std::find_if(
+				std::begin(m_constraints),
+				std::end(m_constraints),
+				[name](const auto& cons)
+				{ return cons->name() == name; }
+			);
+			return found == std::end(m_constraints) ? nullptr : found->get();
+		}
+
 		std::string to_string() const;
 
 		const std::vector<std::unique_ptr<Variable>>& get_variables() const;

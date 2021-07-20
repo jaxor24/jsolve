@@ -88,7 +88,7 @@ namespace jsolve
 
 			if (constraint_type == "N")
 			{
-				// TODO - label the objective
+				model->objective_name() = constraint_name;
 			}
 			else if (constraint_type == "G")
 			{
@@ -118,8 +118,35 @@ namespace jsolve
 				variable = model->make_variable(jsolve::Variable::Type::LINEAR, variable_name);
 			}
 
-			// deal with other entries
+			auto it_end = std::cend(words) - 1;
+			auto it = std::cbegin(words);
 
+			for (; it != it_end; ++it)
+			{
+				it++;
+				auto constraint_name = *it;
+				auto constraint_value = std::stod(*(it + 1));
+
+				if (model->objective_name() == constraint_name)
+				{
+					// Pair is specifying the objective coefficient of this variable
+					variable->cost() = constraint_value;
+				}
+				else
+				{
+					// Pair is specifying the entries of a constraint
+					auto* constraint = model->get_constraint(constraint_name);
+
+					if (constraint) 
+					{
+						constraint->add_to_lhs(constraint_value, variable);
+					}
+					else
+					{
+						throw MPSError("Constraint not found: {}", constraint_value);
+					}
+				}
+			}
 		}
 		else if (section == section::RHS)
 		{
