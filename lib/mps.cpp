@@ -2,14 +2,11 @@
 
 #include "logging.h"
 
-#include "model.h"
-
 #include <optional>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
-
 
 namespace jsolve
 {
@@ -193,20 +190,19 @@ namespace jsolve
 		}
 	}
 
-
-	void read_mps(std::filesystem::path path)
+	jsolve::Model read_mps(std::filesystem::path path)
 	{
+		std::optional<jsolve::Model> model;
+
 		if (!std::filesystem::exists(path))
 		{
-			log()->warn("File {} does not exist.", path);
-			return;
+			throw MPSError("File does not exist: {}", path);
 		}
 
 		std::ifstream file{ path, std::ios::in | std::ios::binary };
 
 		if (file.is_open())
 		{
-			std::optional<jsolve::Model> model;
 			auto current_section = section::NONE;
 
 			std::string line;
@@ -220,7 +216,9 @@ namespace jsolve
 		}
 		else
 		{
-			log()->warn("File {} could not be opened.", path);
-		}	
+			throw MPSError("File could not be opened: {}", path);
+		}
+
+		return std::move(model.value());
 	}
 }

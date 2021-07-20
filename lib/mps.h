@@ -1,3 +1,5 @@
+#include "model.h"
+
 #include <filesystem>
 #include <stdexcept>
 
@@ -11,5 +13,5 @@ namespace jsolve
 		virtual ~MPSError() throw ();
 	};
 
-	void read_mps(std::filesystem::path path);
+	jsolve::Model read_mps(std::filesystem::path path);
 }
