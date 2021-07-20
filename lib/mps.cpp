@@ -120,9 +120,9 @@ namespace jsolve
 				variable = model->make_variable(jsolve::Variable::Type::LINEAR, variable_name);
 			}
 
-			auto it_end = std::cend(words) - 1;
 			auto it = std::cbegin(words);
-
+			auto it_end = std::cend(words) - 1;
+			
 			for (; it != it_end; ++it)
 			{
 				it++;
@@ -152,6 +152,26 @@ namespace jsolve
 		}
 		else if (section == section::RHS)
 		{
+			auto it = std::cbegin(words);
+			auto it_end = std::cend(words) - 1;
+
+			for (; it != it_end; ++it)
+			{
+				it++;
+				auto constraint_name = *it;
+				auto rhs = std::stod(*(it + 1));
+
+				auto* constraint = model->get_constraint(constraint_name);
+
+				if (constraint)
+				{
+					constraint->rhs() = rhs;
+				}
+				else
+				{
+					throw MPSError("Constraint not found: {}", constraint_name);
+				}
+			}
 		}
 		else if (section == section::BOUNDS)
 		{
