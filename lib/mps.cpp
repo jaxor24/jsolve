@@ -36,6 +36,7 @@ namespace jsolve
 		COLUMNS,
 		RHS,
 		BOUNDS,
+		RANGES,
 		END
 	};
 
@@ -49,6 +50,7 @@ namespace jsolve
 		else if (line == "RHS") { return section::RHS; }
 		else if (line == "BOUNDS") { return section::BOUNDS; }
 		else if (line == "ENDATA") { return section::END; }
+		else if (line == "RANGES") { return section::RANGES; }
 		else { throw jsolve::MPSError("Unknown header: {}", line); }
 	}
 
