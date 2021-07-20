@@ -7,6 +7,16 @@ namespace jsolve
 		return m_sense;
 	}
 
+	std::string& Model::objective_name() 
+	{
+		return m_objective_name;
+	}
+
+	const std::string& Model::objective_name() const
+	{
+		return m_objective_name;
+	}
+
 	std::string Model::to_string() const
 	{
 		std::string s = fmt::format(

@@ -11,6 +11,7 @@ TEST_CASE("Model::Model()", "[variable]")
 
         REQUIRE(m.name() == "Example");
         REQUIRE(m.sense() == jsolve::Model::Sense::MIN);
+        REQUIRE(m.objective_name().empty());
         REQUIRE(m.get_variables().empty());
         REQUIRE(m.get_constraints().empty());
     }
@@ -72,6 +73,18 @@ TEST_CASE("Model::Model()", "[variable]")
                 m.make_constraint(jsolve::Constraint::Type::LESS, "a");
                 REQUIRE_THROWS_AS(m.make_constraint(jsolve::Constraint::Type::LESS, "a"), jsolve::ModelError);
             }
+        }
+    }
+
+    SECTION("Model::objective_name")
+    {
+        auto m = jsolve::Model{ jsolve::Model::Sense::MIN, "Example" };
+
+        SECTION("basic")
+        {
+            REQUIRE(m.objective_name().empty());
+            m.objective_name() = "test";
+            REQUIRE(m.objective_name() == "test");
         }
     }
 }

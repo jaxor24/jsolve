@@ -40,6 +40,9 @@ namespace jsolve
 
 		Sense sense() const;
 
+		std::string& objective_name();
+		const std::string& objective_name() const;
+
 		template <typename... Args>
 		Variable* make_variable(Args&&... args)
 		{
@@ -112,6 +115,9 @@ namespace jsolve
 
 	private:
 		Sense m_sense{ Sense::MIN };
+
+		std::string m_objective_name;
+
 		std::vector<std::unique_ptr<Variable>> m_variables;
 		std::vector<std::unique_ptr<Constraint>> m_constraints;
 
