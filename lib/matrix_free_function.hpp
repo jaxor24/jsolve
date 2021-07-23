@@ -75,8 +75,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 		}
 	}
 
-	os << "]" << '\n';
-	os << '\n';
+	os << "]";
 
 	return os;
 }
