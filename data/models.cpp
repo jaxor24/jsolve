@@ -250,4 +250,33 @@ namespace models
 
 		return m;
 	}
+
+	jsolve::Model make_model_7()
+	{
+		// Model from:
+		// Problem 2.10 from Linear Programming (2014) Vanderbei.
+
+		auto m = jsolve::Model(jsolve::Model::Sense::MAX, "P2.10 LP 2014");
+
+		auto* v1 = m.make_variable(jsolve::Variable::Type::LINEAR, "x1");
+		auto* v2 = m.make_variable(jsolve::Variable::Type::LINEAR, "x2");
+		auto* v3 = m.make_variable(jsolve::Variable::Type::LINEAR, "x3");
+		auto* v4 = m.make_variable(jsolve::Variable::Type::LINEAR, "x4");
+
+		v1->cost() = 6;
+		v2->cost() = 8;
+		v3->cost() = 5;
+		v4->cost() = 9;
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "C1");
+			c->rhs() = 1;
+			c->add_to_lhs(1.0, v1);
+			c->add_to_lhs(1.0, v2);
+			c->add_to_lhs(1.0, v3);
+			c->add_to_lhs(1.0, v4);
+		}
+
+		return m;
+	}
 }
