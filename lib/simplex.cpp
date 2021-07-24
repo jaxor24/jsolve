@@ -422,7 +422,7 @@ namespace jsolve::simplex
 		// Pick the objective we need to use
 		auto& c = in_phase_1 ? c_phase_1 : c_phase_2;
 		
-		int max_iter = 20;
+		int max_iter = 50;
 		int iter = 1;
 		double eps = 1e-4;
 
