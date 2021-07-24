@@ -334,6 +334,29 @@ namespace jsolve::simplex
 		}
 	}
 
+	auto ratio_test_division = [](Number a, Number b) -> Number
+	{
+		// A division operator that includes the conventions for the simplex ratio test:
+		// a / 0 = infinity
+		// 0 / 0 = 0
+
+		auto a_zero = approx_equal(a, 0.0);
+		auto b_zero = approx_equal(b, 0.0);
+
+		if (a_zero && b_zero)
+		{
+			return 0.0;
+		}
+		else if (b_zero)
+		{
+			return std::numeric_limits<Number>::infinity();
+		}
+		else
+		{
+			return a / b;
+		}
+	};
+
 	std::optional<Solution> primal_solve(const Model& user_model)
 	{
 		// Follows the implementation in Chapter 4 p46. of "Linear Programming" 2014.
@@ -422,7 +445,7 @@ namespace jsolve::simplex
 
 			// Select leaving variable
 			// Pick i such that: a[i,k]/b[i] is maximised
-			auto [t, leaving_row_index] = div_elem(-1.0 * Acol, b).col_max();
+			auto [t, leaving_row_index] = div_elem(-1.0 * Acol, b, ratio_test_division).col_max();
 			auto leaving_ratio = t(0, 0);
 			auto row_idx = leaving_row_index(0, 0);
 
