@@ -211,14 +211,15 @@ namespace jsolve
 				log()->debug("|{}", line);
 				process_row(model, current_section, line);
 			}
-
-			log()->debug("{}", model.value());
 		}
 		else
 		{
 			throw MPSError("File could not be opened: {}", path);
 		}
 
+		log()->info("Parsed model: {}", model->name());
+		log()->info("Variables: {}", model->get_variables().size());
+		log()->info("Constraints: {}", model->get_variables().size());
 		return std::move(model.value());
 	}
 }
