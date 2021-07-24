@@ -2,7 +2,7 @@
 
 // Free functions - helpers
 template <typename U, typename F = std::multiplies<U>>
-Matrix<U> mult_elem(const Matrix<U>& lhs, const Matrix<U>& rhs)
+Matrix<U> mult_elem(const Matrix<U>& lhs, const Matrix<U>& rhs, F func = F{})
 {
 	// Element-wise multiplication
 
@@ -18,14 +18,14 @@ Matrix<U> mult_elem(const Matrix<U>& lhs, const Matrix<U>& rhs)
 		lhs.cend(),
 		rhs.cbegin(),
 		std::begin(result),
-		F()
+		func
 	);
 
 	return result;
 }
 
 template <typename U, typename F = std::divides<U>>
-Matrix<U> div_elem(const Matrix<U>& lhs, const Matrix<U>& rhs)
+Matrix<U> div_elem(const Matrix<U>& lhs, const Matrix<U>& rhs, F func = F{})
 {
 	// Element-wise division
 
@@ -41,7 +41,7 @@ Matrix<U> div_elem(const Matrix<U>& lhs, const Matrix<U>& rhs)
 		lhs.cend(), 
 		rhs.cbegin(),
 		std::begin(result),
-		F()
+		func
 	);
 
 	return result;
