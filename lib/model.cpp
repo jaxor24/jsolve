@@ -72,7 +72,6 @@ namespace jsolve
 			s.append("\n");
 		}
 
-
 		return s;
 	}
 
@@ -84,6 +83,28 @@ namespace jsolve
 	const std::vector<std::unique_ptr<Constraint>>& Model::get_constraints() const
 	{
 		return m_constraints;
+	}
+
+	Variable* Model::get_variable(const std::string& name) const
+	{
+		auto found = std::find_if(
+			std::begin(m_variables),
+			std::end(m_variables),
+			[name](const auto& var)
+			{ return var->name() == name; }
+		);
+		return found == std::end(m_variables) ? nullptr : found->get();
+	}
+
+	Constraint* Model::get_constraint(const std::string& name) const
+	{
+		auto found = std::find_if(
+			std::begin(m_constraints),
+			std::end(m_constraints),
+			[name](const auto& cons)
+			{ return cons->name() == name; }
+		);
+		return found == std::end(m_constraints) ? nullptr : found->get();
 	}
 
 	std::ostream& operator<<(std::ostream& os, const Model& m)

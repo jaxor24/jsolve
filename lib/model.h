@@ -95,27 +95,8 @@ namespace jsolve
 			return c;
 		}
 
-		Variable* get_variable(const std::string& name)
-		{
-			auto found = std::find_if(
-				std::begin(m_variables),
-				std::end(m_variables),
-				[name](const auto& var)
-				{ return var->name() == name; }
-			);
-			return found == std::end(m_variables) ? nullptr : found->get();
-		}
-
-		Constraint* get_constraint(const std::string& name)
-		{
-			auto found = std::find_if(
-				std::begin(m_constraints),
-				std::end(m_constraints),
-				[name](const auto& cons)
-				{ return cons->name() == name; }
-			);
-			return found == std::end(m_constraints) ? nullptr : found->get();
-		}
+		Variable* get_variable(const std::string& name) const;
+		Constraint* get_constraint(const std::string& name) const;
 
 		std::string to_string() const;
 
