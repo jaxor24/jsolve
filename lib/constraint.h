@@ -25,6 +25,7 @@ namespace jsolve
 		{}
 
 		Type type() const;
+		Type& type();
 
 		double rhs() const;
 		double& rhs();

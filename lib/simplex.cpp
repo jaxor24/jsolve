@@ -125,18 +125,26 @@ namespace jsolve::simplex
 		// b = n_cons * 1,
 		// c = 1 * n_vars
 
-		auto n_user_vars = user_model.get_variables().size();
-		auto n_user_cons = user_model.get_constraints().size();
-
-		// Shield against equal constraints
-		std::for_each(
-			std::begin(user_model.get_constraints()),
-			std::end(user_model.get_constraints()),
-			[](const auto& constraint)
+		// Create a new constraint vector with the equality constraints converted to LESS and GREAT pairs.
+		std::vector<Constraint> converted_constraints;
+		for (const auto& [n_cons, cons] : enumerate(user_model.get_constraints()))
+		{
+			if (cons->type() == Constraint::Type::EQUAL)
 			{
-				if (constraint->type() == Constraint::Type::EQUAL) { throw SolveError("EQUAL constraints unsupported"); }
+				converted_constraints.emplace_back(*cons.get());
+				converted_constraints.back().type() = Constraint::Type::GREAT;
+
+				converted_constraints.emplace_back(*cons.get());
+				converted_constraints.back().type() = Constraint::Type::LESS;
 			}
-		);
+			else
+			{
+				converted_constraints.emplace_back(*cons.get());
+			}
+		}
+
+		auto n_user_vars = user_model.get_variables().size();
+		auto n_user_cons = converted_constraints.size();
 
 		// Objective vector
 		Mat objective{ 1, n_user_vars, 0.0 };
@@ -153,32 +161,36 @@ namespace jsolve::simplex
 
 		// b (RHS) vector
 		Mat rhs{ n_user_cons, 1, 0.0 };
-		for (const auto& [n_cons, cons] : enumerate(user_model.get_constraints()))
+		for (const auto& [n_cons, cons] : enumerate(converted_constraints))
 		{
-			if (cons->type() == Constraint::Type::GREAT)
+			if (cons.type() == Constraint::Type::GREAT)
 			{
 				// 7x + 2y >= 5 becomes -7x - 2y <= -5
-				rhs(n_cons, 0) = -1 * cons->rhs();
+				rhs(n_cons, 0) = -1 * cons.rhs();
+			}
+			else if (cons.type() == Constraint::Type::LESS)
+			{
+				rhs(n_cons, 0) = cons.rhs();
 			}
 			else
 			{
-				rhs(n_cons, 0) = cons->rhs();
+				// Impossible by construction of vector being iterated.
 			}
 		}
 
 		// A matrix
 		Mat a{ n_user_cons, n_user_vars, 0.0 };
 
-		for (const auto& [n_cons, cons] : enumerate(user_model.get_constraints()))
+		for (const auto& [n_cons, cons] : enumerate(converted_constraints))
 		{
-			auto scale = cons->type() == Constraint::Type::GREAT ? -1.0 : 1.0;
+			auto scale = cons.type() == Constraint::Type::GREAT ? -1.0 : 1.0;
 
 			// Add original constraint entries
 			for (const auto& [n_var, var] : enumerate(user_model.get_variables()))
 			{
-				auto found_entry = cons->get_entries().find(var.get());
+				auto found_entry = cons.get_entries().find(var.get());
 
-				if (found_entry != std::end(cons->get_entries()))
+				if (found_entry != std::end(cons.get_entries()))
 				{
 					a(n_cons, n_var) = scale * found_entry->second;
 				}

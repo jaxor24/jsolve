@@ -16,6 +16,11 @@ namespace jsolve
 		return m_type;
 	}
 
+	Constraint::Type& Constraint::type()
+	{
+		return m_type;
+	}
+
 	double Constraint::rhs() const
 	{
 		return m_rhs;
