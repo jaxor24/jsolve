@@ -129,15 +129,24 @@ TEST_CASE("div_elem", "[matrix]")
         REQUIRE(result(0, 2) == 18.0 / 10);
     }
 
+    SECTION("division by zero")
+    {
+        auto m1 = Matr(2, 2, 1.0);
+        auto m2 = Matr(2, 2, 0.0);
+
+        auto result = div_elem(m1, m2);
+
+        REQUIRE(result.n_rows() == 2);
+        REQUIRE(result.n_cols() == 2);
+        REQUIRE(result(0, 0) == std::numeric_limits<Matr::value_type>::infinity());
+        REQUIRE(result(0, 1) == std::numeric_limits<Matr::value_type>::infinity());
+        REQUIRE(result(1, 0) == std::numeric_limits<Matr::value_type>::infinity());
+        REQUIRE(result(1, 1) == std::numeric_limits<Matr::value_type>::infinity());
+    }
+
     SECTION("invalid dimensions")
     {
         REQUIRE_THROWS_AS(div_elem(Matr(2, 2), Matr(1, 2)), MatrixError);
         REQUIRE_THROWS_AS(div_elem(Matr(2, 1), Matr(2, 3)), MatrixError);
-    }
-
-    SECTION("invalid division by zero")
-    {
-        REQUIRE_THROWS_AS(div_elem(Matr(2, 2, 1.0), Matr(2, 2)), MatrixError);
-        REQUIRE_THROWS_AS(div_elem(Matr(2, 1, 5.0), Matr(2, 1)), MatrixError);
     }
 }

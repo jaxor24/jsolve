@@ -1,7 +1,7 @@
 #include "matrix.h"
 
 // Free functions - helpers
-template <typename U>
+template <typename U, typename F = std::multiplies<U>>
 Matrix<U> mult_elem(const Matrix<U>& lhs, const Matrix<U>& rhs)
 {
 	// Element-wise multiplication
@@ -13,18 +13,18 @@ Matrix<U> mult_elem(const Matrix<U>& lhs, const Matrix<U>& rhs)
 
 	Matrix<U> result = lhs;
 
-	for (std::size_t n_row = 0; n_row < lhs.n_rows(); n_row++)
-	{
-		for (std::size_t n_col = 0; n_col < lhs.n_cols(); n_col++)
-		{
-			result(n_row, n_col) *= rhs(n_row, n_col);
-		}
-	}
+	std::transform(
+		lhs.cbegin(),
+		lhs.cend(),
+		rhs.cbegin(),
+		std::begin(result),
+		F()
+	);
 
 	return result;
 }
 
-template <typename U>
+template <typename U, typename F = std::divides<U>>
 Matrix<U> div_elem(const Matrix<U>& lhs, const Matrix<U>& rhs)
 {
 	// Element-wise division
@@ -36,20 +36,13 @@ Matrix<U> div_elem(const Matrix<U>& lhs, const Matrix<U>& rhs)
 
 	Matrix<U> result = lhs;
 
-	for (std::size_t n_row = 0; n_row < lhs.n_rows(); n_row++)
-	{
-		for (std::size_t n_col = 0; n_col < lhs.n_cols(); n_col++)
-		{
-			if (approx_equal(rhs(n_row, n_col), 0.0))
-			{
-				throw MatrixError("Cannot element-wise divide by matrix with zero element");
-			}
-			else
-			{
-				result(n_row, n_col) /= rhs(n_row, n_col);
-			}
-		}
-	}
+	std::transform(
+		lhs.cbegin(), 
+		lhs.cend(), 
+		rhs.cbegin(),
+		std::begin(result),
+		F()
+	);
 
 	return result;
 }
