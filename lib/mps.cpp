@@ -172,6 +172,70 @@ namespace jsolve
 		}
 		else if (section == section::BOUNDS)
 		{
+			const auto& bound_type = words.at(0);
+			// const auto& bound_name = words.at(1);
+
+			auto* variable = model->get_variable(words.at(2));
+			const auto& bound_value = std::stod(words.at(3));
+
+			if (bound_type == "LO")
+			{
+				// Lower bound
+				if (bound_value < 0.0)
+				{
+					// Can't handle negative variables with current simplex implementation.
+					throw MPSError("Unhandled MPS lower bounds < 0 for variable: {}", words.at(2));
+				}
+				else
+				{
+					auto* constraint = model->make_constraint(jsolve::Constraint::Type::GREAT, fmt::format("BND_{}_GEQ_{}", words.at(2), bound_value));
+					constraint->rhs() = bound_value;
+					constraint->add_to_lhs(1.0, variable);
+				}
+			}
+			else if (bound_type == "UP")
+			{
+				// Upper bound
+				if (bound_value < 0.0)
+				{
+					// Can't handle negative variables with current simplex implementation.
+					throw MPSError("Unhandled MPS upper bounds < 0 for variable: {}", words.at(2));
+				}
+				else
+				{
+					auto* constraint = model->make_constraint(jsolve::Constraint::Type::LESS, fmt::format("BND_{}_LEQ_{}", words.at(2), bound_value));
+					constraint->rhs() = bound_value;
+					constraint->add_to_lhs(1.0, variable);
+				}
+			}
+			else if (bound_type == "FX")
+			{
+				// Fixed value
+				if (bound_value < 0.0)
+				{
+					// Can't handle negative variables with current simplex implementation.
+					throw MPSError("Unhandled MPS fixed values < 0 for variable: {}", words.at(2));
+				}
+				else
+				{
+					// Create upper and lower bound constraints
+					auto* lb_constraint = model->make_constraint(jsolve::Constraint::Type::GREAT, fmt::format("BND_{}_GEQ_{}", words.at(2), bound_value));
+					lb_constraint->rhs() = bound_value;
+					lb_constraint->add_to_lhs(1.0, variable);
+
+					auto* ub_constraint = model->make_constraint(jsolve::Constraint::Type::LESS, fmt::format("BND_{}_LEQ_{}", words.at(2), bound_value));
+					ub_constraint->rhs() = bound_value;
+					ub_constraint->add_to_lhs(1.0, variable);
+				}
+			}
+			else
+			{
+				throw MPSError("Unhandled MPS BOUNDS type: {}", bound_type);
+			}
+		}
+		else if (section == section::RANGES)
+		{
+			log()->warn("Unprocessed mps section: RANGES");
 		}
 	}
 
