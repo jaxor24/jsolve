@@ -2,8 +2,9 @@
 #include "catch.hpp"
 #include "logging.h"
 
-int main(int argc, char* argv[]) {
-	logging::init_logging(true);
+int main(int argc, char* argv[]) 
+{
+	logging::init_logging("off");
 
 	int result = Catch::Session().run(argc, argv);
 
