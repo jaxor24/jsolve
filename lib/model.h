@@ -99,6 +99,7 @@ namespace jsolve
 		Constraint* get_constraint(const std::string& name) const;
 
 		std::string to_string() const;
+		std::string to_long_string() const;
 
 		const std::vector<std::unique_ptr<Variable>>& get_variables() const;
 		const std::vector<std::unique_ptr<Constraint>>& get_constraints() const;

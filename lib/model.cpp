@@ -17,10 +17,10 @@ namespace jsolve
 		return m_objective_name;
 	}
 
-	std::string Model::to_string() const
+	std::string Model::to_long_string() const
 	{
 		std::string s = fmt::format(
-			"Model: {} ({} constraints, {} variables)", 
+			"Model: {} ({} constraints, {} variables)",
 			name().empty() ? "Unnamed" : name(),
 			m_constraints.size(),
 			m_variables.size()
@@ -71,6 +71,19 @@ namespace jsolve
 			s.append(constraint->to_string());
 			s.append("\n");
 		}
+
+		return s;
+	}
+
+	std::string Model::to_string() const
+	{
+		std::string s = fmt::format(
+			"Model: {} ({}, {} constraints, {} variables)", 
+			name().empty() ? "Unnamed" : name(),
+			sense() == Sense::MIN ? "MIN" : "MAX",
+			m_constraints.size(),
+			m_variables.size()
+		);
 
 		return s;
 	}
