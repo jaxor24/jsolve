@@ -73,6 +73,6 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
         REQUIRE(solution.value().variables.at("x1") == 0.0);
         REQUIRE(solution.value().variables.at("x2") == 0.0);
         REQUIRE(solution.value().variables.at("x3") == 0.0);
-        REQUIRE(solution.value().variables.at("x4") == 9.0);
+        REQUIRE(solution.value().variables.at("x4") == 1.0);
     }
 }
