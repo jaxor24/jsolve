@@ -5,6 +5,7 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("jsolver_v0")
 
+add_subdirectory ("external/CommandLine")
 add_subdirectory ("external/spdlog")
 add_subdirectory ("app")
 add_subdirectory ("lib")
@@ -13,4 +14,5 @@ add_subdirectory ("tests")
 
 if(NOT TARGET spdlog)
   find_package(spdlog REQUIRED)
+  find_package(CommandLine REQUIRED)
 endif()
