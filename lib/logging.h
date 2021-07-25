@@ -5,7 +5,7 @@
 
 namespace logging
 {
-	void init_logging(bool mute = false);
+	void init_logging(std::string level);
 }
 
 inline auto log()
