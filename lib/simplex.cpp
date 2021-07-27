@@ -309,9 +309,6 @@ namespace jsolve::simplex
 		}
 		else
 		{
-			// In phase 2 we can only pivot on the non-dummy variables
-			// TODO - Write Matrix::iterator then replace with enumerate or range() code
-			
 			std::size_t c_max_index{ 0 };
 			Mat::value_type c_max_value{ eps };
 
@@ -408,9 +405,22 @@ namespace jsolve::simplex
 		double obj_phase_1 = 0;
 		double obj_phase_2 = 0;
 
+		int iter = 1;
+
 		// Do first pivot of phase 1 variable and most negative RHS row
 		if (in_phase_1)
 		{
+			log()->debug("---------------------------------------");
+			log()->info("Iteration: {} Obj = {} {}",
+				iter,
+				obj_phase_2,
+				in_phase_1 ? fmt::format("(Phase 1 Obj = {})", obj_phase_2) : ""
+			);
+			log()->debug("c_phase_1 = {}", c_phase_1);
+			log()->debug("c_phase_2 = {}", c_phase_2);
+			log()->debug("A = {}", A);
+			log()->debug("b = {}", b);
+
 			auto [row_min, row_min_idx] = b.col_min();
 			auto col_idx = c_phase_1.n_cols() - 1;
 			pivot(
@@ -424,23 +434,27 @@ namespace jsolve::simplex
 				c_phase_1, 
 				c_phase_2
 			);
+
+			iter++;
 		}
 
 		// Pick the objective we need to use
 		auto& c = in_phase_1 ? c_phase_1 : c_phase_2;
 		
-		int max_iter = 50;
-		int iter = 1;
-		double eps = 1e-4;
+		int max_iter = 500;
+		
+		double eps = 1e-9;
 
 		auto entering_idx = get_entering_variable(c, in_phase_1, locations, eps);
 
 		while (entering_idx)
 		{
 			log()->debug("---------------------------------------");
-			log()->debug("Iteration: {}", iter);
-			log()->debug("Phase 1 obj = {} {}", obj_phase_1, in_phase_1 ? "***" : "");
-			log()->debug("Phase 2 obj = {} {}", obj_phase_2, in_phase_1 ? "" : "***");
+			log()->info("Iteration: {} Obj = {} {}",
+				iter,
+				obj_phase_2,
+				in_phase_1 ? fmt::format("(Phase 1 Obj = {})", obj_phase_2)  : ""
+			);
 			log()->debug("c = {}", c);
 			log()->debug("A = {}", A);
 			log()->debug("b = {}", b);
