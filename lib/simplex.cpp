@@ -350,7 +350,14 @@ namespace jsolve::simplex
 		}
 		else if (b_zero)
 		{
-			return std::numeric_limits<Number>::infinity();
+			if (a > 0)
+			{
+				return std::numeric_limits<Number>::infinity();
+			}
+			else
+			{
+				return -1 * std::numeric_limits<Number>::infinity();
+			}
 		}
 		else
 		{
