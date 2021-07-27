@@ -500,11 +500,11 @@ namespace jsolve::simplex
 			}
 		}
 
-		if (iter == 1)
-		{
-			log()->warn("Zero iterations. Error in model.", iter);
-			return {};
-		}
+		//if (iter == 1)
+		//{
+		//	log()->warn("Zero iterations. Error in model.", iter);
+		//	return {};
+		//}
 
 		log()->debug("---------------------------------------");
 		log()->info("Optimal solution = {} ({} iterations)", obj_phase_2, iter);
