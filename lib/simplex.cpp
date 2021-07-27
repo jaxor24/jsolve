@@ -344,19 +344,19 @@ namespace jsolve::simplex
 		auto a_zero = approx_equal(a, 0.0);
 		auto b_zero = approx_equal(b, 0.0);
 
-		if (a_zero && b_zero)
+		if (b_zero)
 		{
-			return 0.0;
-		}
-		else if (b_zero)
-		{
-			if (a > 0)
+			if (a_zero)
 			{
-				return std::numeric_limits<Number>::infinity();
+				return 0;
+			}
+			else if (a < 0)
+			{
+				return -1 * std::numeric_limits<Number>::infinity();
 			}
 			else
 			{
-				return -1 * std::numeric_limits<Number>::infinity();
+				return std::numeric_limits<Number>::infinity();
 			}
 		}
 		else
