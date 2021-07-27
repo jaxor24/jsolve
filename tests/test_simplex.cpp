@@ -82,7 +82,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
         auto solution = jsolve::simplex::primal_solve(model);
 
         REQUIRE(solution.has_value());
-        REQUIRE(solution.value().objective == 9.0);
+        REQUIRE(solution.value().objective == -8.0);
         REQUIRE(solution.value().variables.at("x12") == 1.0);
         REQUIRE(solution.value().variables.at("x13") == 0.0);
         REQUIRE(solution.value().variables.at("x14") == 0.0);
