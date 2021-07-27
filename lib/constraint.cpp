@@ -48,7 +48,7 @@ namespace jsolve
 
 	std::string Constraint::to_string() const
 	{
-		std::string s = fmt::format("{}[{}]: ", name().empty() ? "c" : name(), n_created());
+		std::string s = fmt::format("{}: ", name().empty() ? "c" : name());
 
 		if (!m_entries.empty())
 		{
