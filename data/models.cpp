@@ -279,4 +279,60 @@ namespace models
 
 		return m;
 	}
+
+	jsolve::Model make_model_8()
+	{
+		// Model from:
+		// Problem 2.11 from Linear Programming (2014) Vanderbei.
+
+		auto m = jsolve::Model(jsolve::Model::Sense::MIN, "P2.11 LP 2014");
+
+		auto* x12 = m.make_variable(jsolve::Variable::Type::LINEAR, "x12");
+		auto* x13 = m.make_variable(jsolve::Variable::Type::LINEAR, "x13");
+		auto* x14 = m.make_variable(jsolve::Variable::Type::LINEAR, "x14");
+		auto* x23 = m.make_variable(jsolve::Variable::Type::LINEAR, "x23");
+		auto* x24 = m.make_variable(jsolve::Variable::Type::LINEAR, "x24");
+		auto* x34 = m.make_variable(jsolve::Variable::Type::LINEAR, "x34");
+
+		x12->cost() = 1;
+		x13->cost() = 8;
+		x14->cost() = 9;
+		x23->cost() = 2;
+		x24->cost() = 7;
+		x34->cost() = 3;
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::GREAT, "C1");
+			c->rhs() = 1;
+			c->add_to_lhs(1.0, x12);
+			c->add_to_lhs(1.0, x13);
+			c->add_to_lhs(1.0, x14);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "C2");
+			c->rhs() = 0;
+			c->add_to_lhs(-1.0, x12);
+			c->add_to_lhs(1.0, x23);
+			c->add_to_lhs(1.0, x24);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "C3");
+			c->rhs() = 0;
+			c->add_to_lhs(-1.0, x13);
+			c->add_to_lhs(-1.0, x23);
+			c->add_to_lhs(1.0, x34);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C4");
+			c->rhs() = 1;
+			c->add_to_lhs(1.0, x14);
+			c->add_to_lhs(1.0, x24);
+			c->add_to_lhs(1.0, x34);
+		}
+
+		return m;
+	}
 }
