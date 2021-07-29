@@ -453,7 +453,7 @@ namespace jsolve::simplex
 			log()->info("Iteration: {} Obj = {} {}",
 				iter,
 				obj_phase_2,
-				in_phase_1 ? fmt::format("(Phase 1 Obj = {})", obj_phase_2)  : ""
+				in_phase_1 ? fmt::format("(Phase 1 Obj = {})", obj_phase_1)  : ""
 			);
 			log()->debug("c = {}", c);
 			log()->debug("A = {}", A);
