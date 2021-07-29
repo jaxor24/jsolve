@@ -465,6 +465,13 @@ namespace jsolve::simplex
 			// Grab the corresponding A column
 			auto Acol = A.slice({}, { col_idx });
 
+			if (((-1.0 * Acol) > eps).sum() == 0)
+			{
+				// No positive coefficients on entering variable
+				log()->warn("Model is unbounded");
+				return {};
+			}
+
 			// Select leaving variable
 			// Pick i such that: a[i,k]/b[i] is maximised
 			auto [t, leaving_row_index] = div_elem(-1.0 * Acol, b, ratio_test_division).col_max();
@@ -474,12 +481,6 @@ namespace jsolve::simplex
 			log()->debug("Leaving variable:");
 			log()->debug("With a max ratio value {} at row {}", t(0, 0), row_idx);
 
-			if (leaving_ratio < eps)
-			{
-				// Leaving ratio is non-positive
-				log()->warn("Model is unbounded");
-				return {};
-			}
 
 			log()->debug("Pivot on element {} at {},{}", A(row_idx, col_idx), row_idx, col_idx);
 
