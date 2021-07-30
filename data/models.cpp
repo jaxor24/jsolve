@@ -335,4 +335,56 @@ namespace models
 
 		return m;
 	}
+
+	jsolve::Model make_model_9()
+	{
+		// Model from 'Vincent Conitzer' simplex lecture notes.
+		// Contains a degerate pivot.
+
+		auto m = jsolve::Model(jsolve::Model::Sense::MAX, "Degenerate Example");
+
+		auto* x1 = m.make_variable(jsolve::Variable::Type::LINEAR, "x1");
+		auto* x2 = m.make_variable(jsolve::Variable::Type::LINEAR, "x2");
+		auto* x3 = m.make_variable(jsolve::Variable::Type::LINEAR, "x3");
+		auto* x4 = m.make_variable(jsolve::Variable::Type::LINEAR, "x4");
+		auto* x5 = m.make_variable(jsolve::Variable::Type::LINEAR, "x5");
+
+		x1->cost() = 4;
+		x2->cost() = 5;
+		x3->cost() = 4;
+		x4->cost() = 7;
+		x5->cost() = 1;
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C1");
+			c->rhs() = 1;
+			c->add_to_lhs(1.0, x1);
+			c->add_to_lhs(1.0, x3);
+			c->add_to_lhs(1.0, x4);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C2");
+			c->rhs() = 1;
+			c->add_to_lhs(1.0, x1);
+			c->add_to_lhs(1.0, x2);
+			c->add_to_lhs(1.0, x4);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C3");
+			c->rhs() = 1;
+			c->add_to_lhs(1.0, x2);
+			c->add_to_lhs(1.0, x3);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C4");
+			c->rhs() = 1;
+			c->add_to_lhs(1.0, x4);
+			c->add_to_lhs(1.0, x5);
+		}
+
+		return m;
+	}
 }
