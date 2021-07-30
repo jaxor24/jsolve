@@ -339,7 +339,7 @@ namespace models
 	jsolve::Model make_model_9()
 	{
 		// Model from 'Vincent Conitzer' simplex lecture notes.
-		// Contains a degerate pivot.
+		// Contains a degenerate pivot.
 
 		auto m = jsolve::Model(jsolve::Model::Sense::MAX, "Degenerate Example");
 
@@ -383,6 +383,50 @@ namespace models
 			c->rhs() = 1;
 			c->add_to_lhs(1.0, x4);
 			c->add_to_lhs(1.0, x5);
+		}
+
+		return m;
+	}
+
+	jsolve::Model make_model_10()
+	{
+		// Model from 'Vincent Conitzer' simplex lecture notes.
+		// Requires a phase 1.
+
+		auto m = jsolve::Model(jsolve::Model::Sense::MAX, "NEEDS PHASE 1");
+
+		auto* x1 = m.make_variable(jsolve::Variable::Type::LINEAR, "x1");
+		auto* x2 = m.make_variable(jsolve::Variable::Type::LINEAR, "x2");
+
+		x1->cost() = 3;
+		x2->cost() = 2;
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C1");
+			c->rhs() = 16;
+			c->add_to_lhs(4, x1);
+			c->add_to_lhs(2, x2);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C2");
+			c->rhs() = 8;
+			c->add_to_lhs(1, x1);
+			c->add_to_lhs(2, x2);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C3");
+			c->rhs() = 5;
+			c->add_to_lhs(1, x1);
+			c->add_to_lhs(1, x2);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C4");
+			c->rhs() = -2;
+			c->add_to_lhs(-1, x1);
+			c->add_to_lhs(-1, x2);
 		}
 
 		return m;
