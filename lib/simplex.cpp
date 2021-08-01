@@ -378,7 +378,7 @@ namespace jsolve::simplex
 		auto c_phase_1 = Mat{ model.c.n_rows(), model.c.n_cols() + 1, 0.0 };
 		c_phase_1(0, c_phase_1.n_cols() - 1) = -1;
 
-		// Phase 2 objective  = [ c | 0 ]
+		// Phase 2 objective = max [ c | 0 ]
 		auto c_phase_2 = Mat{ model.c.n_rows(), model.c.n_cols() + 1, 0.0 };
 		c_phase_2.update({}, { 0, model.c.n_cols() - 1 }, model.c);
 
