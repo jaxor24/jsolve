@@ -431,4 +431,49 @@ namespace models
 
 		return m;
 	}
+
+	jsolve::Model make_model_11()
+	{
+		// Model from Winston, OR. pg. 172.
+
+		auto m = jsolve::Model(jsolve::Model::Sense::MAX, "COULD CYCLE");
+
+		auto* x1 = m.make_variable(jsolve::Variable::Type::LINEAR, "x1");
+		auto* x2 = m.make_variable(jsolve::Variable::Type::LINEAR, "x2");
+		auto* x3 = m.make_variable(jsolve::Variable::Type::LINEAR, "x3");
+		auto* x4 = m.make_variable(jsolve::Variable::Type::LINEAR, "x4");
+
+		x1->cost() = -3;
+		x2->cost() = 1;
+		x3->cost() = -6;
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C1");
+			c->rhs() = 0;
+			c->add_to_lhs(9, x1);
+			c->add_to_lhs(1, x2);
+			c->add_to_lhs(-9, x3);
+			c->add_to_lhs(-2, x4);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C2");
+			c->rhs() = 0;
+			c->add_to_lhs(1, x1);
+			c->add_to_lhs(1.0/3, x2);
+			c->add_to_lhs(-2, x3);
+			c->add_to_lhs(-1.0/3, x4);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C3");
+			c->rhs() = 1;
+			c->add_to_lhs(-9, x1);
+			c->add_to_lhs(-1, x2);
+			c->add_to_lhs(9, x3);
+			c->add_to_lhs(2, x4);
+		}
+
+		return m;
+	}
 }

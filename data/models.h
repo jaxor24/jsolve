@@ -12,4 +12,5 @@ namespace models
 	jsolve::Model make_model_8();
 	jsolve::Model make_model_9();
 	jsolve::Model make_model_10();
+	jsolve::Model make_model_11();
 }
