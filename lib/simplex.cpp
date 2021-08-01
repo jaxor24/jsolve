@@ -207,6 +207,7 @@ namespace jsolve::simplex
 	struct Var
 	{
 		std::size_t index;
+		int subscript;
 		bool slack{ false };
 		bool dummy{ false };
 	};
@@ -271,20 +272,20 @@ namespace jsolve::simplex
 		// Initially, rows of A are the slack vars
 		for (std::size_t i = 0; i < A.n_rows(); i++)
 		{
-			locations.basics[i] = { i, true, false };
+			locations.basics[i] = { i, int(i + A.n_cols() - 1), true, false };
 		}
 
 		// Initially, cols of A are the user vars
 		for (std::size_t i = 0; i < A.n_cols(); i++)
 		{
-			locations.non_basics[i] = { i, false, false };
+			locations.non_basics[i] = { i, int(i), false, false };
 		}
-		
+
 		// Assume phase 1 dummy
 		if (phase_1_dummy)
 		{
 			std::size_t idx = A.n_cols() - 1;
-			locations.non_basics[idx] = { idx, false, true };
+			locations.non_basics[idx] = { idx, -1, false, true };
 		}
 
 		return locations;
@@ -371,9 +372,8 @@ namespace jsolve::simplex
 		auto model = to_standard_form(user_model);
 
 		// Assume we need both phase 1 and 2 objectives
-
 		// Add dummy variable as variable n + 1 (extra column on A and c)
-		// 
+		
 		// Phase 1 objective is = max [ 0 | -1]
 		auto c_phase_1 = Mat{ model.c.n_rows(), model.c.n_cols() + 1, 0.0 };
 		c_phase_1(0, c_phase_1.n_cols() - 1) = -1;
@@ -423,6 +423,7 @@ namespace jsolve::simplex
 
 			auto [row_min, row_min_idx] = b.col_min();
 			auto col_idx = c_phase_1.n_cols() - 1;
+
 			pivot(
 				row_min_idx(0,0),
 				col_idx, 
@@ -474,15 +475,56 @@ namespace jsolve::simplex
 
 			// Select leaving variable
 			// Pick i such that: a[i,k]/b[i] is maximised
-			auto [t, leaving_row_index] = div_elem(-1.0 * Acol, b, ratio_test_division).col_max();
-			auto leaving_ratio = t(0, 0);
-			auto row_idx = leaving_row_index(0, 0);
+			// auto [t, leaving_row_index] = div_elem(-1.0 * Acol, b, ratio_test_division).col_max();
+			// auto row_idx = leaving_row_index(0, 0);
+
+			std::optional<double> max_ratio;
+			std::size_t row_idx;
+			int var_subscript{ std::numeric_limits<int>::max() };
+
+			for (auto [n_cols, col] : Acol.enumerate_cols())
+			{
+				for (auto [n_row, elem] : enumerate(col))
+				{
+					if (!in_phase_1 && locations.basics[n_row].dummy)
+					{
+						// If in phase 2, we don't care about the dummy var
+						continue;
+					}
+
+					auto new_ratio = ratio_test_division(-elem, b(n_row, 0));
+
+					if (!max_ratio)
+					{
+						max_ratio = new_ratio;
+						row_idx = n_row;
+						var_subscript = locations.basics[n_row].subscript;
+					}
+					else
+					{
+						if (new_ratio > max_ratio.value())
+						{
+							max_ratio = new_ratio;
+							row_idx = n_row;
+							var_subscript = locations.basics[n_row].subscript;
+						}
+						else if (new_ratio == max_ratio.value())
+						{
+							// Bland's rule. Break ties in the ratio test by picking the variable with the smallest subscript.
+							if (locations.basics[n_row].subscript < var_subscript)
+							{
+								max_ratio = new_ratio;
+								row_idx = n_row;
+								var_subscript = locations.basics[n_row].subscript;
+							}
+						}
+					}
+				}
+			}
 
 			log()->debug("Leaving variable:");
-			log()->debug("With a max ratio value {} at row {}", t(0, 0), row_idx);
-
-
-			log()->debug("Pivot on element {} at {},{}", A(row_idx, col_idx), row_idx, col_idx);
+			log()->debug("With a max ratio value {} at row {}", max_ratio.value(), row_idx);
+			log()->debug("Pivot on element {} at {},{}", A_dict(row_idx, col_idx), row_idx, col_idx);
 
 			pivot(
 				row_idx, 
