@@ -405,7 +405,7 @@ namespace jsolve::simplex
 		double obj_phase_1 = 0;
 		double obj_phase_2 = 0;
 
-		int iter = 1;
+		int iter = 0;
 
 		// Do first pivot of phase 1 variable and most negative RHS row
 		if (in_phase_1)
