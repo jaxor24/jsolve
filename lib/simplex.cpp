@@ -387,7 +387,7 @@ namespace jsolve::simplex
 		A_phase_1.update({ 0, model.A.n_rows() - 1 }, { 0, model.A.n_cols() - 1 }, model.A);
 		A_phase_1.update({}, { model.A.n_cols() }, Mat{ model.A.n_rows(), 1, -1.0 });
 
-		auto A = -1 * A_phase_1;  // -1 to model rearranging for slack vars
+		auto A_dict = -1 * A_phase_1;  // -1 to convert to dictionary with basic vars on LHS
 		auto b = model.b;
 
 		bool in_phase_1 = false;
@@ -399,8 +399,8 @@ namespace jsolve::simplex
 			in_phase_1 = true;
 		}
 
-		// Keep track of variables so we can recover solutions at the end
-		auto locations = init_locations(A, true);
+		// Keep track of variable locations
+		auto locations = init_locations(A_dict, true);
 
 		double obj_phase_1 = 0;
 		double obj_phase_2 = 0;
@@ -418,7 +418,7 @@ namespace jsolve::simplex
 			);
 			log()->debug("c_phase_1 = {}", c_phase_1);
 			log()->debug("c_phase_2 = {}", c_phase_2);
-			log()->debug("A = {}", A);
+			log()->debug("A = {}", A_dict);
 			log()->debug("b = {}", b);
 
 			auto [row_min, row_min_idx] = b.col_min();
@@ -429,7 +429,7 @@ namespace jsolve::simplex
 				locations, 
 				obj_phase_1, 
 				obj_phase_2, 
-				A, 
+				A_dict,
 				b, 
 				c_phase_1, 
 				c_phase_2
@@ -456,14 +456,14 @@ namespace jsolve::simplex
 				in_phase_1 ? fmt::format("(Phase 1 Obj = {})", obj_phase_1)  : ""
 			);
 			log()->debug("c = {}", c);
-			log()->debug("A = {}", A);
+			log()->debug("A = {}", A_dict);
 			log()->debug("b = {}", b);
 
 			auto col_idx = entering_idx.value();
 			log()->debug("Entering variable:");
 			log()->debug("Objective max coeff {} at col {}", c(0, col_idx), col_idx);
 			// Grab the corresponding A column
-			auto Acol = A.slice({}, { col_idx });
+			auto Acol = A_dict.slice({}, { col_idx });
 
 			if (((-1.0 * Acol) > eps).sum() == 0)
 			{
@@ -490,7 +490,7 @@ namespace jsolve::simplex
 				locations, 
 				obj_phase_1, 
 				obj_phase_2, 
-				A, 
+				A_dict,
 				b, 
 				c_phase_1, 
 				c_phase_2
