@@ -254,8 +254,23 @@ namespace jsolve
 		}
 	}
 
+	std::size_t count_lines(std::filesystem::path path)
+	{
+		std::ifstream file{ path, std::ios::in | std::ios::binary };
+
+		std::size_t line_count = std::count(
+			std::istreambuf_iterator<char>(file),
+			std::istreambuf_iterator<char>(), 
+			'\n'
+		);
+
+		return line_count;
+	}
+
 	jsolve::Model read_mps(std::filesystem::path path)
 	{
+		log()->info("Reading MPS file: {}", path);
+
 		std::optional<jsolve::Model> model;
 
 		if (!std::filesystem::exists(path))
@@ -267,13 +282,29 @@ namespace jsolve
 
 		if (file.is_open())
 		{
+			auto line_count = count_lines(path);
+			log()->info("File has {} lines", line_count);
+
 			auto current_section = section::NONE;
+
+			const std::size_t print_percent = 10;
+			std::size_t step = line_count / (100 / print_percent);
+			std::size_t next_print = step;
+			std::size_t current_line = 0;
 
 			std::string line;
 			while (getline(file, line))
 			{
 				log()->debug("|{}", line);
 				process_row(model, current_section, line);
+
+				current_line++;
+				if (current_line >= next_print)
+				{
+					auto percent = (100 * current_line) / line_count;
+					next_print += step;
+					log()->info("{}%", percent);
+				}
 			}
 		}
 		else
@@ -281,9 +312,8 @@ namespace jsolve
 			throw MPSError("File could not be opened: {}", path);
 		}
 
-		log()->info("Parsed model: {}", model->name());
-		log()->info("Variables: {}", model->get_variables().size());
-		log()->info("Constraints: {}", model->get_variables().size());
+		log()->info("Parsed model:");
+		//log()->info(model->to_string());
 		return std::move(model.value());
 	}
 }

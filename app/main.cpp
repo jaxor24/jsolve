@@ -4,7 +4,6 @@
 
 int main(int argc, char* argv[])
 {
-
 	std::string mps_path;
 	std::string log_level;
 
@@ -27,7 +26,7 @@ int main(int argc, char* argv[])
 	logging::init_logging(log_level);
 	log()->info("Starting jsolve...");
 
-	solve_mps_file(mps_path);
+	go(mps_path);
 
 	log()->info("Done.");
 	return 0;

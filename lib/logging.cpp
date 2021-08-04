@@ -34,7 +34,7 @@ namespace logging
         }
         else
         {
-            throw std::runtime_error("Unvalid logging level");
+            logger->set_level(spdlog::level::debug);
         }
         
         spdlog::register_logger(logger);
