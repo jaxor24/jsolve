@@ -460,9 +460,9 @@ namespace models
 			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C2");
 			c->rhs() = 0;
 			c->add_to_lhs(1, x1);
-			c->add_to_lhs(1.0/3, x2);
+			c->add_to_lhs(1.0 / 3, x2);
 			c->add_to_lhs(-2, x3);
-			c->add_to_lhs(-1.0/3, x4);
+			c->add_to_lhs(-1.0 / 3, x4);
 		}
 
 		{
