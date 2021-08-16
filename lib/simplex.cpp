@@ -206,7 +206,7 @@ namespace jsolve::simplex
 
 	struct Var
 	{
-		std::size_t index;
+		int index;
 		int subscript;
 		bool slack{ false };
 		bool dummy{ false };
@@ -270,22 +270,37 @@ namespace jsolve::simplex
 		Locations locations;
 
 		// Initially, rows of A are the slack vars
-		for (std::size_t i = 0; i < A.n_rows(); i++)
+		for (int i = 0; i < A.n_rows(); i++)
 		{
-			locations.basics[i] = { i, int(i + A.n_cols() - 1), true, false };
+			locations.basics[i] = { 
+				i, 
+				i + static_cast<int>(A.n_cols()) - 1,
+				true, 
+				false 
+			};
 		}
 
 		// Initially, cols of A are the user vars
-		for (std::size_t i = 0; i < A.n_cols(); i++)
+		for (int i = 0; i < A.n_cols(); i++)
 		{
-			locations.non_basics[i] = { i, int(i), false, false };
+			locations.non_basics[i] = {
+				i,
+				i, 
+				false, 
+				false 
+			};
 		}
 
 		// Assume phase 1 dummy
 		if (phase_1_dummy)
 		{
-			std::size_t idx = A.n_cols() - 1;
-			locations.non_basics[idx] = { idx, -1, false, true };
+			int idx = static_cast<int>(A.n_cols()) - 1;
+			locations.non_basics[idx] = { 
+				idx, 
+				-1, 
+				false, 
+				true 
+			};
 		}
 
 		return locations;
@@ -480,7 +495,7 @@ namespace jsolve::simplex
 
 			std::optional<double> max_ratio;
 			std::size_t row_idx;
-			int var_subscript{ std::numeric_limits<int>::max() };
+			std::optional<int> subscript;
 
 			for (auto [n_cols, col] : Acol.enumerate_cols())
 			{
@@ -493,12 +508,13 @@ namespace jsolve::simplex
 					}
 
 					auto new_ratio = ratio_test_division(-elem, b(n_row, 0));
+					auto curr_var = locations.basics[n_row];
 
 					if (!max_ratio)
 					{
 						max_ratio = new_ratio;
 						row_idx = n_row;
-						var_subscript = locations.basics[n_row].subscript;
+						subscript = locations.basics[n_row].subscript;
 					}
 					else
 					{
@@ -506,16 +522,16 @@ namespace jsolve::simplex
 						{
 							max_ratio = new_ratio;
 							row_idx = n_row;
-							var_subscript = locations.basics[n_row].subscript;
+							subscript = locations.basics[n_row].subscript;
 						}
-						else if (new_ratio == max_ratio.value())
+						else if (approx_equal_new(new_ratio, max_ratio.value()))
 						{
 							// Bland's rule. Break ties in the ratio test by picking the variable with the smallest subscript.
-							if (locations.basics[n_row].subscript < var_subscript)
+							if (!subscript || (locations.basics[n_row].subscript < subscript.value()))
 							{
 								max_ratio = new_ratio;
 								row_idx = n_row;
-								var_subscript = locations.basics[n_row].subscript;
+								subscript = locations.basics[n_row].subscript;
 							}
 						}
 					}
