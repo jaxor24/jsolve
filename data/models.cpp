@@ -476,4 +476,100 @@ namespace models
 
 		return m;
 	}
+
+
+	jsolve::Model make_model_12()
+	{
+		// Model from Winston, OR. pg. 179.
+
+		auto m = jsolve::Model(jsolve::Model::Sense::MIN, "TWO PHASE BEVCO");
+
+		auto* x1 = m.make_variable(jsolve::Variable::Type::LINEAR, "x1");
+		auto* x2 = m.make_variable(jsolve::Variable::Type::LINEAR, "x2");
+
+		x1->cost() = 2;
+		x2->cost() = 3;
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C1");
+			c->rhs() = 4;
+			c->add_to_lhs(1.0 / 2, x1);
+			c->add_to_lhs(1.0 / 4, x2);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::GREAT, "C2");
+			c->rhs() = 20;
+			c->add_to_lhs(1, x1);
+			c->add_to_lhs(3, x2);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "C3");
+			c->rhs() = 10;
+			c->add_to_lhs(1, x1);
+			c->add_to_lhs(1, x2);
+		}
+
+		return m;
+	}
+
+	jsolve::Model make_model_13()
+	{
+		// Model from Winston, OR. pg. 183.
+
+		auto m = jsolve::Model(jsolve::Model::Sense::MAX, "TWO PHASE SIMPLEX");
+
+		auto* x1 = m.make_variable(jsolve::Variable::Type::LINEAR, "x1");
+		auto* x2 = m.make_variable(jsolve::Variable::Type::LINEAR, "x2");
+		auto* x3 = m.make_variable(jsolve::Variable::Type::LINEAR, "x3");
+		auto* x4 = m.make_variable(jsolve::Variable::Type::LINEAR, "x4");
+		auto* x5 = m.make_variable(jsolve::Variable::Type::LINEAR, "x5");
+		auto* x6 = m.make_variable(jsolve::Variable::Type::LINEAR, "x6");
+
+		x1->cost() = 40;
+		x2->cost() = 10;
+		x3->cost() = 0;
+		x4->cost() = 0;
+		x5->cost() = 7;
+		x6->cost() = 14;
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "C1");
+			c->rhs() = 0;
+			c->add_to_lhs(1, x1);
+			c->add_to_lhs(-1, x2);
+			c->add_to_lhs(2, x5);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "C2");
+			c->rhs() = 0;
+			c->add_to_lhs(-2, x1);
+			c->add_to_lhs(1, x2);
+			c->add_to_lhs(-2, x5);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "C3");
+			c->rhs() = 3;
+			c->add_to_lhs(1, x1);
+			c->add_to_lhs(1, x3);
+			c->add_to_lhs(1, x5);
+			c->add_to_lhs(-1, x6);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "C4");
+			c->rhs() = 4;
+			c->add_to_lhs(2, x2);
+			c->add_to_lhs(1, x3);
+			c->add_to_lhs(1, x4);
+			c->add_to_lhs(2, x5);
+			c->add_to_lhs(1, x6);
+		}
+
+		return m;
+	}
 }
+

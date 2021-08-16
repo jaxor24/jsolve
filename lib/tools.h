@@ -39,11 +39,25 @@ private:
 
 inline bool approx_equal(double a, double b)
 {
-    int factor = 2;
+    int factor = 10;
     double min_a = a - (a - std::nextafter(a, std::numeric_limits<double>::lowest())) * factor;
     double max_a = a + (std::nextafter(a, std::numeric_limits<double>::max()) - a) * factor;
     return min_a <= b && max_a >= b;
 }
+
+inline bool approx_equal_new(double a, double b, double eps = 1e-8)
+{
+    if (a == std::numeric_limits<double>::infinity() && b == std::numeric_limits<double>::infinity())
+    {
+        return true;
+    }
+    else
+    {
+        return fabs(a - b) <= eps;
+    }
+}
+
+
 
 
 // Python-like enumerate()
