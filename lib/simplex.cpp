@@ -133,10 +133,10 @@ namespace jsolve::simplex
 			if (cons->type() == Constraint::Type::EQUAL)
 			{
 				converted_constraints.emplace_back(*cons.get());
-				converted_constraints.back().type() = Constraint::Type::GREAT;
+				converted_constraints.back().type() = Constraint::Type::LESS;
 
 				converted_constraints.emplace_back(*cons.get());
-				converted_constraints.back().type() = Constraint::Type::LESS;
+				converted_constraints.back().type() = Constraint::Type::GREAT;
 			}
 			else
 			{
