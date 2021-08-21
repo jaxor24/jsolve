@@ -372,6 +372,10 @@ namespace jsolve::simplex
 				return std::numeric_limits<Number>::infinity();
 			}
 		}
+		else if (a_zero)
+		{
+			return 0;
+		}
 		else
 		{
 			return a / b;
