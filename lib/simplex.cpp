@@ -348,14 +348,14 @@ namespace jsolve::simplex
 		}
 	}
 
-	auto ratio_test_division = [](Number a, Number b) -> Number
+	auto ratio_test_division = [](Number a, Number b, Number eps) -> Number
 	{
 		// A division operator that includes the conventions for the simplex ratio test:
 		// a / 0 = infinity
 		// 0 / 0 = 0
 
-		auto a_zero = approx_equal(a, 0.0);
-		auto b_zero = approx_equal(b, 0.0);
+		auto a_zero = approx_equal_new(a, 0.0, eps);
+		auto b_zero = approx_equal_new(b, 0.0, eps);
 
 		if (b_zero)
 		{
@@ -387,6 +387,9 @@ namespace jsolve::simplex
 		// Follows the implementation in Chapter 4 p46. of "Linear Programming" 2014.
 
 		Timer timer{ info_logger(),  "Primal Simplex Algorithm" };
+
+		int max_iter = 1000;
+		double eps = 1e-9;
 
 		auto model = to_standard_form(user_model);
 
@@ -461,10 +464,6 @@ namespace jsolve::simplex
 		// Pick the objective we need to use
 		auto& c = in_phase_1 ? c_phase_1 : c_phase_2;
 		
-		int max_iter = 500;
-		
-		double eps = 1e-9;
-
 		auto entering_idx = get_entering_variable(c, in_phase_1, locations, eps);
 
 		while (entering_idx)
@@ -511,7 +510,7 @@ namespace jsolve::simplex
 						continue;
 					}
 
-					auto new_ratio = ratio_test_division(-elem, b(n_row, 0));
+					auto new_ratio = ratio_test_division(-elem, b(n_row, 0), eps);
 					auto curr_var = locations.basics[n_row];
 
 					if (!max_ratio)
@@ -528,7 +527,7 @@ namespace jsolve::simplex
 							row_idx = n_row;
 							subscript = locations.basics[n_row].subscript;
 						}
-						else if (approx_equal_new(new_ratio, max_ratio.value()))
+						else if (approx_equal_new(new_ratio, max_ratio.value(), eps))
 						{
 							// Bland's rule. Break ties in the ratio test by picking the variable with the smallest subscript.
 							if (!subscript || (locations.basics[n_row].subscript < subscript.value()))

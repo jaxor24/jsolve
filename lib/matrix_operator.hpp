@@ -168,7 +168,7 @@ Matrix<T> Matrix<T>::operator*=(double x)
 template <typename T>
 Matrix<T> Matrix<T>::operator/=(double x)
 {
-	if (approx_equal(x, 0.0))
+	if (approx_equal_new(x, 0.0))
 	{
 		throw MatrixError("Scalar division by zero");
 	}
