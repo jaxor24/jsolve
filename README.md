@@ -1,3 +1,5 @@
 # jsolver
 
-Trying to implement a basic LP solver.
+Implementing a basic LP solver. 
+
+Currently has a two phase primal simplex algorithm.
