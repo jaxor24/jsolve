@@ -270,7 +270,7 @@ namespace jsolve::simplex
 		Locations locations;
 
 		// Initially, rows of A are the slack vars
-		for (int i = 0; i < A.n_rows(); i++)
+		for (auto i = 0; i < static_cast<int>(A.n_rows()); i++)
 		{
 			locations.basics[i] = { 
 				i, 
@@ -281,7 +281,7 @@ namespace jsolve::simplex
 		}
 
 		// Initially, cols of A are the user vars
-		for (int i = 0; i < A.n_cols(); i++)
+		for (auto i = 0; i < static_cast<int>(A.n_cols()); i++)
 		{
 			locations.non_basics[i] = {
 				i,
@@ -511,7 +511,6 @@ namespace jsolve::simplex
 					}
 
 					auto new_ratio = ratio_test_division(-elem, b(n_row, 0), eps);
-					auto curr_var = locations.basics[n_row];
 
 					if (!max_ratio)
 					{
