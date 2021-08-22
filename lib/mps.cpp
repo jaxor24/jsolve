@@ -312,6 +312,11 @@ namespace jsolve
 			throw MPSError("File could not be opened: {}", path);
 		}
 
+		if (!model)
+		{
+			throw MPSError("No model created");
+		}
+
 		log()->info("Parsed model:");
 		//log()->info(model->to_string());
 		return std::move(model.value());
