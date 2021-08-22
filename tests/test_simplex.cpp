@@ -82,13 +82,13 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
         auto solution = jsolve::simplex::primal_solve(model);
 
         REQUIRE(solution.has_value());
-        REQUIRE(solution.value().objective == -8.0);
-        REQUIRE(solution.value().variables.at("x12") == 1.0);
-        REQUIRE(solution.value().variables.at("x13") == 0.0);
-        REQUIRE(solution.value().variables.at("x14") == 0.0);
-        REQUIRE(solution.value().variables.at("x23") == 0.0);
-        REQUIRE(solution.value().variables.at("x24") == 1.0);
-        REQUIRE(solution.value().variables.at("x34") == 0.0);
+        REQUIRE(approx_equal_new(solution.value().objective, -6.0));
+        REQUIRE(approx_equal_new(solution.value().variables.at("x12"), 1.0));
+        REQUIRE(approx_equal_new(solution.value().variables.at("x13"), 0.0));
+        REQUIRE(approx_equal_new(solution.value().variables.at("x14"), 0.0));
+        REQUIRE(approx_equal_new(solution.value().variables.at("x23"), 1.0));
+        REQUIRE(approx_equal_new(solution.value().variables.at("x24"), 0.0));
+        REQUIRE(approx_equal_new(solution.value().variables.at("x34"), 1.0));
     }
 
     SECTION("model 9")
