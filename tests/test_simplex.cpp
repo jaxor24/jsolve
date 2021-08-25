@@ -82,13 +82,13 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
         auto solution = jsolve::simplex::primal_solve(model);
 
         REQUIRE(solution.has_value());
-        REQUIRE(approx_equal_new(solution.value().objective, -6.0));
-        REQUIRE(approx_equal_new(solution.value().variables.at("x12"), 1.0));
-        REQUIRE(approx_equal_new(solution.value().variables.at("x13"), 0.0));
-        REQUIRE(approx_equal_new(solution.value().variables.at("x14"), 0.0));
-        REQUIRE(approx_equal_new(solution.value().variables.at("x23"), 1.0));
-        REQUIRE(approx_equal_new(solution.value().variables.at("x24"), 0.0));
-        REQUIRE(approx_equal_new(solution.value().variables.at("x34"), 1.0));
+        REQUIRE(approx_equal(solution.value().objective, -6.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x12"), 1.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x13"), 0.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x14"), 0.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x23"), 1.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x24"), 0.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x34"), 1.0));
     }
 
     SECTION("model 9")
@@ -146,12 +146,12 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
         auto solution = jsolve::simplex::primal_solve(model);
 
         REQUIRE(solution.has_value());
-        REQUIRE(approx_equal_new(solution.value().objective, 7.0));
-        REQUIRE(approx_equal_new(solution.value().variables.at("x1"), 0.0));
-        REQUIRE(approx_equal_new(solution.value().variables.at("x2"), 0.0));
-        REQUIRE(approx_equal_new(solution.value().variables.at("x3"), 3.5));
-        REQUIRE(approx_equal_new(solution.value().variables.at("x4"), 0.0));
-        REQUIRE(approx_equal_new(solution.value().variables.at("x5"), 0.0));
-        REQUIRE(approx_equal_new(solution.value().variables.at("x6"), 0.5));
+        REQUIRE(approx_equal(solution.value().objective, 7.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x1"), 0.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x2"), 0.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x3"), 3.5));
+        REQUIRE(approx_equal(solution.value().variables.at("x4"), 0.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x5"), 0.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x6"), 0.5));
     }
 }

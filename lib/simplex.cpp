@@ -354,8 +354,8 @@ namespace jsolve::simplex
 		// a / 0 = infinity
 		// 0 / 0 = 0
 
-		auto a_zero = approx_equal_new(a, 0.0, eps);
-		auto b_zero = approx_equal_new(b, 0.0, eps);
+		auto a_zero = approx_equal(a, 0.0, eps);
+		auto b_zero = approx_equal(b, 0.0, eps);
 
 		if (b_zero)
 		{
@@ -526,7 +526,7 @@ namespace jsolve::simplex
 							row_idx = n_row;
 							subscript = locations.basics[n_row].subscript;
 						}
-						else if (approx_equal_new(new_ratio, max_ratio.value(), eps))
+						else if (approx_equal(new_ratio, max_ratio.value(), eps))
 						{
 							// Bland's rule. Break ties in the ratio test by picking the variable with the smallest subscript.
 							if (!subscript || (locations.basics[n_row].subscript < subscript.value()))
