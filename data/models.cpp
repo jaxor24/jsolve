@@ -574,7 +574,7 @@ namespace models
 
 	jsolve::Model make_model_14()
 	{
-		// Model from Winston, OR. pg. 159.
+		// Model from Winston, OR. pg. 159. Unbounded.
 
 		auto m = jsolve::Model(jsolve::Model::Sense::MAX, "UNBONDED");
 
@@ -595,6 +595,47 @@ namespace models
 			c->rhs() = 1;
 			c->add_to_lhs(-1, x1);
 			c->add_to_lhs(+1, x2);
+		}
+
+		return m;
+	}
+
+	jsolve::Model make_model_15()
+	{
+		// Model from Luenberger & Ye, 4th ed, pg. 47.
+
+		auto m = jsolve::Model(jsolve::Model::Sense::MAX, "SIMPLE");
+
+		auto* x1 = m.make_variable(jsolve::Variable::Type::LINEAR, "x1");
+		auto* x2 = m.make_variable(jsolve::Variable::Type::LINEAR, "x2");
+		auto* x3 = m.make_variable(jsolve::Variable::Type::LINEAR, "x3");
+
+		x1->cost() = 3;
+		x2->cost() = 1;
+		x3->cost() = 3;
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C1");
+			c->rhs() = 2;
+			c->add_to_lhs(+2, x1);
+			c->add_to_lhs(+1, x2);
+			c->add_to_lhs(+1, x3);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C2");
+			c->rhs() = 5;
+			c->add_to_lhs(+1, x1);
+			c->add_to_lhs(+2, x2);
+			c->add_to_lhs(+3, x3);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C3");
+			c->rhs() = 5;
+			c->add_to_lhs(+2, x1);
+			c->add_to_lhs(+2, x2);
+			c->add_to_lhs(+1, x3);
 		}
 
 		return m;
