@@ -640,5 +640,38 @@ namespace models
 
 		return m;
 	}
+
+	jsolve::Model make_model_16()
+	{
+		// Model from Luenberger & Ye, 4th ed, pg. 51.
+
+		auto m = jsolve::Model(jsolve::Model::Sense::MIN, "SIMPLE");
+
+		auto* x1 = m.make_variable(jsolve::Variable::Type::LINEAR, "x1");
+		auto* x2 = m.make_variable(jsolve::Variable::Type::LINEAR, "x2");
+		auto* x3 = m.make_variable(jsolve::Variable::Type::LINEAR, "x3");
+
+		x1->cost() = 4;
+		x2->cost() = 1;
+		x3->cost() = 1;
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "C1");
+			c->rhs() = 4;
+			c->add_to_lhs(+2, x1);
+			c->add_to_lhs(+1, x2);
+			c->add_to_lhs(+2, x3);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "C2");
+			c->rhs() = 3;
+			c->add_to_lhs(+3, x1);
+			c->add_to_lhs(+3, x2);
+			c->add_to_lhs(+1, x3);
+		}
+
+		return m;
+	}
 }
 
