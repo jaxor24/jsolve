@@ -28,8 +28,8 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
         "CMAKE_VERBOSE_MAKEFILE": "ON",
-        "CMAKE_CXX_COMPILER": "clang++-10",
-        "CMAKE_C_COMPILER": "clang-10",
+        "CMAKE_CXX_COMPILER": "clang++-12",
+        "CMAKE_C_COMPILER": "clang-12",
         "CMAKE_CXX_FLAGS": "-std=c++17 -Wall -Wextra -pedantic -Werror"
       },
       "vendor": {
