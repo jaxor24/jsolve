@@ -39,6 +39,9 @@ private:
 
 inline bool approx_equal(double a, double b, double eps = 1e-8)
 {
+    // Compares a == b, where they will be considered equal below some tolerance.
+    // Compares infinity to itself as true.
+
     if (a == std::numeric_limits<double>::infinity() && b == std::numeric_limits<double>::infinity())
     {
         return true;
@@ -47,6 +50,12 @@ inline bool approx_equal(double a, double b, double eps = 1e-8)
     {
         return fabs(a - b) <= eps;
     }
+}
+
+inline bool approx_greater(double a, double b, double eps = 1e-8)
+{
+    // Compares a > b, where they will be considered equal below some tolerance.
+    return a > b && !approx_equal(a, b, eps);
 }
 
 

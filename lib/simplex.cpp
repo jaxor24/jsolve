@@ -520,7 +520,7 @@ namespace jsolve::simplex
 					}
 					else
 					{
-						if (new_ratio > max_ratio.value())
+						if (approx_greater(new_ratio, max_ratio.value(), eps))
 						{
 							max_ratio = new_ratio;
 							row_idx = n_row;
