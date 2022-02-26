@@ -388,7 +388,7 @@ namespace jsolve::simplex
 
 		Timer timer{ info_logger(),  "Primal Simplex Algorithm" };
 
-		int max_iter = 1000;
+		int max_iter = 10000;
 		double eps = 1e-9;
 
 		auto model = to_standard_form(user_model);
