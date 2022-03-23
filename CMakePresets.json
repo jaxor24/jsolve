@@ -11,7 +11,7 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
         "CMAKE_VERBOSE_MAKEFILE": "ON",
-        "CMAKE_CXX_FLAGS": "-std=c++17 -Wall -Wextra -pedantic -Werror"
+        "CMAKE_CXX_FLAGS": "-std=c++17 -Wall -Wextra -Wpedantic -Werror"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Linux" ] },
@@ -30,7 +30,7 @@
         "CMAKE_VERBOSE_MAKEFILE": "ON",
         "CMAKE_CXX_COMPILER": "clang++-12",
         "CMAKE_C_COMPILER": "clang-12",
-        "CMAKE_CXX_FLAGS": "-std=c++17 -Wall -Wextra -pedantic -Werror"
+        "CMAKE_CXX_FLAGS": "-std=c++17 -Wall -Wextra -Wpedantic -Werror"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Linux" ] },
