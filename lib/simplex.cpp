@@ -580,7 +580,8 @@ namespace jsolve::simplex
 
 		// Extract solution
 		Solution sol;
-		sol.objective = obj_phase_2;
+
+		sol.objective = user_model.sense() == Model::Sense::MIN ? -1.0 * obj_phase_2 : obj_phase_2;
 
 		for (auto& [idx, var] : locations.basics)
 		{ 
