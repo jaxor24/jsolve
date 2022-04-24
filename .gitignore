@@ -70,3 +70,6 @@ cmake-build-*/
 *.tcl
 *.user
 *.sln
+
+# venv
+.venv/
