@@ -36,7 +36,7 @@
       }
     },
     {
-      "name": "windows-default",
+      "name": "windows-debug",
       "displayName": "Windows x64 Debug",
       "description": "Target Windows with the Visual Studio development environment.",
       "generator": "Ninja",
