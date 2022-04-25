@@ -65,7 +65,7 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-        "CMAKE_CXX_FLAGS": "/DWIN32 /D_WINDOWS /W4 /GR /EHsc/WX"
+        "CMAKE_CXX_FLAGS": "/DWIN32 /D_WINDOWS /W4 /GR /EHsc /WX"
       },
       "vendor": { "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Windows" ] } }
     }
