@@ -598,7 +598,7 @@ namespace jsolve::simplex
 
 		log()->debug("---------------------------------------");
 		log()->info("Optimal solution found");
-		log()->info("Objective = {:.2f} ({} iterations)", obj_phase_2, iter);
+		log()->info("Objective = {:.2f} ({} iterations)", sol.objective, iter);
 
 		return sol;
 	}
