@@ -20,6 +20,6 @@ void go(std::filesystem::path file)
 
 	if (solution)
 	{
-		jsolve::log_solution(info_logger(), solution.value());
+		jsolve::log_solution(debug_logger(), solution.value());
 	}
 }

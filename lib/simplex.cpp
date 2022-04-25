@@ -433,7 +433,7 @@ namespace jsolve::simplex
 		if (in_phase_1)
 		{
 			log()->debug("---------------------------------------");
-			log()->info("Iteration: {} Obj = {} {}",
+			log()->debug("Iteration: {} Obj = {} {}",
 				iter,
 				obj_phase_2,
 				in_phase_1 ? fmt::format("(Phase 1 Obj = {})", obj_phase_2) : ""
@@ -469,7 +469,7 @@ namespace jsolve::simplex
 		while (entering_idx)
 		{
 			log()->debug("---------------------------------------");
-			log()->info("Iteration: {} Obj = {} {}",
+			log()->debug("Iteration: {} Obj = {} {}",
 				iter,
 				obj_phase_2,
 				in_phase_1 ? fmt::format("(Phase 1 Obj = {})", obj_phase_1)  : ""
@@ -575,9 +575,6 @@ namespace jsolve::simplex
 			}
 		}
 
-		log()->debug("---------------------------------------");
-		log()->info("Optimal solution = {} ({} iterations)", obj_phase_2, iter);
-
 		// Extract solution
 		Solution sol;
 
@@ -598,6 +595,10 @@ namespace jsolve::simplex
 				sol.variables[user_model.get_variables().at(var.index)->name()] = 0;
 			}
 		}
+
+		log()->debug("---------------------------------------");
+		log()->info("Optimal solution found");
+		log()->info("Objective = {:.2f} ({} iterations)", obj_phase_2, iter);
 
 		return sol;
 	}
