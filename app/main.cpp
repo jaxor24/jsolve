@@ -2,6 +2,8 @@
 #include "CommandLine.hpp"
 #include "work.h"
 
+#include "tools.h"
+
 int main(int argc, char* argv[])
 {
 	std::string mps_path;
@@ -24,10 +26,11 @@ int main(int argc, char* argv[])
 	}
 
 	logging::init_logging(log_level);
-	log()->info("Starting jsolve...");
 
-	go(mps_path);
+	{
+		Timer timer{ info_logger(),  "Running jsolve" };
+		go(mps_path);
+	}
 
-	log()->info("Done.");
 	return 0;
 }
