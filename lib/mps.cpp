@@ -1,6 +1,7 @@
 #include "mps.h"
 
 #include "logging.h"
+#include "tools.h"
 
 #include <optional>
 #include <fstream>
@@ -269,7 +270,7 @@ namespace jsolve
 
 	jsolve::Model read_mps(std::filesystem::path path)
 	{
-		log()->info("Reading MPS file: {}", path);
+		Timer timer{ info_logger(),  "Reading MPS file {}", path };
 
 		std::optional<jsolve::Model> model;
 
@@ -283,7 +284,7 @@ namespace jsolve
 		if (file.is_open())
 		{
 			auto line_count = count_lines(path);
-			log()->info("File has {} lines", line_count);
+			log()->debug("File has {} lines", line_count);
 
 			auto current_section = section::NONE;
 
@@ -303,7 +304,7 @@ namespace jsolve
 				{
 					auto percent = (100 * current_line) / line_count;
 					next_print += step;
-					log()->info("{}%", percent);
+					log()->debug("{}%", percent);
 				}
 			}
 		}
@@ -317,8 +318,6 @@ namespace jsolve
 			throw MPSError("No model created");
 		}
 
-		log()->info("Parsed model:");
-		//log()->info(model->to_string());
 		return std::move(model.value());
 	}
 }
