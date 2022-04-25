@@ -8,16 +8,17 @@
 
 // Basic RAII timer
 
-template <typename Log>
+template <typename Log, typename... Args>
 class Timer
 {
 public:
     using Clock = std::chrono::high_resolution_clock;
-    Timer(Log log, const std::string& msg) 
+
+    Timer(Log log, Args... args)
         : 
         m_start{ Clock::now() },
         m_log{ log },
-        m_msg{ msg }
+        m_msg{ fmt::format(std::forward<Args>(args)...) }
     {
         m_log("(Start) {}", m_msg);
     }
