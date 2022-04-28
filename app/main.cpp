@@ -25,14 +25,13 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	logging::init_logging(log_level);
-
 	try
 	{
+		logging::init_logging(log_level);
 		Timer timer{ info_logger(),  "Running jsolve" };
 		go(mps_path);
 	}
-	catch (std::runtime_error const& e)
+	catch (std::exception const& e)
 	{
 		log()->error("Exception: {}", e.what());
 		return -1;
