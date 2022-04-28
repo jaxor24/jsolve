@@ -174,13 +174,14 @@ namespace jsolve
 		else if (section == section::BOUNDS)
 		{
 			const auto& bound_type = words.at(0);
-			// const auto& bound_name = words.at(1);
+			// const auto& bound_name = words.at(1); // ignored
 
 			auto* variable = model->get_variable(words.at(2));
-			const auto& bound_value = std::stod(words.at(3));
-
+			
 			if (bound_type == "LO")
 			{
+				const auto& bound_value = std::stod(words.at(3));
+
 				// Lower bound
 				if (bound_value < 0.0)
 				{
@@ -196,6 +197,8 @@ namespace jsolve
 			}
 			else if (bound_type == "UP")
 			{
+				const auto& bound_value = std::stod(words.at(3));
+
 				// Upper bound
 				if (bound_value < 0.0)
 				{
@@ -211,6 +214,8 @@ namespace jsolve
 			}
 			else if (bound_type == "FX")
 			{
+				const auto& bound_value = std::stod(words.at(3));
+
 				// Fixed value
 				if (bound_value < 0.0)
 				{
