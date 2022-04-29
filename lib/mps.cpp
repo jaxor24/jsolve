@@ -241,7 +241,7 @@ namespace jsolve
 		}
 		else if (section == section::RANGES)
 		{
-			log()->warn("Unprocessed mps section: RANGES");
+			throw MPSError("Unhandled MPS section RANGES");
 		}
 	}
 
