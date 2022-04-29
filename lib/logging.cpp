@@ -34,7 +34,7 @@ namespace logging
         }
         else
         {
-            logger->set_level(spdlog::level::debug);
+            logger->set_level(spdlog::level::info);
         }
         
         spdlog::register_logger(logger);
