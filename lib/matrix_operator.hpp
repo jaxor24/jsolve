@@ -1,5 +1,7 @@
 #include "matrix.h"
 
+#include <execution>
+
 // Member functions ---------------------------------------------------------------
 // Access
 
@@ -121,7 +123,7 @@ Matrix<T>& Matrix<T>::operator*=(const Matrix<T>& rhs)
 
 	Matrix result{ n_rows(), rhs.n_cols(), 0.0 };
 
-	for (std::size_t lhs_row = 0; lhs_row < n_rows(); lhs_row++)
+	auto func = [this, &result, &rhs](auto lhs_row)
 	{
 		for (std::size_t lhs_col = 0; lhs_col < n_cols(); lhs_col++)
 		{
@@ -130,7 +132,12 @@ Matrix<T>& Matrix<T>::operator*=(const Matrix<T>& rhs)
 				result(lhs_row, rhs_col) += operator()(lhs_row, lhs_col) * rhs(lhs_col, rhs_col);
 			}
 		}
-	}
+	};
+
+	std::vector<std::size_t> lhs_rows(n_rows());
+	std::iota(lhs_rows.begin(), lhs_rows.end(), 0);
+
+	std::for_each(std::execution::par, lhs_rows.begin(), lhs_rows.end(), func);
 
 	m_data = result.m_data;
 	m_n_cols = result.m_n_cols;
