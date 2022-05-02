@@ -427,7 +427,8 @@ namespace jsolve::simplex
 		double obj_phase_1 = 0;
 		double obj_phase_2 = 0;
 
-		int iter = 0;
+		int iter{ 0 };
+		int log_every{ 50 };
 
 		// Do first pivot of phase 1 variable and most negative RHS row
 		if (in_phase_1)
@@ -469,11 +470,23 @@ namespace jsolve::simplex
 		while (entering_idx)
 		{
 			log()->debug("---------------------------------------");
-			log()->debug("Iteration: {} Obj = {} {}",
-				iter,
+
+			std::string progress{ fmt::format(
+				"Iteration: {} Obj = {:0.2f} {}", 
+				iter, 
 				obj_phase_2,
-				in_phase_1 ? fmt::format("(Phase 1 Obj = {})", obj_phase_1)  : ""
-			);
+				in_phase_1 ? fmt::format("(Phase 1 Obj = {:0.2f})", obj_phase_1) : ""
+			) };
+
+			if (iter % log_every == 0)
+			{
+				log()->info(progress);
+			}
+			else
+			{
+				log()->debug(progress);
+			}
+
 			log()->debug("c = {}", c);
 			log()->debug("A = {}", A_dict);
 			log()->debug("b = {}", b);

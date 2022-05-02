@@ -697,6 +697,12 @@ TEST_CASE("matrix::slice", "[matrix]")
         m(1, 2) = 6;
         m(2, 2) = 9;
 
+        SECTION("slice outside bounds")
+        {
+            REQUIRE_THROWS_AS(m.slice(m.n_rows(), {}), MatrixError);
+            REQUIRE_THROWS_AS(m.slice({}, m.n_cols()), MatrixError);
+        }
+
         SECTION("slice all")
         {
             auto slice = m.slice({}, {});
@@ -751,6 +757,12 @@ TEST_CASE("matrix::slice", "[matrix]")
         m(0, 0) = 1;
         m(0, 1) = 2;
         m(0, 2) = 3;
+
+        SECTION("slice outside bounds")
+        {
+            REQUIRE_THROWS_AS(m.slice(m.n_rows(), {}), MatrixError);
+            REQUIRE_THROWS_AS(m.slice({}, m.n_cols()), MatrixError);
+        }
 
         SECTION("slice all")
         {

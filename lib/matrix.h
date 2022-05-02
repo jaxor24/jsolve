@@ -250,21 +250,16 @@ Matrix<T> Matrix<T>::slice(Range rows, Range cols) const
 		0.0
 	};
 
-	std::size_t result_row{ 0 };
-	for (auto [n_row, curr_row] : enumerate_rows())
+	std::size_t row_start = rows ? rows.start() : 0;
+	std::size_t row_end = rows ? rows.end() : n_rows() - 1;
+	std::size_t col_start = cols ? cols.start() : 0;
+	std::size_t col_end = cols ? cols.end() : n_cols() - 1;
+
+	for (std::size_t curr_row{ row_start }; curr_row <= row_end; curr_row++)
 	{
-		if (!rows || ((n_row >= rows.start()) && (n_row <= rows.end())))
+		for (std::size_t curr_col{ col_start }; curr_col <= col_end; curr_col++)
 		{
-			std::size_t result_col{ 0 };
-			for (const auto& [n_col, elem] : enumerate(curr_row))
-			{
-				if (!cols || ((n_col >= cols.start()) && (n_col <= cols.end())))
-				{
-					result(result_row, result_col) = elem;
-					result_col++;
-				}
-			}
-			result_row++;
+			result(curr_row - row_start, curr_col - col_start) = operator()(curr_row, curr_col);
 		}
 	}
 
@@ -318,22 +313,16 @@ void Matrix<T>::update(Range rows, Range cols, Matrix sub)
 		return;
 	}
 
-	// Update matrix with sub matrix
-	std::size_t result_row{ 0 };
-	for (auto [n_row, row] : enumerate_rows())
+	std::size_t row_start = rows ? rows.start() : 0;
+	std::size_t row_end = rows ? rows.end() : n_rows() - 1;
+	std::size_t col_start = cols ? cols.start() : 0;
+	std::size_t col_end = cols ? cols.end() : n_cols() - 1;
+
+	for (std::size_t curr_row{ row_start }; curr_row <= row_end; curr_row++)
 	{
-		if (!rows || ((n_row >= rows.start()) && (n_row <= rows.end())))
+		for (std::size_t curr_col{ col_start }; curr_col <= col_end; curr_col++)
 		{
-			std::size_t result_col{ 0 };
-			for (auto [n_col, elem] : enumerate(row))
-			{
-				if (!cols || ((n_col >= cols.start()) && (n_col <= cols.end())))
-				{
-					elem = sub(result_row, result_col);
-					result_col++;
-				}
-			}
-			result_row++;
+			operator()(curr_row, curr_col) = sub(curr_row - row_start, curr_col - col_start);
 		}
 	}
 }

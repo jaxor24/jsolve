@@ -1,5 +1,7 @@
 #include "matrix.h"
 
+#include <execution>
+
 // Member functions ---------------------------------------------------------------
 // Access
 
@@ -118,28 +120,29 @@ Matrix<T>& Matrix<T>::operator*=(const Matrix<T>& rhs)
 			rhs.n_cols()
 		);
 	}
-	// (r1 x c1).(r2 x c2) = r1 x c2
-	Matrix result{ n_rows(), rhs.n_cols() };
 
-	for (std::size_t lhs_n_r = 0; lhs_n_r < n_rows(); lhs_n_r++)
+	Matrix result{ n_rows(), rhs.n_cols(), 0.0 };
+
+	auto func = [this, &result, &rhs](auto lhs_row)
 	{
-		for (std::size_t rhs_n_c = 0; rhs_n_c < rhs.n_cols(); rhs_n_c++)
+		for (std::size_t lhs_col = 0; lhs_col < n_cols(); lhs_col++)
 		{
-			// For this LHS row and RHS col, sum product the elements.
-			value_type element{ 0.0 };
-
-			for (std::size_t lhs_n_c = 0; lhs_n_c < n_cols(); lhs_n_c++)
+			for (std::size_t rhs_col = 0; rhs_col < rhs.n_cols(); rhs_col++)
 			{
-				element += operator()(lhs_n_r, lhs_n_c) * rhs(lhs_n_c, rhs_n_c);
+				result(lhs_row, rhs_col) += operator()(lhs_row, lhs_col) * rhs(lhs_col, rhs_col);
 			}
-
-			result(lhs_n_r, rhs_n_c) = element;
 		}
-	}
+	};
+
+	std::vector<std::size_t> lhs_rows(n_rows());
+	std::iota(lhs_rows.begin(), lhs_rows.end(), 0);
+
+	std::for_each(std::execution::par, lhs_rows.begin(), lhs_rows.end(), func);
 
 	m_data = result.m_data;
 	m_n_cols = result.m_n_cols;
 	m_n_rows = result.m_n_rows;
+
 	return *this;
 }
 
