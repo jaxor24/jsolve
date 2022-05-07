@@ -2,6 +2,8 @@
 
 #include "matrix.h"
 
+#include <stdexcept> 
+
 using Matr = Matrix<double>;
 
 TEST_CASE("matrix::matrix(row,col)", "[matrix]")
@@ -699,8 +701,8 @@ TEST_CASE("matrix::slice", "[matrix]")
 
         SECTION("slice outside bounds")
         {
-            REQUIRE_THROWS_AS(m.slice(m.n_rows(), {}), MatrixError);
-            REQUIRE_THROWS_AS(m.slice({}, m.n_cols()), MatrixError);
+            REQUIRE_THROWS_AS(m.slice(m.n_rows(), {}), std::out_of_range);
+            REQUIRE_THROWS_AS(m.slice({}, m.n_cols()), std::out_of_range);
         }
 
         SECTION("slice all")
@@ -760,8 +762,8 @@ TEST_CASE("matrix::slice", "[matrix]")
 
         SECTION("slice outside bounds")
         {
-            REQUIRE_THROWS_AS(m.slice(m.n_rows(), {}), MatrixError);
-            REQUIRE_THROWS_AS(m.slice({}, m.n_cols()), MatrixError);
+            REQUIRE_THROWS_AS(m.slice(m.n_rows(), {}), std::out_of_range);
+            REQUIRE_THROWS_AS(m.slice({}, m.n_cols()), std::out_of_range);
         }
 
         SECTION("slice all")

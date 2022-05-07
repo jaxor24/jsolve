@@ -2,6 +2,8 @@
 
 #include "matrix.h"
 
+#include <stdexcept> 
+
 using Matr = Matrix<double>;
 
 TEST_CASE("matrix::operator()", "[matrix]")
@@ -33,14 +35,14 @@ TEST_CASE("matrix::operator()", "[matrix]")
 
     SECTION("access out of bound row")
     {
-        REQUIRE_THROWS_AS(m(m.n_rows(), m.n_cols() - 1), MatrixError);
-        REQUIRE_THROWS_AS(m(m.n_rows() + 1, m.n_cols() - 1), MatrixError);
+        REQUIRE_THROWS_AS(m(m.n_rows(), m.n_cols() - 1), std::out_of_range);
+        REQUIRE_THROWS_AS(m(m.n_rows() + 1, m.n_cols() - 1), std::out_of_range);
     }
 
     SECTION("access out of bound col")
     {
-        REQUIRE_THROWS_AS(m(m.n_rows() - 1, m.n_cols()), MatrixError);
-        REQUIRE_THROWS_AS(m(m.n_rows() - 1, m.n_cols() + 1), MatrixError);
+        REQUIRE_THROWS_AS(m(m.n_rows() - 1, m.n_cols()), std::out_of_range);
+        REQUIRE_THROWS_AS(m(m.n_rows() - 1, m.n_cols() + 1), std::out_of_range);
     }
 }
 
