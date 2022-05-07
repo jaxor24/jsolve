@@ -390,7 +390,7 @@ namespace jsolve::simplex
 
 		int max_iter = 10000;
 		double eps_column = 1e-5; // Tolerance for selection of entering variable.
-		double eps1 = 1e-9;
+		double eps_zero = 1e-8; // Needs to be the same as that used in matrix/double
 
 		auto model = to_standard_form(user_model);
 
@@ -498,7 +498,7 @@ namespace jsolve::simplex
 			// Grab the corresponding A column
 			auto Acol = A_dict.slice({}, { col_idx });
 
-			if (((-1.0 * Acol) > eps1).sum() == 0)
+			if (((-1.0 * Acol) > eps_zero).sum() == 0)
 			{
 				// No positive coefficients on entering variable
 				log()->warn("Model is unbounded");
@@ -524,7 +524,7 @@ namespace jsolve::simplex
 						continue;
 					}
 
-					auto new_ratio = ratio_test_division(-elem, b(n_row, 0), eps1);
+					auto new_ratio = ratio_test_division(-elem, b(n_row, 0), eps_zero);
 
 					if (!max_ratio)
 					{
@@ -534,13 +534,13 @@ namespace jsolve::simplex
 					}
 					else
 					{
-						if (approx_greater(new_ratio, max_ratio.value(), eps1))
+						if (approx_greater(new_ratio, max_ratio.value(), eps_zero))
 						{
 							max_ratio = new_ratio;
 							row_idx = n_row;
 							subscript = locations.basics[n_row].subscript;
 						}
-						else if (approx_equal(new_ratio, max_ratio.value(), eps1))
+						else if (approx_equal(new_ratio, max_ratio.value(), eps_zero))
 						{
 							// Bland's rule. Break ties in the ratio test by picking the variable with the smallest subscript.
 							if (!subscript || (locations.basics[n_row].subscript < subscript.value()))
