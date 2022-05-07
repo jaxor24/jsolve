@@ -389,7 +389,8 @@ namespace jsolve::simplex
 		Timer timer{ info_logger(),  "Primal Simplex Algorithm" };
 
 		int max_iter = 10000;
-		double eps = 1e-9;
+		double eps_column = 1e-5; // Tolerance for selection of entering variable.
+		double eps1 = 1e-9;
 
 		auto model = to_standard_form(user_model);
 
@@ -464,8 +465,8 @@ namespace jsolve::simplex
 
 		// Pick the objective we need to use
 		auto& c = in_phase_1 ? c_phase_1 : c_phase_2;
-		
-		auto entering_idx = get_entering_variable(c, in_phase_1, locations, eps);
+
+		auto entering_idx = get_entering_variable(c, in_phase_1, locations, eps_column);
 
 		while (entering_idx)
 		{
@@ -497,7 +498,7 @@ namespace jsolve::simplex
 			// Grab the corresponding A column
 			auto Acol = A_dict.slice({}, { col_idx });
 
-			if (((-1.0 * Acol) > eps).sum() == 0)
+			if (((-1.0 * Acol) > eps1).sum() == 0)
 			{
 				// No positive coefficients on entering variable
 				log()->warn("Model is unbounded");
@@ -523,7 +524,7 @@ namespace jsolve::simplex
 						continue;
 					}
 
-					auto new_ratio = ratio_test_division(-elem, b(n_row, 0), eps);
+					auto new_ratio = ratio_test_division(-elem, b(n_row, 0), eps1);
 
 					if (!max_ratio)
 					{
@@ -533,13 +534,13 @@ namespace jsolve::simplex
 					}
 					else
 					{
-						if (approx_greater(new_ratio, max_ratio.value(), eps))
+						if (approx_greater(new_ratio, max_ratio.value(), eps1))
 						{
 							max_ratio = new_ratio;
 							row_idx = n_row;
 							subscript = locations.basics[n_row].subscript;
 						}
-						else if (approx_equal(new_ratio, max_ratio.value(), eps))
+						else if (approx_equal(new_ratio, max_ratio.value(), eps1))
 						{
 							// Bland's rule. Break ties in the ratio test by picking the variable with the smallest subscript.
 							if (!subscript || (locations.basics[n_row].subscript < subscript.value()))
@@ -570,14 +571,14 @@ namespace jsolve::simplex
 			);
 
 			// Update our loop vars
-			entering_idx = get_entering_variable(c, in_phase_1, locations, eps);
+			entering_idx = get_entering_variable(c, in_phase_1, locations, eps_column);
 
 			// Switch to phase 2 objective
 			if (in_phase_1 && !entering_idx)
 			{
 				in_phase_1 = false;
 				c = c_phase_2;
-				entering_idx = get_entering_variable(c, in_phase_1, locations, eps);
+				entering_idx = get_entering_variable(c, in_phase_1, locations, eps_column);
 			}
 
 			iter++;
