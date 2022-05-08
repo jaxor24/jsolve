@@ -1,9 +1,9 @@
 #if _WIN32
 
-#include "includes.h"
-#include "test_sink.h"
+#    include "includes.h"
+#    include "test_sink.h"
 
-#include "spdlog/sinks/win_eventlog_sink.h"
+#    include "spdlog/sinks/win_eventlog_sink.h"
 
 static const LPCSTR TEST_SOURCE = "spdlog_test";
 
@@ -24,20 +24,20 @@ static void test_single_print(std::function<void(std::string const &)> do_log, s
                 REQUIRE(CloseEventLog(handle_));
             }
         }
-    } event_log{::OpenEventLog(nullptr, TEST_SOURCE)};
+    } event_log{::OpenEventLogA(nullptr, TEST_SOURCE)};
 
     REQUIRE(event_log.handle_);
 
     DWORD read_bytes{}, size_needed{};
-    auto ok =
-        ::ReadEventLog(event_log.handle_, EVENTLOG_SEQUENTIAL_READ | EVENTLOG_BACKWARDS_READ, 0, &read_bytes, 0, &read_bytes, &size_needed);
+    auto ok = ::ReadEventLogA(
+        event_log.handle_, EVENTLOG_SEQUENTIAL_READ | EVENTLOG_BACKWARDS_READ, 0, &read_bytes, 0, &read_bytes, &size_needed);
     REQUIRE(!ok);
     REQUIRE(::GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
     std::vector<char> record_buffer(size_needed);
     PEVENTLOGRECORD record = (PEVENTLOGRECORD)record_buffer.data();
 
-    ok = ::ReadEventLog(
+    ok = ::ReadEventLogA(
         event_log.handle_, EVENTLOG_SEQUENTIAL_READ | EVENTLOG_BACKWARDS_READ, 0, record, size_needed, &read_bytes, &size_needed);
     REQUIRE(ok);
 
