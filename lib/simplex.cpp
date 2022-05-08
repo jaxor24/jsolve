@@ -367,9 +367,13 @@ namespace jsolve::simplex
 			{
 				return -1 * std::numeric_limits<Number>::infinity();
 			}
-			else
+			else if (a > 0)
 			{
 				return std::numeric_limits<Number>::infinity();
+			}
+			else
+			{
+				throw SolveError("Should never get here");
 			}
 		}
 		else if (a_zero)
@@ -388,7 +392,6 @@ namespace jsolve::simplex
 		// Pick i such that: a[i,k]/b[i] is maximised
 		// auto [t, leaving_row_index] = div_elem(-1.0 * Acol, b, ratio_test_division).col_max();
 		// auto row_idx = leaving_row_index(0, 0);
-
 
 		if (std::none_of(Acol.cbegin(), Acol.cend(), [eps_zero](auto elem) { return -1.0 * elem > eps_zero; }))
 		{
@@ -458,7 +461,7 @@ namespace jsolve::simplex
 		Timer timer{ info_logger(),  "Primal Simplex Algorithm" };
 
 		int max_iter = 10000;
-		double eps_column = 1e-5; // Tolerance for selection of entering variable.
+		double eps_column = 1e-5; // Tolerance for selection of entering variable. i.e. optimality tolerance.
 		double eps_zero = 1e-8; // Needs to be the same as that used in matrix/double
 
 		auto model = to_standard_form(user_model);
