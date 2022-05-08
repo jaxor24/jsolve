@@ -63,24 +63,55 @@ inline bool approx_greater(double a, double b, double eps = 1e-8)
 // Python-like enumerate()
 // Ref: http://reedbeta.com/blog/python-like-enumerate-in-cpp17/
 
-template <typename T,
-typename TIter = decltype(std::begin(std::declval<T>())),
-typename = decltype(std::end(std::declval<T>()))>
-constexpr auto enumerate(T&& iterable)
+template<typename Iterable>
+auto enumerate(Iterable&& iterable) 
 {
-    struct iterator
+    using Iterator = decltype(std::begin(std::declval<Iterable>()));
+    using T = decltype(*std::declval<Iterator>());
+
+    struct Enumerated 
     {
-        size_t i;
-        TIter iter;
-        bool operator != (const iterator& other) const { return iter != other.iter; }
-        void operator ++ () { ++i; ++iter; }
-        auto operator * () const { return std::tie(i, *iter); }
+        std::size_t index;
+        T element;
     };
-    struct iterable_wrapper
+
+    struct Enumerator 
     {
-        T iterable;
-        auto begin() { return iterator{ 0, std::begin(iterable) }; }
-        auto end() { return iterator{ 0, std::end(iterable) }; }
+        Iterator iterator;
+        std::size_t index;
+
+        auto operator!=(const Enumerator& other) const 
+        {
+            return iterator != other.iterator;
+        }
+
+        auto& operator++() 
+        {
+            ++iterator;
+            ++index;
+            return *this;
+        }
+
+        auto operator*() const 
+        {
+            return Enumerated{ index, *iterator };
+        }
     };
-    return iterable_wrapper{ std::forward<T>(iterable) };
+
+    struct Wrapper 
+    {
+        Iterable& iterable;
+
+        [[nodiscard]] auto begin() const 
+        {
+            return Enumerator{ std::begin(iterable), 0U };
+        }
+
+        [[nodiscard]] auto end() const 
+        {
+            return Enumerator{ std::end(iterable), 0U };
+        }
+    };
+
+    return Wrapper{ std::forward<Iterable>(iterable) };
 }
