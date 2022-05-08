@@ -382,6 +382,75 @@ namespace jsolve::simplex
 		}
 	};
 
+	std::optional<std::size_t> get_leaving_variable(const Mat& Acol, const Mat& b, bool in_phase_1, Locations& locations, double eps_zero)
+	{
+		// Select leaving variable
+		// Pick i such that: a[i,k]/b[i] is maximised
+		// auto [t, leaving_row_index] = div_elem(-1.0 * Acol, b, ratio_test_division).col_max();
+		// auto row_idx = leaving_row_index(0, 0);
+
+
+		if (((-1.0 * Acol) > eps_zero).sum() == 0)
+		{
+			// No positive coefficients on entering variable
+			return {};
+		}
+
+		std::optional<std::size_t> row_idx;
+		std::optional<double> max_ratio;
+		std::optional<int> subscript;
+
+		for (auto [n_cols, col] : Acol.enumerate_cols())
+		{
+			for (auto [n_row, elem] : enumerate(col))
+			{
+				if (!in_phase_1 && locations.basics[n_row].dummy)
+				{
+					// If in phase 2, we don't care about the dummy var
+					continue;
+				}
+
+				auto new_ratio = ratio_test_division(-elem, b(n_row, 0), eps_zero);
+
+				if (!max_ratio)
+				{
+					max_ratio = new_ratio;
+					row_idx = n_row;
+					subscript = locations.basics[n_row].subscript;
+				}
+				else
+				{
+					if (approx_greater(new_ratio, max_ratio.value(), eps_zero))
+					{
+						max_ratio = new_ratio;
+						row_idx = n_row;
+						subscript = locations.basics[n_row].subscript;
+					}
+					else if (approx_equal(new_ratio, max_ratio.value(), eps_zero))
+					{
+						// Bland's rule. Break ties in the ratio test by picking the variable with the smallest subscript.
+						if (!subscript || (locations.basics[n_row].subscript < subscript.value()))
+						{
+							max_ratio = new_ratio;
+							row_idx = n_row;
+							subscript = locations.basics[n_row].subscript;
+						}
+					}
+				}
+			}
+		}
+	
+		if (!row_idx)
+		{
+			throw SolveError("Error in selecting leaving variables");
+		}
+
+		log()->debug("Leaving variable:");
+		log()->debug("With a max ratio value {} at row {}", max_ratio.value(), row_idx.value());
+
+		return row_idx;
+	}
+
 	std::optional<Solution> primal_solve(const Model& user_model)
 	{
 		// Follows the implementation in Chapter 4 p46. of "Linear Programming" 2014.
@@ -498,64 +567,16 @@ namespace jsolve::simplex
 			// Grab the corresponding A column
 			auto Acol = A_dict.slice({}, { col_idx });
 
-			if (((-1.0 * Acol) > eps_zero).sum() == 0)
+			auto leaving_idx = get_leaving_variable(Acol, b, in_phase_1, locations, eps_zero);
+
+			if (!leaving_idx)
 			{
-				// No positive coefficients on entering variable
 				log()->warn("Model is unbounded");
 				return {};
 			}
 
-			// Select leaving variable
-			// Pick i such that: a[i,k]/b[i] is maximised
-			// auto [t, leaving_row_index] = div_elem(-1.0 * Acol, b, ratio_test_division).col_max();
-			// auto row_idx = leaving_row_index(0, 0);
+			auto row_idx = leaving_idx.value();
 
-			std::optional<double> max_ratio;
-			std::size_t row_idx;
-			std::optional<int> subscript;
-
-			for (auto [n_cols, col] : Acol.enumerate_cols())
-			{
-				for (auto [n_row, elem] : enumerate(col))
-				{
-					if (!in_phase_1 && locations.basics[n_row].dummy)
-					{
-						// If in phase 2, we don't care about the dummy var
-						continue;
-					}
-
-					auto new_ratio = ratio_test_division(-elem, b(n_row, 0), eps_zero);
-
-					if (!max_ratio)
-					{
-						max_ratio = new_ratio;
-						row_idx = n_row;
-						subscript = locations.basics[n_row].subscript;
-					}
-					else
-					{
-						if (approx_greater(new_ratio, max_ratio.value(), eps_zero))
-						{
-							max_ratio = new_ratio;
-							row_idx = n_row;
-							subscript = locations.basics[n_row].subscript;
-						}
-						else if (approx_equal(new_ratio, max_ratio.value(), eps_zero))
-						{
-							// Bland's rule. Break ties in the ratio test by picking the variable with the smallest subscript.
-							if (!subscript || (locations.basics[n_row].subscript < subscript.value()))
-							{
-								max_ratio = new_ratio;
-								row_idx = n_row;
-								subscript = locations.basics[n_row].subscript;
-							}
-						}
-					}
-				}
-			}
-
-			log()->debug("Leaving variable:");
-			log()->debug("With a max ratio value {} at row {}", max_ratio.value(), row_idx);
 			log()->debug("Pivot on element {} at {},{}", A_dict(row_idx, col_idx), row_idx, col_idx);
 
 			pivot(
