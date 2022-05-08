@@ -21,7 +21,7 @@ add_subdirectory ("tests")
 add_subdirectory ("benchmarks")
 
 if(NOT TARGET spdlog)
-	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang|GNU")
+	if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
 	  	find_package(TBB REQUIRED)
 	endif()
 
