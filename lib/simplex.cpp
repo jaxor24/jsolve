@@ -390,7 +390,7 @@ namespace jsolve::simplex
 		// auto row_idx = leaving_row_index(0, 0);
 
 
-		if (((-1.0 * Acol) > eps_zero).sum() == 0)
+		if (std::none_of(Acol.cbegin(), Acol.cend(), [eps_zero](auto elem) { return -1.0 * elem > eps_zero; }))
 		{
 			// No positive coefficients on entering variable
 			return {};
