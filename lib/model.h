@@ -8,6 +8,7 @@
 #include <set>
 #include <memory>
 #include <stdexcept>
+#include <algorithm>
 
 namespace jsolve
 {
