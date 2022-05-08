@@ -306,7 +306,7 @@ namespace jsolve::simplex
 		return locations;
 	}
 
-	std::optional<std::size_t> get_entering_variable(Mat& c, bool in_phase_1, Locations& locations, double eps)
+	std::optional<std::size_t> get_entering_variable(const Mat& c, bool in_phase_1, Locations& locations, double eps)
 	{
 		// Return the index in c of the entering variable.
 		
