@@ -934,3 +934,186 @@ TEST_CASE("matrix::update", "[matrix]")
         }
     }
 }
+
+TEST_CASE("matrix::begin/end", "[matrix]")
+{
+    SECTION("begin/end")
+    {
+        SECTION("2x2 matrix")
+        {
+            Matr m { 2, 2, 0.0 }; // [1 2; 3 4]
+            m(0, 0) = 1;
+            m(0, 1) = 2;
+            m(1, 0) = 3;
+            m(1, 1) = 4;
+
+            auto begin = m.begin();
+
+            REQUIRE(*begin == 1);
+            ++begin;
+            REQUIRE(*begin == 2);
+            ++begin;
+            REQUIRE(*begin == 3);
+            ++begin;
+            REQUIRE(*begin == 4);
+            ++begin;
+            REQUIRE(begin == m.end());
+        }
+
+        SECTION("2x2 matrix")
+        {
+            Matr m { 2, 2, 0.0 }; 
+            // [0 0; 0 0] -> [1 2; 3 4]
+
+            auto begin = m.begin();
+
+            *begin = 1;
+            REQUIRE(*begin == 1);
+            ++begin;
+
+            *begin = 2;
+            REQUIRE(*begin == 2);
+            ++begin;
+
+            *begin = 3;
+            REQUIRE(*begin == 3);
+            ++begin;
+
+            *begin = 4;
+            REQUIRE(*begin == 4);
+            ++begin;
+
+            REQUIRE(begin == m.end());
+        }
+
+        SECTION("1x2 matrix")
+        {
+            Matr m { 1, 2, 0.0 }; // [1 2]
+            m(0, 0) = 1;
+            m(0, 1) = 2;
+
+            auto begin = m.begin();
+
+            REQUIRE(*begin == 1);
+            ++begin;
+            REQUIRE(*begin == 2);
+            ++begin;
+            REQUIRE(begin == m.end());
+        }
+
+        SECTION("2x1 matrix")
+        {
+            Matr m { 2, 1, 0.0 }; // [1 ; 2]
+            m(0, 0) = 1;
+            m(1, 0) = 2;
+
+            auto begin = m.begin();
+
+            REQUIRE(*begin == 1);
+            ++begin;
+            REQUIRE(*begin == 2);
+            ++begin;
+            REQUIRE(begin == m.end());
+        }
+    }
+
+    SECTION("begin/end const")
+    {
+        SECTION("2x2 matrix")
+        {
+            const Matr m { 2, 2, 0.0 };
+
+            auto begin = m.begin();
+
+            REQUIRE(*begin == 0);
+            ++begin;
+            REQUIRE(*begin == 0);
+            ++begin;
+            REQUIRE(*begin == 0);
+            ++begin;
+            REQUIRE(*begin == 0);
+            ++begin;
+            REQUIRE(begin == m.end());
+        }
+
+        SECTION("1x2 matrix")
+        {
+            const Matr m { 1, 2, 0.0 };
+
+            auto begin = m.begin();
+
+            REQUIRE(*begin == 0);
+            ++begin;
+            REQUIRE(*begin == 0);
+            ++begin;
+            REQUIRE(begin == m.end());
+        }
+
+        SECTION("2x1 matrix")
+        {
+            const Matr m { 2, 1, 0.0 };
+
+            auto begin = m.begin();
+
+            REQUIRE(*begin == 0);
+            ++begin;
+            REQUIRE(*begin == 0);
+            ++begin;
+            REQUIRE(begin == m.end());
+        }
+    }
+
+    SECTION("cbegin/cend")
+    {
+        SECTION("2x2 matrix")
+        {
+            Matr m { 2, 2, 0.0 }; // [1 2; 3 4]
+            m(0, 0) = 1;
+            m(0, 1) = 2;
+            m(1, 0) = 3;
+            m(1, 1) = 4;
+
+            auto begin = m.cbegin();
+
+            REQUIRE(*begin == 1);
+            ++begin;
+            REQUIRE(*begin == 2);
+            ++begin;
+            REQUIRE(*begin == 3);
+            ++begin;
+            REQUIRE(*begin == 4);
+            ++begin;
+            REQUIRE(begin == m.cend());
+        }
+
+        SECTION("1x2 matrix")
+        {
+            Matr m { 1, 2, 0.0 }; // [1 2]
+            m(0, 0) = 1;
+            m(0, 1) = 2;
+
+            auto begin = m.cbegin();
+
+            REQUIRE(*begin == 1);
+            ++begin;
+            REQUIRE(*begin == 2);
+            ++begin;
+            REQUIRE(begin == m.cend());
+        }
+
+        SECTION("2x1 matrix")
+        {
+            Matr m { 2, 1, 0.0 }; // [1 ; 2]
+            m(0, 0) = 1;
+            m(1, 0) = 2;
+
+            auto begin = m.cbegin();
+
+            REQUIRE(*begin == 1);
+            ++begin;
+            REQUIRE(*begin == 2);
+            ++begin;
+            REQUIRE(begin == m.cend());
+        }
+    }
+}

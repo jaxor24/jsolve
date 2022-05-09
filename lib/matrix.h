@@ -49,6 +49,9 @@ public:
 	matrix_iterator begin();
 	matrix_iterator end();
 
+	const_matrix_iterator begin() const;
+    const_matrix_iterator end() const;
+
 	const_matrix_iterator cbegin() const;
 	const_matrix_iterator cend() const;
 
@@ -337,6 +340,18 @@ template <typename T>
 typename Matrix<T>::matrix_iterator Matrix<T>::end()
 { 
 	return { std::end(m_data), std::end(m_data), n_cols() };
+}
+
+template <typename T>
+typename Matrix<T>::const_matrix_iterator Matrix<T>::begin() const
+{
+    return cbegin();
+}
+
+template <typename T>
+typename Matrix<T>::const_matrix_iterator Matrix<T>::end() const
+{
+    return cend();
 }
 
 template <typename T>
