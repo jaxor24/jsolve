@@ -55,7 +55,7 @@ namespace jsolve
 		
 		// Objective vector
 		Mat objective{ n_total_vars, 1, 0.0 };
-		
+
 		for (const auto& [n_var, var] : enumerate(user_model.get_variables()))
 		{
 			objective(n_var, 0) = var->cost();
@@ -403,41 +403,38 @@ namespace jsolve::simplex
 		std::optional<double> max_ratio;
 		std::optional<int> subscript;
 
-		for (auto [n_cols, col] : Acol.enumerate_cols())
+		for (const auto [n_row, elem] : enumerate(Acol))
 		{
-			for (auto [n_row, elem] : enumerate(col))
+			if (!in_phase_1 && locations.basics[n_row].dummy)
 			{
-				if (!in_phase_1 && locations.basics[n_row].dummy)
-				{
-					// If in phase 2, we don't care about the dummy var
-					continue;
-				}
+				// If in phase 2, we don't care about the dummy var
+				continue;
+			}
 
-				auto new_ratio = ratio_test_division(-elem, b(n_row, 0), eps_zero);
+			auto new_ratio = ratio_test_division(-elem, b(n_row, 0), eps_zero);
 
-				if (!max_ratio)
+			if (!max_ratio)
+			{
+				max_ratio = new_ratio;
+				row_idx = n_row;
+				subscript = locations.basics[n_row].subscript;
+			}
+			else
+			{
+				if (approx_greater(new_ratio, max_ratio.value(), eps_zero))
 				{
 					max_ratio = new_ratio;
 					row_idx = n_row;
 					subscript = locations.basics[n_row].subscript;
 				}
-				else
+				else if (approx_equal(new_ratio, max_ratio.value(), eps_zero))
 				{
-					if (approx_greater(new_ratio, max_ratio.value(), eps_zero))
+					// Bland's rule. Break ties in the ratio test by picking the variable with the smallest subscript.
+					if (!subscript || (locations.basics[n_row].subscript < subscript.value()))
 					{
 						max_ratio = new_ratio;
 						row_idx = n_row;
 						subscript = locations.basics[n_row].subscript;
-					}
-					else if (approx_equal(new_ratio, max_ratio.value(), eps_zero))
-					{
-						// Bland's rule. Break ties in the ratio test by picking the variable with the smallest subscript.
-						if (!subscript || (locations.basics[n_row].subscript < subscript.value()))
-						{
-							max_ratio = new_ratio;
-							row_idx = n_row;
-							subscript = locations.basics[n_row].subscript;
-						}
 					}
 				}
 			}
