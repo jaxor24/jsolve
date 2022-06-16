@@ -8,13 +8,22 @@
 template <typename T>
 T& Matrix<T>::operator()(const std::size_t row, const std::size_t col)
 {
-	return m_data.at(row * n_cols() + col);
+#ifdef NDEBUG
+    return m_data[row * n_cols() + col];
+#else
+    return m_data.at(row * n_cols() + col);
+#endif
+	
 }
 
 template <typename T>
 T Matrix<T>::operator()(const std::size_t row, const std::size_t col) const
 {
-	return m_data.at(row * n_cols() + col);
+#ifdef NDEBUG
+    return m_data[row * n_cols() + col];
+#else
+    return m_data.at(row * n_cols() + col);
+#endif
 }
 
 // Unary
