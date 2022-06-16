@@ -89,7 +89,10 @@ Matrix<T>& Matrix<T>::operator-=(const Matrix<T>& rhs)
 	auto it1 = std::begin(m_data);
 	auto it2 = std::begin(rhs.m_data);
 
-	for (; it1 != std::end(m_data) && it2 != std::end(rhs.m_data); ++it1, ++it2)
+	auto end1 = std::end(m_data);
+    auto end2 = std::end(rhs.m_data);
+
+	for (; it1 != end1 && it2 != end2; ++it1, ++it2)
 	{
 		*(it1) -= *(it2);
 	}
