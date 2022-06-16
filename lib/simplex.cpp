@@ -229,7 +229,7 @@ namespace jsolve::simplex
 		auto a = A(pivot_row, pivot_col);
 
 		// Pivot A
-		A = A - ((Acol * Arow) / a);
+		A -= ((Acol * Arow) / a);
 		A.update(pivot_row, {}, -1 * Arow / a);
 		A.update({}, pivot_col, +1 * Acol / a);
 		A(pivot_row, pivot_col) = 1 / a;
