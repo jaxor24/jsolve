@@ -451,6 +451,26 @@ namespace jsolve::simplex
 		return row_idx;
 	}
 
+	void log_iteration(int iter, double obj_phase_1, double obj_phase_2, bool in_phase_1)
+    {
+        int log_every{ 1 };
+
+        std::string progress{ fmt::format(
+            "It {:8} Obj {:14.6f} {}",
+            iter,
+            obj_phase_2,
+            in_phase_1 ? fmt::format("P1 Obj {:14.6f}", obj_phase_1) : ""
+		) };
+
+        if (iter % log_every == 0) 
+		{
+            log()->info(progress);
+        } else 
+		{
+            log()->debug(progress);
+        }
+	}
+
 	std::optional<Solution> primal_solve(const Model& user_model)
 	{
 		// Follows the implementation in Chapter 4 p46. of "Linear Programming" 2014.
@@ -494,21 +514,16 @@ namespace jsolve::simplex
 		// Keep track of variable locations
 		auto locations = init_locations(A_dict, true);
 
-		double obj_phase_1 = 0;
-		double obj_phase_2 = 0;
+		double obj_phase_1 { 0.0 };
+        double obj_phase_2 { 0.0 };
 
-		int iter{ 0 };
-		int log_every{ 50 };
+		int iter{ 1 };
 
 		// Do first pivot of phase 1 variable and most negative RHS row
 		if (in_phase_1)
 		{
-			log()->debug("---------------------------------------");
-			log()->debug("Iteration: {} Obj = {} {}",
-				iter,
-				obj_phase_2,
-				in_phase_1 ? fmt::format("(Phase 1 Obj = {})", obj_phase_2) : ""
-			);
+			log_iteration(iter, obj_phase_1, obj_phase_2, in_phase_1);
+
 			log()->debug("c_phase_1 = {}", c_phase_1);
 			log()->debug("c_phase_2 = {}", c_phase_2);
 			log()->debug("A = {}", A_dict);
@@ -539,31 +554,17 @@ namespace jsolve::simplex
 
 		while (entering_idx)
 		{
-			log()->debug("---------------------------------------");
-
-			std::string progress{ fmt::format(
-				"Iteration: {} Obj = {:0.2f} {}", 
-				iter, 
-				obj_phase_2,
-				in_phase_1 ? fmt::format("(Phase 1 Obj = {:0.2f})", obj_phase_1) : ""
-			) };
-
-			if (iter % log_every == 0)
-			{
-				log()->info(progress);
-			}
-			else
-			{
-				log()->debug(progress);
-			}
+			log_iteration(iter, obj_phase_1, obj_phase_2, in_phase_1);
 
 			log()->debug("c = {}", c);
 			log()->debug("A = {}", A_dict);
 			log()->debug("b = {}", b);
 
 			auto col_idx = entering_idx.value();
+
 			log()->debug("Entering variable:");
 			log()->debug("Objective max coeff {} at col {}", c(0, col_idx), col_idx);
+
 			// Grab the corresponding A column
 			auto Acol = A_dict.slice({}, { col_idx });
 
