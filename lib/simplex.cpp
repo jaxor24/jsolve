@@ -517,13 +517,11 @@ namespace jsolve::simplex
 		double obj_phase_1 { 0.0 };
         double obj_phase_2 { 0.0 };
 
-		int iter{ 1 };
+		int iter { 0 }; 
 
 		// Do first pivot of phase 1 variable and most negative RHS row
 		if (in_phase_1)
 		{
-			log_iteration(iter, obj_phase_1, obj_phase_2, in_phase_1);
-
 			log()->debug("c_phase_1 = {}", c_phase_1);
 			log()->debug("c_phase_2 = {}", c_phase_2);
 			log()->debug("A = {}", A_dict);
@@ -544,21 +542,44 @@ namespace jsolve::simplex
 				c_phase_2
 			);
 
-			iter++;
+			log_iteration(iter, obj_phase_1, obj_phase_2, in_phase_1);
+            iter++;
 		}
 
 		// Pick the objective we need to use
 		auto& c = in_phase_1 ? c_phase_1 : c_phase_2;
 
-		auto entering_idx = get_entering_variable(c, in_phase_1, locations, eps_column);
+		std::optional<std::size_t> entering_idx{};
 
-		while (entering_idx)
+		for(;iter <= max_iter; iter++)
 		{
-			log_iteration(iter, obj_phase_1, obj_phase_2, in_phase_1);
-
 			log()->debug("c = {}", c);
 			log()->debug("A = {}", A_dict);
 			log()->debug("b = {}", b);
+
+			entering_idx = get_entering_variable(c, in_phase_1, locations, eps_column);
+
+			if (!entering_idx && in_phase_1) 
+			{
+				if (obj_phase_1 < -eps_column) 
+				{
+                    log()->warn("Model is infeasible");
+                    return {};
+				} 
+				else 
+				{
+                    // Switch to phase 2
+                    in_phase_1 = false;
+                    c = c_phase_2;
+                    entering_idx = get_entering_variable(c, in_phase_1, locations, eps_column);          
+				}
+			}
+
+			if (!entering_idx) 
+			{
+				// Optimal
+                break;
+			}
 
 			auto col_idx = entering_idx.value();
 
@@ -567,7 +588,6 @@ namespace jsolve::simplex
 
 			// Grab the corresponding A column
 			auto Acol = A_dict.slice({}, { col_idx });
-
 			auto leaving_idx = get_leaving_variable(Acol, b, in_phase_1, locations, eps_zero);
 
 			if (!leaving_idx)
@@ -592,23 +612,8 @@ namespace jsolve::simplex
 				c_phase_2
 			);
 
-			// Update our loop vars
-			entering_idx = get_entering_variable(c, in_phase_1, locations, eps_column);
+            log_iteration(iter, obj_phase_1, obj_phase_2, in_phase_1);
 
-			// Switch to phase 2 objective
-			if (in_phase_1 && !entering_idx)
-			{
-				in_phase_1 = false;
-				c = c_phase_2;
-				entering_idx = get_entering_variable(c, in_phase_1, locations, eps_column);
-			}
-
-			iter++;
-			if (iter == max_iter)
-			{
-				log()->warn("Iteration limit ({}) reached.", iter);
-				return {};
-			}
 		}
 
 		// Extract solution
@@ -632,8 +637,13 @@ namespace jsolve::simplex
 			}
 		}
 
+		if (iter == max_iter) 
+		{
+			log()->warn("Iteration limit ({}) reached.", iter);
+		}
+
 		log()->debug("---------------------------------------");
-		log()->info("Optimal solution found");
+		log()->info("Solution found");
 		log()->info("Objective = {:.2f} ({} iterations)", sol.objective, iter);
 
 		return sol;
