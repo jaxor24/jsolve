@@ -211,4 +211,17 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
         REQUIRE(approx_equal(solution.value().variables.at("x2"), 4 + (2.0 / 7.0)));
         REQUIRE(approx_equal(solution.value().variables.at("x3"), 0));
     }
+
+    SECTION("model 19")
+    {
+        auto model = models::make_model_19();
+        auto solution = jsolve::simplex::primal_solve(model);
+
+        REQUIRE(solution.has_value());
+        REQUIRE(approx_equal(solution.value().objective, 1.5));
+        REQUIRE(approx_equal(solution.value().variables.at("x1"), 0));
+        REQUIRE(approx_equal(solution.value().variables.at("x2"), 2.5));
+        REQUIRE(approx_equal(solution.value().variables.at("x3"), 1.5));
+        REQUIRE(approx_equal(solution.value().variables.at("x4"), 0));
+    }
 }
