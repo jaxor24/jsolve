@@ -637,13 +637,15 @@ namespace jsolve::simplex
 			}
 		}
 
-		if (iter == max_iter) 
+		if (iter >= max_iter) 
 		{
 			log()->warn("Iteration limit ({}) reached.", iter);
-		}
+		} else 
+		{
+			log()->info("Optimal solution found");
+        }
 
 		log()->debug("---------------------------------------");
-		log()->info("Solution found");
 		log()->info("Objective = {:.2f} ({} iterations)", sol.objective, iter);
 
 		return sol;
