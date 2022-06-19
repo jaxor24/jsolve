@@ -264,4 +264,31 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
         REQUIRE(approx_equal(solution.value().variables.at("x2"), 0.5));
         REQUIRE(approx_equal(solution.value().variables.at("x3"), 0.5));
     }
+
+    SECTION("model 24")
+    {
+        auto model = models::make_model_24();
+        auto solution = jsolve::simplex::primal_solve(model);
+
+        double eps = 0.0001;
+
+        REQUIRE(solution.has_value());
+        REQUIRE(approx_equal(solution.value().objective, 61.6562, eps));
+        REQUIRE(approx_equal(solution.value().variables.at("a1"), 54.4253, eps));
+        REQUIRE(approx_equal(solution.value().variables.at("a2"), 15.6023, eps));
+        REQUIRE(approx_equal(solution.value().variables.at("a3"), 24.9724, eps));
+        REQUIRE(approx_equal(solution.value().variables.at("a4"), 0.0, eps));
+
+        REQUIRE(approx_equal(solution.value().variables.at("b1"), 0.574694, eps));
+        REQUIRE(approx_equal(solution.value().variables.at("b2"), 14.9803, eps));
+        REQUIRE(approx_equal(solution.value().variables.at("b3"), 20.0000, eps));
+        REQUIRE(approx_equal(solution.value().variables.at("b4"), 27.4450, eps));
+
+        REQUIRE(approx_equal(solution.value().variables.at("c1"), 0.0, eps));
+        REQUIRE(approx_equal(solution.value().variables.at("c2"), 42.4174, eps));
+        REQUIRE(approx_equal(solution.value().variables.at("c3"), 60.0276, eps));
+        REQUIRE(approx_equal(solution.value().variables.at("c4"), 10.5550, eps));
+
+        REQUIRE(approx_equal(solution.value().variables.at("pmax"), 11.4, eps));
+    }
 }

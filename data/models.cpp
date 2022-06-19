@@ -947,5 +947,174 @@ namespace models
 
 		return m;
 	}
+
+	jsolve::Model make_model_24()
+	{
+		// Model from pg 121 of "Applied Mathematical Programming" Chapter 3.
+		// Heating Oil Allocation
+
+		auto m = jsolve::Model(jsolve::Model::Sense::MIN, "Heating Oil");
+
+		auto* a1 = m.make_variable(jsolve::Variable::Type::LINEAR, "a1");
+		auto* a2 = m.make_variable(jsolve::Variable::Type::LINEAR, "a2");
+		auto* a3 = m.make_variable(jsolve::Variable::Type::LINEAR, "a3");
+		auto* a4 = m.make_variable(jsolve::Variable::Type::LINEAR, "a4");
+
+		auto* b1 = m.make_variable(jsolve::Variable::Type::LINEAR, "b1");
+		auto* b2 = m.make_variable(jsolve::Variable::Type::LINEAR, "b2");
+		auto* b3 = m.make_variable(jsolve::Variable::Type::LINEAR, "b3");
+		auto* b4 = m.make_variable(jsolve::Variable::Type::LINEAR, "b4");
+
+		auto* c1 = m.make_variable(jsolve::Variable::Type::LINEAR, "c1");
+		auto* c2 = m.make_variable(jsolve::Variable::Type::LINEAR, "c2");
+		auto* c3 = m.make_variable(jsolve::Variable::Type::LINEAR, "c3");
+		auto* c4 = m.make_variable(jsolve::Variable::Type::LINEAR, "c4");
+
+		auto* pmax = m.make_variable(jsolve::Variable::Type::LINEAR, "pmax");
+
+		a1->cost() = 0.1;
+		a2->cost() = 0.16;
+		a3->cost() = 0.32;
+		a4->cost() = 0.28;
+
+		b1->cost() = 0.2;
+		b2->cost() = 0.34;
+		b3->cost() = 0.3;
+		b4->cost() = 0.12;
+
+		c1->cost() = 0.34;
+		c2->cost() = 0.38;
+		c3->cost() = 0.22;
+		c4->cost() = 0.18;
+
+		pmax->cost() = 0;
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "supply1");
+			c->rhs() = 95;
+			c->add_to_lhs(1, a1);
+			c->add_to_lhs(1, a2);
+			c->add_to_lhs(1, a3);
+			c->add_to_lhs(1, a4);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "supply2");
+			c->rhs() = 63;
+			c->add_to_lhs(1, b1);
+			c->add_to_lhs(1, b2);
+			c->add_to_lhs(1, b3);
+			c->add_to_lhs(1, b4);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "supply3");
+			c->rhs() = 116;
+			c->add_to_lhs(1, c1);
+			c->add_to_lhs(1, c2);
+			c->add_to_lhs(1, c3);
+			c->add_to_lhs(1, c4);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "quota1");
+			c->rhs() = 55;
+			c->add_to_lhs(1, a1);
+			c->add_to_lhs(1, b1);
+			c->add_to_lhs(1, c1);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "quota2");
+			c->rhs() = 73;
+			c->add_to_lhs(1, a2);
+			c->add_to_lhs(1, b2);
+			c->add_to_lhs(1, c2);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "quota3");
+			c->rhs() = 105;
+			c->add_to_lhs(1, a3);
+			c->add_to_lhs(1, b3);
+			c->add_to_lhs(1, c3);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "quota4");
+			c->rhs() = 38;
+			c->add_to_lhs(1, a4);
+			c->add_to_lhs(1, b4);
+			c->add_to_lhs(1, c4);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "aveprice1");
+			c->rhs() = 0;
+			c->add_to_lhs(0.1915, a1);
+			c->add_to_lhs(1.701, b1);
+			c->add_to_lhs(0.2260, c1);
+			c->add_to_lhs(-1, pmax);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "aveprice2");
+			c->rhs() = 0;
+			c->add_to_lhs(0.1442, a2);
+			c->add_to_lhs(0.1286, b2);
+			c->add_to_lhs(0.1703, c2);
+			c->add_to_lhs(-1, pmax);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "aveprice3");
+			c->rhs() = 0;
+			c->add_to_lhs(0.1003, a3);
+			c->add_to_lhs(0.0894, b3);
+			c->add_to_lhs(0.1184, c3);
+			c->add_to_lhs(-1, pmax);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "aveprice4");
+			c->rhs() = 0;
+			c->add_to_lhs(0.2771, a4);
+			c->add_to_lhs(0.2471, b4);
+			c->add_to_lhs(0.3271, c4);
+			c->add_to_lhs(-1, pmax);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "aveprice5");
+			c->rhs() = 11.4;
+			c->add_to_lhs(+1, pmax);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "shipcapacity1");
+			c->rhs() = 25;
+			c->add_to_lhs(+1, a2);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "shipcapacity2");
+			c->rhs() = 20;
+			c->add_to_lhs(+1, b2);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "shipcapacity3");
+			c->rhs() = 20;
+			c->add_to_lhs(+1, b3);
+		}
+
+		{
+			auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "shipcapacity4");
+			c->rhs() = 25;
+			c->add_to_lhs(+1, c1);
+		}
+
+		return m;
+	}
 }
 
