@@ -24,4 +24,5 @@ namespace models
     jsolve::Model make_model_20();
     jsolve::Model make_model_21();
 	jsolve::Model make_model_22();
+	jsolve::Model make_model_23();
 }
