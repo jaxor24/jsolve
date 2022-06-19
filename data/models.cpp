@@ -849,10 +849,6 @@ namespace models
         auto* x2 = m.make_variable(jsolve::Variable::Type::LINEAR, "x2");
         auto* x3 = m.make_variable(jsolve::Variable::Type::LINEAR, "x3");
 
-        //x1->cost() = 0;
-        //x2->cost() = 0;
-        //x3->cost() = 0;
-
         {
             auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C1");
             c->rhs() = -3;
