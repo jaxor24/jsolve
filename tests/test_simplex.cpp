@@ -244,4 +244,12 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
 
         REQUIRE(!solution.has_value());
     }
+
+    SECTION("model 22")
+    {
+        auto model = models::make_model_22();
+        auto solution = jsolve::simplex::primal_solve(model);
+
+        REQUIRE(solution.has_value());
+    }
 }
