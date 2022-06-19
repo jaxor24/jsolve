@@ -719,5 +719,44 @@ namespace models
 		return m;
 	}
 
+	jsolve::Model make_model_18()
+    {
+        // Model from pg 77 of "Applied Mathematical Programming" Chapter 2.
+
+        auto m = jsolve::Model(jsolve::Model::Sense::MAX, "Simplex");
+
+        auto* x1 = m.make_variable(jsolve::Variable::Type::LINEAR, "x1");
+        auto* x2 = m.make_variable(jsolve::Variable::Type::LINEAR, "x2");
+        auto* x3 = m.make_variable(jsolve::Variable::Type::LINEAR, "x3");
+
+        x1->cost() = 5;
+        x2->cost() = 4.5;
+        x3->cost() = 6;
+
+        {
+            auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C1");
+            c->rhs() = 60;
+            c->add_to_lhs(6, x1);
+            c->add_to_lhs(5, x2);
+            c->add_to_lhs(8, x3);
+        }
+
+        {
+            auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C2");
+            c->rhs() = 150;
+            c->add_to_lhs(10, x1);
+            c->add_to_lhs(20, x2);
+            c->add_to_lhs(10, x3);
+        }
+
+        {
+            auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C3");
+            c->rhs() = 8;
+            c->add_to_lhs(1, x1);
+        }
+
+        return m;
+    }
+
 }
 
