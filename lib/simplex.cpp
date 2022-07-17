@@ -388,19 +388,10 @@ namespace jsolve::simplex
 
 	std::optional<std::size_t> get_leaving_variable(const Mat& Acol, const Mat& b, bool in_phase_1, Locations& locations, double eps_zero)
 	{
-		// Select leaving variable
-		// Pick i such that: a[i,k]/b[i] is maximised
-		// auto [t, leaving_row_index] = div_elem(-1.0 * Acol, b, ratio_test_division).col_max();
-		// auto row_idx = leaving_row_index(0, 0);
-
-		if (std::none_of(Acol.cbegin(), Acol.cend(), [eps_zero](auto elem) { return -1.0 * elem > eps_zero; }))
-		{
-			// No positive coefficients on entering variable
-			return {};
-		}
+		// Select variable to leave the basis using Bland's rule.
 
 		std::optional<std::size_t> row_idx;
-		std::optional<double> max_ratio;
+		std::optional<double> min_ratio { std::numeric_limits<double>::infinity() };
 		std::optional<int> subscript;
 
 		for (const auto [n_row, elem] : enumerate(Acol))
@@ -410,50 +401,44 @@ namespace jsolve::simplex
 				// If in phase 2, we don't care about the dummy var
 				continue;
 			}
-
-			auto new_ratio = ratio_test_division(-elem, b(n_row, 0), eps_zero);
-
-			if (!max_ratio)
+			else if (elem < -eps_zero)
 			{
-				max_ratio = new_ratio;
-				row_idx = n_row;
-				subscript = locations.basics[n_row].subscript;
-			}
-			else
-			{
-				if (approx_greater(new_ratio, max_ratio.value(), eps_zero))
+				auto curr_ratio = -b(n_row, 0) / elem;
+
+				if (approx_equal(curr_ratio, min_ratio.value(), eps_zero))
 				{
-					max_ratio = new_ratio;
-					row_idx = n_row;
-					subscript = locations.basics[n_row].subscript;
-				}
-				else if (approx_equal(new_ratio, max_ratio.value(), eps_zero))
-				{
-					// Bland's rule. Break ties in the ratio test by picking the variable with the smallest subscript.
+					// Bland's rule - only use the new row if it has a lower subscript
 					if (!subscript || (locations.basics[n_row].subscript < subscript.value()))
 					{
-						max_ratio = new_ratio;
+						min_ratio = curr_ratio;
 						row_idx = n_row;
 						subscript = locations.basics[n_row].subscript;
 					}
 				}
+				else if (curr_ratio < min_ratio)
+				{
+					min_ratio = curr_ratio;
+					row_idx = n_row;
+					subscript = locations.basics[n_row].subscript;
+				}
 			}
 		}
-	
+
 		if (!row_idx)
 		{
-			throw SolveError("Error in selecting leaving variables");
+			// No suitable exiting variable (unbounded)
+			return {};
 		}
 
 		log()->debug("Leaving variable:");
-		log()->debug("With a max ratio value {} at row {}", max_ratio.value(), row_idx.value());
+		log()->debug("With a min ratio value {} at row {}", min_ratio.value(), row_idx.value());
 
 		return row_idx;
 	}
 
 	void log_iteration(int iter, double obj_phase_1, double obj_phase_2, bool in_phase_1)
     {
-        int log_every{ 1 };
+        int log_every{ 100 };
 
         std::string progress{ fmt::format(
             "It {:8} Obj {:14.6f} {}",
@@ -613,7 +598,6 @@ namespace jsolve::simplex
 			);
 
             log_iteration(iter, obj_phase_1, obj_phase_2, in_phase_1);
-
 		}
 
 		// Extract solution
