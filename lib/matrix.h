@@ -121,11 +121,6 @@ Matrix<T>::Matrix(std::size_t r, std::size_t c, T initial)
 		throw MatrixError("Cannot construct matrix with zero row/col count");
 	}
 
-	if ((r < 0) || (c < 0))
-	{
-		throw MatrixError("Cannot construct matrix with negative row/col count");
-	}
-
 	m_data.resize(r * c, initial);
 }
 
