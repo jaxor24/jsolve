@@ -41,7 +41,7 @@ Results of running the netlib model suite:
 | FIT2D      | 26    | 10500 | 138018    | 482330  | B  |     -68464.29 |       timeout |            |
 | FIT2P      | 3001  | 13525 | 60784     | 439794  | B  |      68464.29 |       timeout |            |
 | FORPLAN    | 162   | 421   | 4916      | 25100   | BR |       -664.22 |     mps error |            |
-| GANGES     | 1310  | 1681  | 7021      | 60191   | B  |    -109586.36 |       timeout |            |
+| GANGES     | 1310  | 1681  | 7021      | 60191   | B  |    -109586.36 |    -109585.74 |       2082 |
 | GFRD-PNC   | 617   | 1092  | 3467      | 24476   | B  |    6902236.00 |     mps error |            |
 | GREENBEA   | 2393  | 5405  | 31499     | 235711  | B  |  -72462405.91 |     mps fixed |            |
 | GREENBEB   | 2393  | 5405  | 31499     | 235739  | B  |   -4302147.61 |      mps free |            |
