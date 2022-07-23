@@ -16,13 +16,14 @@ namespace jsolve
 	{
 	public:
 		template <typename... Args>
-		explicit ModelError(Args&&... args)
+		explicit ModelError(fmt::format_string<Args...> format, Args&&... args)
 			:
-			std::runtime_error(fmt::format(std::forward<Args>(args)...))
+			std::runtime_error(fmt::format(format, std::forward<Args>(args)...))
 		{}
-		virtual ~ModelError() throw () {}
-	};
 
+		virtual ~ModelError() throw ()
+		{}
+	};
 
 	class Model : public Counter<Model>
 	{ 

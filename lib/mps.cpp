@@ -1,6 +1,5 @@
 #include "mps.h"
 
-#include "logging.h"
 #include "tools.h"
 
 #include <optional>
@@ -8,19 +7,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
-namespace jsolve
-{
-	template <typename... Args>
-	MPSError::MPSError(Args&&... args)
-		:
-		std::runtime_error(fmt::format(std::forward<Args>(args)...))
-	{}
-	
-	MPSError::~MPSError() throw () 
-	{}
-}
-
 
 namespace jsolve
 {
