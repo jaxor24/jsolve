@@ -18,3 +18,11 @@ jobs:
       run: cmake .
     - name: Run make
       run: make
+  Build-Windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run CMake
+      run: cmake .
+    - name: Run make
+      run: make
