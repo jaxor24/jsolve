@@ -7,13 +7,14 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
-
+  Build-GCC:
     runs-on: ubuntu-22.04
-
     steps:
     - uses: actions/checkout@v3
-    - name: CMake
+    - name: Install TBB
+      # Sadly, we need to manually install this as it is not supported yet within CMake
+      run: sudo apt install -y libtbb-dev
+    - name: Run CMake
       run: cmake .
-    - name: make
+    - name: Run make
       run: make
