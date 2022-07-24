@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: jsolve Build
 
 on:
   push:
@@ -14,7 +14,15 @@ jobs:
     - name: Install TBB
       # Sadly, we need to manually install this as it is not supported yet within CMake
       run: sudo apt install -y libtbb-dev
-    - name: Run CMake
+    - name: Configure
       run: cmake .
-    - name: Run make
-      run: make
+    - name: Build
+      run: cmake --build .
+  Build-Windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Configure
+      run: cmake .
+    - name: Build
+      run: cmake --build .
