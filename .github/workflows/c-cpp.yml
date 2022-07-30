@@ -18,6 +18,8 @@ jobs:
       run: cmake .
     - name: Build
       run: cmake --build .
+    - name: Test
+      run: ctest --verbose .
   Build-Windows:
     runs-on: windows-latest
     steps:
