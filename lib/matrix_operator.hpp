@@ -115,11 +115,13 @@ Matrix<T>& Matrix<T>::operator*=(const Matrix<T>& rhs)
 	if (n_cols() != rhs.n_rows())
 	{
 		throw MatrixError(
-			"Cannot multiply dimensions {}x{} and {}x{}",
-			n_rows(),
-			n_cols(),
-			rhs.n_rows(),
-			rhs.n_cols()
+			fmt::format(
+				"Cannot multiply dimensions {}x{} and {}x{}",
+				n_rows(),
+				n_cols(),
+				rhs.n_rows(),
+				rhs.n_cols()
+			)
 		);
 	}
 

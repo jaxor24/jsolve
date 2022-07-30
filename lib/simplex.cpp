@@ -3,7 +3,7 @@
 #include "variable.h"
 #include "constraint.h"
 
-#include "solver_error.h"
+#include "solve_error.h"
 
 #include "tools.h"
 #include "matrix.h"
@@ -347,44 +347,6 @@ namespace jsolve::simplex
 			}
 		}
 	}
-
-	auto ratio_test_division = [](Number a, Number b, Number eps) -> Number
-	{
-		// A division operator that includes the conventions for the simplex ratio test:
-		// a / 0 = infinity
-		// 0 / 0 = 0
-
-		auto a_zero = approx_equal(a, 0.0, eps);
-		auto b_zero = approx_equal(b, 0.0, eps);
-
-		if (b_zero)
-		{
-			if (a_zero)
-			{
-				return 0;
-			}
-			else if (a < 0)
-			{
-				return -1 * std::numeric_limits<Number>::infinity();
-			}
-			else if (a > 0)
-			{
-				return std::numeric_limits<Number>::infinity();
-			}
-			else
-			{
-				throw SolveError("Should never get here");
-			}
-		}
-		else if (a_zero)
-		{
-			return 0;
-		}
-		else
-		{
-			return a / b;
-		}
-	};
 
 	std::optional<std::size_t> get_leaving_variable(const Mat& Acol, const Mat& b, bool in_phase_1, Locations& locations, double eps_zero)
 	{

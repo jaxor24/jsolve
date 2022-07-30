@@ -1,6 +1,5 @@
 #include "mps.h"
 
-#include "logging.h"
 #include "tools.h"
 
 #include <optional>
@@ -8,19 +7,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
-namespace jsolve
-{
-	template <typename... Args>
-	MPSError::MPSError(Args&&... args)
-		:
-		std::runtime_error(fmt::format(std::forward<Args>(args)...))
-	{}
-	
-	MPSError::~MPSError() throw () 
-	{}
-}
-
 
 namespace jsolve
 {
@@ -49,7 +35,7 @@ namespace jsolve
 		else if (line == "BOUNDS") { return section::BOUNDS; }
 		else if (line == "ENDATA") { return section::END; }
 		else if (line == "RANGES") { return section::RANGES; }
-		else { throw jsolve::MPSError("Unknown header: {}", line); }
+		else { throw jsolve::MPSError(fmt::format("Unknown header: {}", line)); }
 	}
 
 	bool is_header(std::string_view line)
@@ -104,7 +90,7 @@ namespace jsolve
 			}
 			else
 			{
-				throw MPSError("Unknown ROWS type: {}", constraint_type);
+				throw MPSError(fmt::format("Unknown ROWS type: {}", constraint_type));
 			}
 		}
 		else if (section == section::COLUMNS)
@@ -143,7 +129,7 @@ namespace jsolve
 					}
 					else
 					{
-						throw MPSError("Constraint not found: {}", constraint_value);
+						throw MPSError(fmt::format("Constraint not found: {}", constraint_value));
 					}
 				}
 			}
@@ -167,7 +153,7 @@ namespace jsolve
 				}
 				else
 				{
-					throw MPSError("Constraint not found: {}", constraint_name);
+					throw MPSError(fmt::format("Constraint not found: {}", constraint_name));
 				}
 			}
 		}
@@ -186,7 +172,7 @@ namespace jsolve
 				if (bound_value < 0.0)
 				{
 					// Can't handle negative variables with current simplex implementation.
-					throw MPSError("Unhandled MPS lower bounds < 0 for variable: {}", words.at(2));
+					throw MPSError(fmt::format("Unhandled MPS lower bounds < 0 for variable: {}", words.at(2)));
 				}
 				else
 				{
@@ -203,7 +189,7 @@ namespace jsolve
 				if (bound_value < 0.0)
 				{
 					// Can't handle negative variables with current simplex implementation.
-					throw MPSError("Unhandled MPS upper bounds < 0 for variable: {}", words.at(2));
+					throw MPSError(fmt::format("Unhandled MPS upper bounds < 0 for variable: {}", words.at(2)));
 				}
 				else
 				{
@@ -220,7 +206,7 @@ namespace jsolve
 				if (bound_value < 0.0)
 				{
 					// Can't handle negative variables with current simplex implementation.
-					throw MPSError("Unhandled MPS fixed values < 0 for variable: {}", words.at(2));
+					throw MPSError(fmt::format("Unhandled MPS fixed values < 0 for variable: {}", words.at(2)));
 				}
 				else
 				{
@@ -236,7 +222,7 @@ namespace jsolve
 			}
 			else
 			{
-				throw MPSError("Unhandled MPS BOUNDS type: {}", bound_type);
+				throw MPSError(fmt::format("Unhandled MPS BOUNDS type: {}", bound_type));
 			}
 		}
 		else if (section == section::RANGES)
@@ -281,7 +267,7 @@ namespace jsolve
 
 		if (!std::filesystem::exists(path))
 		{
-			throw MPSError("File does not exist: {}", path);
+			throw MPSError(fmt::format("File does not exist: {}", path));
 		}
 
 		std::ifstream file{ path, std::ios::in | std::ios::binary };
@@ -315,7 +301,7 @@ namespace jsolve
 		}
 		else
 		{
-			throw MPSError("File could not be opened: {}", path);
+			throw MPSError(fmt::format("File could not be opened: {}", path));
 		}
 
 		if (!model)

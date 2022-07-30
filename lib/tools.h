@@ -1,5 +1,7 @@
 #pragma once
 
+#include "logging.h"
+
 #include <tuple>
 #include <limits>
 #include <cmath>
@@ -14,11 +16,11 @@ class Timer
 public:
     using Clock = std::chrono::high_resolution_clock;
 
-    Timer(Log log, Args... args)
+    Timer(Log log, fmt::format_string<Args...> format, Args... args)
         : 
         m_start{ Clock::now() },
         m_log{ log },
-        m_msg{ fmt::format(std::forward<Args>(args)...) }
+        m_msg{ fmt::format(format, std::forward<Args>(args)...) }
     {
         m_log("(Start) {}", m_msg);
     }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "spdlog/spdlog.h"
+#include "spdlog/fmt/fmt.h"
 #include "spdlog/fmt/ostr.h"
 
 namespace logging
@@ -15,10 +16,10 @@ inline auto log()
 
 inline auto info_logger()
 {
-	return [](auto&&... args) { log()->info(std::forward<decltype(args)>(args)...); };
+	return []<typename... Args>(fmt::format_string<Args...> format, Args&&... args) { log()->info(format, std::forward<decltype(args)>(args)...); };
 }
 
 inline auto debug_logger()
 {
-	return [](auto&&... args) { log()->debug(std::forward<decltype(args)>(args)...); };
+	return []<typename... Args>(fmt::format_string<Args...> format, Args&&... args) { log()->debug(format, std::forward<decltype(args)>(args)...); };
 }

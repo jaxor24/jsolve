@@ -15,14 +15,14 @@ namespace jsolve
 	class ModelError : public std::runtime_error
 	{
 	public:
-		template <typename... Args>
-		explicit ModelError(Args&&... args)
+		explicit ModelError(const std::string& message)
 			:
-			std::runtime_error(fmt::format(std::forward<Args>(args)...))
+			std::runtime_error(message)
 		{}
-		virtual ~ModelError() throw () {}
-	};
 
+		virtual ~ModelError() throw ()
+		{}
+	};
 
 	class Model : public Counter<Model>
 	{ 
@@ -57,7 +57,7 @@ namespace jsolve
 			}
 			else
 			{
-				throw ModelError("Variable name {} already exists", v->name());
+				throw ModelError(fmt::format("Variable name {} already exists", v->name()));
 			}
 
 			std::sort(
@@ -83,7 +83,7 @@ namespace jsolve
 			}
 			else
 			{
-				throw ModelError("Constraint name {} already exists", c->name());
+				throw ModelError(fmt::format("Constraint name {} already exists", c->name()));
 			}
 
 			std::sort(
