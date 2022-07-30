@@ -1,5 +1,4 @@
-#include "logging.h"
-
+#include <string>
 #include <stdexcept>
 
 namespace jsolve
@@ -7,10 +6,9 @@ namespace jsolve
 	class SolveError : public std::runtime_error
 	{
 	public:
-		template <typename... Args>
-		explicit SolveError(fmt::format_string<Args...> format, Args&&... args)
+		explicit SolveError(const std::string& message)
 			:
-			std::runtime_error(fmt::format(format, std::forward<Args>(args)...))
+			std::runtime_error(message)
 		{}
 
 		virtual ~SolveError() throw ()

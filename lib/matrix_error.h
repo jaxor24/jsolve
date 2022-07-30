@@ -1,14 +1,12 @@
-#include "logging.h"
-
+#include <string>
 #include <stdexcept>
 
 class MatrixError : public std::runtime_error
 {
 public:
-	template <typename... Args>
-	explicit MatrixError(fmt::format_string<Args...> format, Args&&... args) 
+	explicit MatrixError(const std::string& message) 
 		:
-		std::runtime_error(fmt::format(format, std::forward<Args>(args)...))
+		std::runtime_error(message)
 	{}
 
 	virtual ~MatrixError() throw ()

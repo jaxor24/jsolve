@@ -15,10 +15,9 @@ namespace jsolve
 	class ModelError : public std::runtime_error
 	{
 	public:
-		template <typename... Args>
-		explicit ModelError(fmt::format_string<Args...> format, Args&&... args)
+		explicit ModelError(const std::string& message)
 			:
-			std::runtime_error(fmt::format(format, std::forward<Args>(args)...))
+			std::runtime_error(message)
 		{}
 
 		virtual ~ModelError() throw ()
@@ -58,7 +57,7 @@ namespace jsolve
 			}
 			else
 			{
-				throw ModelError("Variable name {} already exists", v->name());
+				throw ModelError(fmt::format("Variable name {} already exists", v->name()));
 			}
 
 			std::sort(
@@ -84,7 +83,7 @@ namespace jsolve
 			}
 			else
 			{
-				throw ModelError("Constraint name {} already exists", c->name());
+				throw ModelError(fmt::format("Constraint name {} already exists", c->name()));
 			}
 
 			std::sort(
