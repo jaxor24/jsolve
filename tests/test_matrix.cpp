@@ -699,11 +699,14 @@ TEST_CASE("matrix::slice", "[matrix]")
         m(1, 2) = 6;
         m(2, 2) = 9;
 
+#ifndef NDEBUG
         SECTION("slice outside bounds")
         {
+            // Bounds checking only done in debug builds for performance reasons
             REQUIRE_THROWS_AS(m.slice(m.n_rows(), {}), std::out_of_range);
             REQUIRE_THROWS_AS(m.slice({}, m.n_cols()), std::out_of_range);
         }
+#endif
 
         SECTION("slice all")
         {
@@ -760,11 +763,14 @@ TEST_CASE("matrix::slice", "[matrix]")
         m(0, 1) = 2;
         m(0, 2) = 3;
 
+#ifndef NDEBUG
         SECTION("slice outside bounds")
         {
+            // Bounds checking only done in debug builds for performance reasons
             REQUIRE_THROWS_AS(m.slice(m.n_rows(), {}), std::out_of_range);
             REQUIRE_THROWS_AS(m.slice({}, m.n_cols()), std::out_of_range);
         }
+#endif
 
         SECTION("slice all")
         {

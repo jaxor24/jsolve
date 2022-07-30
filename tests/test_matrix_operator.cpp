@@ -33,17 +33,21 @@ TEST_CASE("matrix::operator()", "[matrix]")
         }
     }
 
+#ifndef NDEBUG
     SECTION("access out of bound row")
     {
+        // Bounds checking only done in debug builds for performance reasons
         REQUIRE_THROWS_AS(m(m.n_rows(), m.n_cols() - 1), std::out_of_range);
         REQUIRE_THROWS_AS(m(m.n_rows() + 1, m.n_cols() - 1), std::out_of_range);
     }
 
     SECTION("access out of bound col")
     {
+        // Bounds checking only done in debug builds for performance reasons
         REQUIRE_THROWS_AS(m(m.n_rows() - 1, m.n_cols()), std::out_of_range);
         REQUIRE_THROWS_AS(m(m.n_rows() - 1, m.n_cols() + 1), std::out_of_range);
     }
+#endif
 }
 
 TEST_CASE("matrix::operator==", "[matrix]")
