@@ -8,6 +8,172 @@
 #include <string>
 #include <vector>
 
+namespace
+{
+	void process_rows_data_record(jsolve::Model& model, const std::vector<std::string>& words)
+	{
+		const auto& constraint_type = words.at(0);
+		const auto& constraint_name = words.at(1);
+
+		if (constraint_type == "N")
+		{
+			model.objective_name() = constraint_name;
+		}
+		else if (constraint_type == "G")
+		{
+			model.make_constraint(jsolve::Constraint::Type::GREAT, constraint_name);
+		}
+		else if (constraint_type == "L")
+		{
+			model.make_constraint(jsolve::Constraint::Type::LESS, constraint_name);
+		}
+		else if (constraint_type == "E")
+		{
+			model.make_constraint(jsolve::Constraint::Type::EQUAL, constraint_name);
+		}
+		else
+		{
+			throw jsolve::MPSError(fmt::format("Unknown ROWS type: {}", constraint_type));
+		}
+	}
+
+	void process_cols_data_record(jsolve::Model& model, const std::vector<std::string>& words)
+	{
+		const auto& variable_name = words.at(0);
+
+		auto* variable = model.get_variable(variable_name);
+
+		if (!variable)
+		{
+			variable = model.make_variable(jsolve::Variable::Type::LINEAR, variable_name);
+		}
+
+		auto it = std::cbegin(words);
+		auto it_end = std::cend(words) - 1;
+
+		for (; it != it_end; ++it)
+		{
+			it++;
+			auto constraint_name = *it;
+			auto constraint_value = std::stod(*(it + 1));
+
+			if (model.objective_name() == constraint_name)
+			{
+				// Pair is specifying the objective coefficient of this variable
+				variable->cost() = constraint_value;
+			}
+			else
+			{
+				// Pair is specifying the entries of a constraint
+				auto* constraint = model.get_constraint(constraint_name);
+
+				if (constraint)
+				{
+					constraint->add_to_lhs(constraint_value, variable);
+				}
+				else
+				{
+					throw jsolve::MPSError(fmt::format("Constraint not found: {}", constraint_value));
+				}
+			}
+		}
+	}
+
+	void process_rhs_data_record(jsolve::Model& model, const std::vector<std::string>& words)
+	{
+		auto it = std::cbegin(words);
+		auto it_end = std::cend(words) - 1;
+
+		for (; it != it_end; ++it)
+		{
+			it++;
+			auto constraint_name = *it;
+			auto rhs = std::stod(*(it + 1));
+
+			auto* constraint = model.get_constraint(constraint_name);
+
+			if (constraint)
+			{
+				constraint->rhs() = rhs;
+			}
+			else
+			{
+				throw jsolve::MPSError(fmt::format("Constraint not found: {}", constraint_name));
+			}
+		}
+	}
+
+	void process_bounds_data_record(jsolve::Model& model, const std::vector<std::string>& words)
+	{
+		const auto& bound_type = words.at(0);
+		// const auto& bound_name = words.at(1); // ignored
+
+		auto* variable = model.get_variable(words.at(2));
+
+		if (bound_type == "LO")
+		{
+			const auto& bound_value = std::stod(words.at(3));
+
+			// Lower bound
+			if (bound_value < 0.0)
+			{
+				// Can't handle negative variables with current simplex implementation.
+				throw jsolve::MPSError(fmt::format("Unhandled MPS lower bounds < 0 for variable: {}", words.at(2)));
+			}
+			else
+			{
+				auto* constraint = model.make_constraint(jsolve::Constraint::Type::GREAT, fmt::format("BND_{}_GEQ_{}", words.at(2), bound_value));
+				constraint->rhs() = bound_value;
+				constraint->add_to_lhs(1.0, variable);
+			}
+		}
+		else if (bound_type == "UP")
+		{
+			const auto& bound_value = std::stod(words.at(3));
+
+			// Upper bound
+			if (bound_value < 0.0)
+			{
+				// Can't handle negative variables with current simplex implementation.
+				throw jsolve::MPSError(fmt::format("Unhandled MPS upper bounds < 0 for variable: {}", words.at(2)));
+			}
+			else
+			{
+				auto* constraint = model.make_constraint(jsolve::Constraint::Type::LESS, fmt::format("BND_{}_LEQ_{}", words.at(2), bound_value));
+				constraint->rhs() = bound_value;
+				constraint->add_to_lhs(1.0, variable);
+			}
+		}
+		else if (bound_type == "FX")
+		{
+			const auto& bound_value = std::stod(words.at(3));
+
+			// Fixed value
+			if (bound_value < 0.0)
+			{
+				// Can't handle negative variables with current simplex implementation.
+				throw jsolve::MPSError(fmt::format("Unhandled MPS fixed values < 0 for variable: {}", words.at(2)));
+			}
+			else
+			{
+				// Create upper and lower bound constraints
+				auto* lb_constraint = model.make_constraint(jsolve::Constraint::Type::GREAT, fmt::format("BND_{}_GEQ_{}", words.at(2), bound_value));
+				lb_constraint->rhs() = bound_value;
+				lb_constraint->add_to_lhs(1.0, variable);
+
+				auto* ub_constraint = model.make_constraint(jsolve::Constraint::Type::LESS, fmt::format("BND_{}_LEQ_{}", words.at(2), bound_value));
+				ub_constraint->rhs() = bound_value;
+				ub_constraint->add_to_lhs(1.0, variable);
+			}
+		}
+		else
+		{
+			throw jsolve::MPSError(fmt::format("Unhandled MPS BOUNDS type: {}", bound_type));
+		}
+	}
+}
+
+
 namespace jsolve
 {
 	enum class section
@@ -24,7 +190,7 @@ namespace jsolve
 		END
 	};
 
-	section line_to_section(std::string_view line)
+	section record_to_section(std::string_view line)
 	{
 		if (line == "NAME") { return section::NAME; }
 		else if (line == "OBJSENSE") { return section::OBJSENSE; }
@@ -38,7 +204,7 @@ namespace jsolve
 		else { throw jsolve::MPSError(fmt::format("Unknown header: {}", line)); }
 	}
 
-	bool is_header(std::string_view line)
+	bool is_indicator_record(std::string_view line)
 	{
 		if (line.empty())
 		{
@@ -57,7 +223,7 @@ namespace jsolve
 		return result;
 	}
 
-	void process_header_row(std::optional<jsolve::Model>& model, const section& section, const std::vector<std::string>& words)
+	void process_indicator_record(std::optional<jsolve::Model>& model, const section& section, const std::vector<std::string>& words)
 	{
 		if (section == section::NAME)
 		{
@@ -65,165 +231,23 @@ namespace jsolve
 		}
 	}
 
-	void process_section_row(std::optional<jsolve::Model>& model, const section& section, const std::vector<std::string>& words)
+	void process_data_record(std::optional<jsolve::Model>& model, const section& section, const std::vector<std::string>& words)
 	{
 		if (section == section::ROWS)
 		{
-			const auto& constraint_type = words.at(0);
-			const auto& constraint_name = words.at(1);
-
-			if (constraint_type == "N")
-			{
-				model->objective_name() = constraint_name;
-			}
-			else if (constraint_type == "G")
-			{
-				model->make_constraint(jsolve::Constraint::Type::GREAT, constraint_name);
-			}
-			else if (constraint_type == "L")
-			{
-				model->make_constraint(jsolve::Constraint::Type::LESS, constraint_name);
-			}
-			else if (constraint_type == "E")
-			{
-				model->make_constraint(jsolve::Constraint::Type::EQUAL, constraint_name);
-			}
-			else
-			{
-				throw MPSError(fmt::format("Unknown ROWS type: {}", constraint_type));
-			}
+			process_rows_data_record(model.value(), words);
 		}
 		else if (section == section::COLUMNS)
 		{
-			const auto& variable_name = words.at(0);
-
-			auto* variable = model->get_variable(variable_name);
-
-			if (!variable)
-			{
-				variable = model->make_variable(jsolve::Variable::Type::LINEAR, variable_name);
-			}
-
-			auto it = std::cbegin(words);
-			auto it_end = std::cend(words) - 1;
-			
-			for (; it != it_end; ++it)
-			{
-				it++;
-				auto constraint_name = *it;
-				auto constraint_value = std::stod(*(it + 1));
-
-				if (model->objective_name() == constraint_name)
-				{
-					// Pair is specifying the objective coefficient of this variable
-					variable->cost() = constraint_value;
-				}
-				else
-				{
-					// Pair is specifying the entries of a constraint
-					auto* constraint = model->get_constraint(constraint_name);
-
-					if (constraint) 
-					{
-						constraint->add_to_lhs(constraint_value, variable);
-					}
-					else
-					{
-						throw MPSError(fmt::format("Constraint not found: {}", constraint_value));
-					}
-				}
-			}
+			process_cols_data_record(model.value(), words);
 		}
 		else if (section == section::RHS)
 		{
-			auto it = std::cbegin(words);
-			auto it_end = std::cend(words) - 1;
-
-			for (; it != it_end; ++it)
-			{
-				it++;
-				auto constraint_name = *it;
-				auto rhs = std::stod(*(it + 1));
-
-				auto* constraint = model->get_constraint(constraint_name);
-
-				if (constraint)
-				{
-					constraint->rhs() = rhs;
-				}
-				else
-				{
-					throw MPSError(fmt::format("Constraint not found: {}", constraint_name));
-				}
-			}
+			process_rhs_data_record(model.value(), words);
 		}
 		else if (section == section::BOUNDS)
 		{
-			const auto& bound_type = words.at(0);
-			// const auto& bound_name = words.at(1); // ignored
-
-			auto* variable = model->get_variable(words.at(2));
-			
-			if (bound_type == "LO")
-			{
-				const auto& bound_value = std::stod(words.at(3));
-
-				// Lower bound
-				if (bound_value < 0.0)
-				{
-					// Can't handle negative variables with current simplex implementation.
-					throw MPSError(fmt::format("Unhandled MPS lower bounds < 0 for variable: {}", words.at(2)));
-				}
-				else
-				{
-					auto* constraint = model->make_constraint(jsolve::Constraint::Type::GREAT, fmt::format("BND_{}_GEQ_{}", words.at(2), bound_value));
-					constraint->rhs() = bound_value;
-					constraint->add_to_lhs(1.0, variable);
-				}
-			}
-			else if (bound_type == "UP")
-			{
-				const auto& bound_value = std::stod(words.at(3));
-
-				// Upper bound
-				if (bound_value < 0.0)
-				{
-					// Can't handle negative variables with current simplex implementation.
-					throw MPSError(fmt::format("Unhandled MPS upper bounds < 0 for variable: {}", words.at(2)));
-				}
-				else
-				{
-					auto* constraint = model->make_constraint(jsolve::Constraint::Type::LESS, fmt::format("BND_{}_LEQ_{}", words.at(2), bound_value));
-					constraint->rhs() = bound_value;
-					constraint->add_to_lhs(1.0, variable);
-				}
-			}
-			else if (bound_type == "FX")
-			{
-				const auto& bound_value = std::stod(words.at(3));
-
-				// Fixed value
-				if (bound_value < 0.0)
-				{
-					// Can't handle negative variables with current simplex implementation.
-					throw MPSError(fmt::format("Unhandled MPS fixed values < 0 for variable: {}", words.at(2)));
-				}
-				else
-				{
-					// Create upper and lower bound constraints
-					auto* lb_constraint = model->make_constraint(jsolve::Constraint::Type::GREAT, fmt::format("BND_{}_GEQ_{}", words.at(2), bound_value));
-					lb_constraint->rhs() = bound_value;
-					lb_constraint->add_to_lhs(1.0, variable);
-
-					auto* ub_constraint = model->make_constraint(jsolve::Constraint::Type::LESS, fmt::format("BND_{}_LEQ_{}", words.at(2), bound_value));
-					ub_constraint->rhs() = bound_value;
-					ub_constraint->add_to_lhs(1.0, variable);
-				}
-			}
-			else
-			{
-				throw MPSError(fmt::format("Unhandled MPS BOUNDS type: {}", bound_type));
-			}
+			process_bounds_data_record(model.value(), words);
 		}
 		else if (section == section::RANGES)
 		{
@@ -231,18 +255,18 @@ namespace jsolve
 		}
 	}
 
-	void process_row(std::optional<jsolve::Model>& model, section& section, const std::string& line)
+	void process_record(std::optional<jsolve::Model>& model, section& section, const std::string& line)
 	{
 		auto words = split_string(line);
 
-		if (is_header(line))
+		if (is_indicator_record(line))
 		{
-			section = line_to_section(words.front());
-			process_header_row(model, section, words);
+			section = record_to_section(words.front());
+			process_indicator_record(model, section, words);
 		}
 		else
 		{
-			process_section_row(model, section, words);
+			process_data_record(model, section, words);
 		}
 	}
 
@@ -288,7 +312,7 @@ namespace jsolve
 			while (getline(file, line))
 			{
 				log()->debug("|{}", line);
-				process_row(model, current_section, line);
+				process_record(model, current_section, line);
 
 				current_line++;
 				if (current_line >= next_print)
