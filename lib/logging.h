@@ -7,6 +7,7 @@
 namespace logging
 {
 	void init_logging(std::string level);
+	void teardown_logging();
 }
 
 inline auto log()
