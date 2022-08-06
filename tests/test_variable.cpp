@@ -78,7 +78,7 @@ TEST_CASE("variable::upper_bound()", "[variable]")
     {
         SECTION("default")
         {
-            REQUIRE(c.upper_bound() == std::numeric_limits<double>::max());
+            REQUIRE(c.upper_bound() == std::numeric_limits<double>::infinity());
         }
     }
 

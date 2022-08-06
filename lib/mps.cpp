@@ -110,11 +110,12 @@ namespace
 
 		auto* variable = model.get_variable(words.at(2));
 
+
 		if (bound_type == "LO")
 		{
+			// Lower bound
 			const auto& bound_value = std::stod(words.at(3));
 
-			// Lower bound
 			if (bound_value < 0.0)
 			{
 				// Can't handle negative variables with current simplex implementation.
@@ -122,16 +123,14 @@ namespace
 			}
 			else
 			{
-				auto* constraint = model.make_constraint(jsolve::Constraint::Type::GREAT, fmt::format("BND_{}_GEQ_{}", words.at(2), bound_value));
-				constraint->rhs() = bound_value;
-				constraint->add_to_lhs(1.0, variable);
+				variable->lower_bound() = bound_value;
 			}
 		}
 		else if (bound_type == "UP")
 		{
+			// Upper bound
 			const auto& bound_value = std::stod(words.at(3));
 
-			// Upper bound
 			if (bound_value < 0.0)
 			{
 				// Can't handle negative variables with current simplex implementation.
@@ -139,16 +138,14 @@ namespace
 			}
 			else
 			{
-				auto* constraint = model.make_constraint(jsolve::Constraint::Type::LESS, fmt::format("BND_{}_LEQ_{}", words.at(2), bound_value));
-				constraint->rhs() = bound_value;
-				constraint->add_to_lhs(1.0, variable);
+				variable->upper_bound() = bound_value;
 			}
 		}
 		else if (bound_type == "FX")
 		{
+			// Fixed value
 			const auto& bound_value = std::stod(words.at(3));
 
-			// Fixed value
 			if (bound_value < 0.0)
 			{
 				// Can't handle negative variables with current simplex implementation.
@@ -156,15 +153,14 @@ namespace
 			}
 			else
 			{
-				// Create upper and lower bound constraints
-				auto* lb_constraint = model.make_constraint(jsolve::Constraint::Type::GREAT, fmt::format("BND_{}_GEQ_{}", words.at(2), bound_value));
-				lb_constraint->rhs() = bound_value;
-				lb_constraint->add_to_lhs(1.0, variable);
-
-				auto* ub_constraint = model.make_constraint(jsolve::Constraint::Type::LESS, fmt::format("BND_{}_LEQ_{}", words.at(2), bound_value));
-				ub_constraint->rhs() = bound_value;
-				ub_constraint->add_to_lhs(1.0, variable);
+				variable->lower_bound() = bound_value;
+				variable->upper_bound() = bound_value;
 			}
+		}
+		else if (bound_type == "FR")
+		{
+			variable->lower_bound() = -std::numeric_limits<double>::infinity();
+			variable->upper_bound() = std::numeric_limits<double>::infinity();
 		}
 		else
 		{
@@ -173,6 +169,38 @@ namespace
 	}
 }
 
+namespace
+{
+	void post_process_model(jsolve::Model& model)
+	{
+		// Convert bounds to constraints
+
+		for (const auto& variable : model.get_variables())
+		{
+			if (variable->lower_bound() == -std::numeric_limits<double>::infinity() && variable->upper_bound() == std::numeric_limits<double>::infinity())
+			{
+				throw jsolve::MPSError(fmt::format("Free variables unsupported"));
+				continue;
+			}
+
+			if (variable->lower_bound() > 0)
+			{
+				// Lower bounds are converted to constraints
+				auto* constraint = model.make_constraint(jsolve::Constraint::Type::GREAT, fmt::format("BND_{}_GEQ_{}", variable->name(), variable->lower_bound()));
+				constraint->rhs() = variable->lower_bound();
+				constraint->add_to_lhs(1.0, variable.get());
+			}
+
+			if (variable->upper_bound() < std::numeric_limits<double>::infinity())
+			{
+				// Upper bounds are converted to constraints
+				auto* constraint = model.make_constraint(jsolve::Constraint::Type::LESS, fmt::format("BND_{}_LEQ_{}", variable->name(), variable->upper_bound()));
+				constraint->rhs() = variable->upper_bound();
+				constraint->add_to_lhs(1.0, variable.get());
+			}
+		}
+	}
+}
 
 namespace jsolve
 {
@@ -331,6 +359,10 @@ namespace jsolve
 		if (!model)
 		{
 			throw MPSError("No model created");
+		}
+		else
+		{
+			post_process_model(model.value());
 		}
 
 		return std::move(model.value());

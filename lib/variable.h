@@ -39,7 +39,7 @@ namespace jsolve
 		Type m_type{ Type::LINEAR };
 		double m_cost{ 0.0 };
 		double m_lower_bound{ 0.0 };
-		double m_upper_bound{ std::numeric_limits<double>::max() };
+		double m_upper_bound{ std::numeric_limits<double>::infinity() };
 	};
 
 	std::ostream& operator<<(std::ostream& os, const Variable& v);

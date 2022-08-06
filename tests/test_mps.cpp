@@ -38,13 +38,13 @@ TEST_CASE("jsolve::mps::read_mps", "[matrix]")
 
             // These are currently not set
             REQUIRE(x1->lower_bound() == 0);
-            REQUIRE(y2->lower_bound() == 0);
+            REQUIRE(y2->lower_bound() == 1);
             REQUIRE(z3->lower_bound() == 0);
 
             // These are currently not set
-            REQUIRE(x1->upper_bound() == std::numeric_limits<double>::max());
-            REQUIRE(y2->upper_bound() == std::numeric_limits<double>::max());
-            REQUIRE(z3->upper_bound() == std::numeric_limits<double>::max());
+            REQUIRE(x1->upper_bound() == 4);
+            REQUIRE(y2->upper_bound() == 1);
+            REQUIRE(z3->upper_bound() == std::numeric_limits<double>::infinity());
         }
 
         SECTION("constraints")
