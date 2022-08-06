@@ -18,11 +18,7 @@ namespace jsolve
 			EQUAL
 		};
 
-		explicit Constraint(Type type, const std::string& name = "") 
-			: 
-			Counter<Constraint>{ name },
-			m_type{ type }
-		{}
+		explicit Constraint(Type type, const std::string& name = "");
 
 		Type type() const;
 		Type& type();

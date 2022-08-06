@@ -204,6 +204,14 @@ namespace
 
 namespace jsolve
 {
+	MPSError::MPSError(const std::string& message)
+		:
+		std::runtime_error(message)
+	{}
+
+	MPSError::~MPSError() throw ()
+	{}
+
 	enum class section
 	{
 		NONE,

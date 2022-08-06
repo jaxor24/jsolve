@@ -5,6 +5,12 @@
 
 namespace jsolve
 {
+	Constraint::Constraint(Type type, const std::string& name)
+		:
+		Counter<Constraint>{ name },
+		m_type{ type }
+	{}
+
 	std::ostream& operator<<(std::ostream& os, const Constraint& c)
 	{
 		os << c.to_string();

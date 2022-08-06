@@ -2,6 +2,20 @@
 
 namespace jsolve
 {
+	ModelError::ModelError(const std::string& message)
+		:
+		std::runtime_error(message)
+	{}
+
+	ModelError::~ModelError() throw ()
+	{}
+
+	Model::Model(Sense sense, const std::string& name)
+		:
+		Counter<Model>{ name },
+		m_sense{ sense }
+	{}
+
 	Model::Sense Model::sense() const
 	{
 		return m_sense;

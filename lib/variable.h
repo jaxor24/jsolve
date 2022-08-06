@@ -14,11 +14,7 @@ namespace jsolve
 			LINEAR
 		};
 
-		explicit Variable(Type type, const std::string& name = "")
-			:
-			Counter<Variable>{ name },
-			m_type{ type }
-		{}
+		explicit Variable(Type type, const std::string& name = "");
 
 		Type type() const;
 

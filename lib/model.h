@@ -15,13 +15,8 @@ namespace jsolve
 	class ModelError : public std::runtime_error
 	{
 	public:
-		explicit ModelError(const std::string& message)
-			:
-			std::runtime_error(message)
-		{}
-
-		virtual ~ModelError() throw ()
-		{}
+		explicit ModelError(const std::string& message);
+		virtual ~ModelError() throw ();
 	};
 
 	class Model : public Counter<Model>
@@ -33,11 +28,7 @@ namespace jsolve
 			MIN
 		};
 
-		explicit Model(Sense sense, const std::string& name)
-			:
-			Counter<Model>{ name },
-			m_sense{ sense }
-		{}
+		explicit Model(Sense sense, const std::string& name);
 
 		Sense sense() const;
 
