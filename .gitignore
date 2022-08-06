@@ -39,16 +39,17 @@ build/*
 generated
 
 # Cmake
+CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
+Testing
 Makefile
 cmake_install.cmake
 install_manifest.txt
-/tests/tests.VC.VC.opendb
-/tests/tests.VC.db
-/tests/tests
-/tests/logs/*
+compile_commands.json
+CTestTestfile.cmake
+_deps
 
 
 # out
