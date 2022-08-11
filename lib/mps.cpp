@@ -263,7 +263,7 @@ namespace jsolve
 	{
 		if (section == section::NAME)
 		{
-			model.emplace(Model::Sense::MIN, words.at(1));
+			model.emplace(Model::Sense::MIN, words.size() > 1 ? words.at(1) : "Unnamed");
 		}
 	}
 
