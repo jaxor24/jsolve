@@ -1,5 +1,7 @@
 #include "model.h"
 
+#include <ranges>
+
 namespace jsolve
 {
 	ModelError::ModelError(const std::string& message)
@@ -170,6 +172,10 @@ namespace jsolve
 		auto found = m_constraints.find(name);
 		return found == std::end(m_constraints) ? nullptr : found->second.get();
 	}
+
+	void Model::remove_variable(const std::string& name)
+	{
+		[[maybe_unused]] auto result = m_variables.erase(name);
 	}
 
 	std::ostream& operator<<(std::ostream& os, const Model& m)
