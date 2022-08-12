@@ -47,18 +47,18 @@ namespace jsolve
 		std::for_each(
 			std::begin(user_model.get_constraints()),
 			std::end(user_model.get_constraints()),
-			[](const auto& constraint) 
+			[](const auto& pair) 
 			{ 
-				if (constraint->type() == Constraint::Type::EQUAL) { throw SolveError("EQUAL constraints unsupported"); }
+				if (pair.second->type() == Constraint::Type::EQUAL) { throw SolveError("EQUAL constraints unsupported"); }
 			}
 		);
 		
 		// Objective vector
 		Mat objective{ n_total_vars, 1, 0.0 };
 
-		for (const auto& [n_var, var] : enumerate(user_model.get_variables()))
+		for (const auto& [n_var, pair] : enumerate(user_model.get_variables()))
 		{
-			objective(n_var, 0) = var->cost();
+			objective(n_var, 0) = pair.second->cost();
 		}
 
 		if (user_model.sense() == Model::Sense::MIN)
@@ -70,16 +70,16 @@ namespace jsolve
 
 		// b (RHS) vector
 		Mat rhs{ n_slack_vars, 1, 0.0 };
-		for (const auto& [n_cons, cons] : enumerate(user_model.get_constraints()))
+		for (const auto& [n_cons, pair] : enumerate(user_model.get_constraints()))
 		{
-			if (cons->type() == Constraint::Type::GREAT)
+			if (pair.second->type() == Constraint::Type::GREAT)
 			{
 				// 7x + 2y >= 5 becomes -7x - 2y <= -5
-				rhs(n_cons, 0) = -1 * cons->rhs();
+				rhs(n_cons, 0) = -1 * pair.second->rhs();
 			}
 			else
 			{
-				rhs(n_cons, 0) = cons->rhs();
+				rhs(n_cons, 0) = pair.second->rhs();
 			}
 		}
 
@@ -88,16 +88,16 @@ namespace jsolve
 		// A matrix
 		Mat a{ n_slack_vars, n_total_vars, 0.0};
 
-		for (const auto& [n_cons, cons] : enumerate(user_model.get_constraints()))
+		for (const auto& [n_cons, cons_pair] : enumerate(user_model.get_constraints()))
 		{
-			auto scale = cons->type() == Constraint::Type::GREAT ? -1.0 : 1.0;
+			auto scale = cons_pair.second->type() == Constraint::Type::GREAT ? -1.0 : 1.0;
 			
 			// Add original constraint entries
-			for (const auto& [n_var, var] : enumerate(user_model.get_variables()))
+			for (const auto& [n_var, var_pair] : enumerate(user_model.get_variables()))
 			{
-				auto found_entry = cons->get_entries().find(var.get());
+				auto found_entry = cons_pair.second->get_entries().find(var_pair.second.get());
 
-				if (found_entry != std::end(cons->get_entries()))
+				if (found_entry != std::end(cons_pair.second->get_entries()))
 				{
 					a(n_cons, n_var) = scale * found_entry->second;
 				}
@@ -128,19 +128,19 @@ namespace jsolve::simplex
 
 		// Create a new constraint vector with the equality constraints converted to LESS and GREAT pairs.
 		std::vector<Constraint> converted_constraints;
-		for (const auto& [n_cons, cons] : enumerate(user_model.get_constraints()))
+		for (const auto& [n_cons, pair] : enumerate(user_model.get_constraints()))
 		{
-			if (cons->type() == Constraint::Type::EQUAL)
+			if (pair.second->type() == Constraint::Type::EQUAL)
 			{
-				converted_constraints.emplace_back(*cons.get());
+				converted_constraints.emplace_back(*pair.second.get());
 				converted_constraints.back().type() = Constraint::Type::LESS;
 
-				converted_constraints.emplace_back(*cons.get());
+				converted_constraints.emplace_back(*pair.second.get());
 				converted_constraints.back().type() = Constraint::Type::GREAT;
 			}
 			else
 			{
-				converted_constraints.emplace_back(*cons.get());
+				converted_constraints.emplace_back(*pair.second.get());
 			}
 		}
 
@@ -150,9 +150,9 @@ namespace jsolve::simplex
 		// Objective vector
 		Mat objective{ 1, n_user_vars, 0.0 };
 
-		for (const auto& [n_var, var] : enumerate(user_model.get_variables()))
+		for (const auto& [n_var, pair] : enumerate(user_model.get_variables()))
 		{
-			objective(0, n_var) = var->cost();
+			objective(0, n_var) = pair.second->cost();
 		}
 
 		if (user_model.sense() == Model::Sense::MIN)
@@ -187,9 +187,9 @@ namespace jsolve::simplex
 			auto scale = cons.type() == Constraint::Type::GREAT ? -1.0 : 1.0;
 
 			// Add original constraint entries
-			for (const auto& [n_var, var] : enumerate(user_model.get_variables()))
+			for (const auto& [n_var, pair] : enumerate(user_model.get_variables()))
 			{
-				auto found_entry = cons.get_entries().find(var.get());
+				auto found_entry = cons.get_entries().find(pair.second.get());
 
 				if (found_entry != std::end(cons.get_entries()))
 				{
@@ -284,7 +284,7 @@ namespace jsolve::simplex
 		for (auto i = 0; i < static_cast<int>(A.n_cols()); i++)
 		{
 			locations.non_basics[i] = {
-				i,
+				i,  // These are the only index variables we care about
 				i, 
 				false, 
 				false 
@@ -446,6 +446,9 @@ namespace jsolve::simplex
 		A_phase_1.update({ 0, model.A.n_rows() - 1 }, { 0, model.A.n_cols() - 1 }, model.A);
 		A_phase_1.update({}, { model.A.n_cols() }, Mat{ model.A.n_rows(), 1, -1.0 });
 
+		// Keep track of variable locations
+		auto locations = init_locations(A_phase_1, true);
+
 		auto A_dict = -1 * A_phase_1;  // -1 to convert to dictionary with basic vars on LHS
 		auto b = model.b;
 
@@ -458,8 +461,7 @@ namespace jsolve::simplex
 			in_phase_1 = true;
 		}
 
-		// Keep track of variable locations
-		auto locations = init_locations(A_dict, true);
+
 
 		double obj_phase_1 { 0.0 };
         double obj_phase_2 { 0.0 };
@@ -571,7 +573,7 @@ namespace jsolve::simplex
 		{ 
 			if (!var.slack && !var.dummy)
 			{
-				sol.variables[user_model.get_variables().at(var.index)->name()] = b(idx, 0);
+				sol.variables[user_model.get_variable(var.index)->name()] = b(idx, 0);
 			}
 		}
 
@@ -579,7 +581,7 @@ namespace jsolve::simplex
 		{ 
 			if (!var.slack && !var.dummy)
 			{
-				sol.variables[user_model.get_variables().at(var.index)->name()] = 0;
+				sol.variables[user_model.get_variable(var.index)->name()] = 0;
 			}
 		}
 

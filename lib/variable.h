@@ -14,7 +14,7 @@ namespace jsolve
 			LINEAR
 		};
 
-		explicit Variable(Type type, const std::string& name = "");
+		explicit Variable(Type type, const std::string& name);
 
 		Type type() const;
 

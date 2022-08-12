@@ -18,7 +18,7 @@ namespace jsolve
 			EQUAL
 		};
 
-		explicit Constraint(Type type, const std::string& name = "");
+		explicit Constraint(Type type, const std::string& name);
 
 		Type type() const;
 		Type& type();
@@ -30,6 +30,7 @@ namespace jsolve
 		void add_to_rhs(double coeff, Variable* var);
 
 		const std::map<Variable*, double, Variable::CompareNames>& get_entries() const;
+		std::map<Variable*, double, Variable::CompareNames>& get_entries();
 
 		std::string to_string() const;
 

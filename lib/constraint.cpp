@@ -52,6 +52,11 @@ namespace jsolve
 		return m_entries; 
 	}
 
+	std::map<Variable*, double, Variable::CompareNames>& Constraint::get_entries()
+	{
+		return m_entries;
+	}
+
 	std::string Constraint::to_string() const
 	{
 		std::string s = fmt::format("{}: ", name().empty() ? "c" : name());

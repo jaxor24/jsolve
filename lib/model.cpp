@@ -31,6 +31,38 @@ namespace jsolve
 		return m_objective_name;
 	}
 
+	Variable* Model::make_variable(Variable::Type type, const std::string& name)
+	{
+		auto [it, result] = m_variables.try_emplace(name, nullptr);
+
+		if (result)
+		{
+			it->second = std::make_unique<Variable>(type, name);
+		}
+		else
+		{
+			throw ModelError(fmt::format("Variable name {} already exists", name));
+		}
+
+		return it->second.get();
+	}
+
+	Constraint* Model::make_constraint(Constraint::Type type, const std::string& name)
+	{
+		auto [it, result] = m_constraints.try_emplace(name, nullptr);
+
+		if (result)
+		{
+			it->second = std::make_unique<Constraint>(type, name);
+		}
+		else
+		{
+			throw ModelError(fmt::format("Constraint name {} already exists", name));
+		}
+
+		return it->second.get();
+	}
+
 	std::string Model::to_long_string() const
 	{
 		std::string s = fmt::format(
@@ -68,7 +100,7 @@ namespace jsolve
 		auto it = std::begin(m_variables);
 		while (it != std::end(m_variables))
 		{
-			const auto& variable = *it;
+			const auto& variable = it->second;
 			if (variable->cost() != 0)
 			{
 				s.append(" + ");
@@ -80,7 +112,7 @@ namespace jsolve
 		s.append("Subject to:");
 		s.append("\n");
 		// Constraints
-		for (const auto& constraint : m_constraints)
+		for (const auto& [name, constraint] : m_constraints)
 		{
 			s.append(constraint->to_string());
 			s.append("\n");
@@ -102,36 +134,42 @@ namespace jsolve
 		return s;
 	}
 
-	const std::vector<std::unique_ptr<Variable>>& Model::get_variables() const
+	const std::map<std::string, std::unique_ptr<Variable>>& Model::get_variables() const
 	{
 		return m_variables;
 	}
 
-	const std::vector<std::unique_ptr<Constraint>>& Model::get_constraints() const
+	const std::map<std::string, std::unique_ptr<Constraint>>& Model::get_constraints() const
 	{
 		return m_constraints;
 	}
 
 	Variable* Model::get_variable(const std::string& name) const
 	{
-		auto found = std::find_if(
-			std::begin(m_variables),
-			std::end(m_variables),
-			[name](const auto& var)
-			{ return var->name() == name; }
-		);
-		return found == std::end(m_variables) ? nullptr : found->get();
+		auto found = m_variables.find(name);
+		return found == std::end(m_variables) ? nullptr : found->second.get();
+	}
+
+	Variable* Model::get_variable(std::size_t index) const
+	{
+		// Added until we get a better way of tracking indices during solve.
+		if (m_variables.size() <= index)
+		{
+			return nullptr;
+		}
+		else
+		{
+			auto it = std::begin(m_variables);
+			std::advance(it, index);
+			return it->second.get();
+		}
 	}
 
 	Constraint* Model::get_constraint(const std::string& name) const
 	{
-		auto found = std::find_if(
-			std::begin(m_constraints),
-			std::end(m_constraints),
-			[name](const auto& cons)
-			{ return cons->name() == name; }
-		);
-		return found == std::end(m_constraints) ? nullptr : found->get();
+		auto found = m_constraints.find(name);
+		return found == std::end(m_constraints) ? nullptr : found->second.get();
+	}
 	}
 
 	std::ostream& operator<<(std::ostream& os, const Model& m)
