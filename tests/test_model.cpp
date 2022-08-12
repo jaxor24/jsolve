@@ -24,7 +24,7 @@ TEST_CASE("Model::Model()", "[variable]")
         {
             auto* v1 = m.make_variable(jsolve::Variable::Type::LINEAR, "x1");
             REQUIRE(m.get_variables().size() == 1);
-            REQUIRE(m.get_variables().front().get() == v1);
+            REQUIRE(m.get_variables().at("x1").get() == v1);
         }
 
         SECTION("two variables")
@@ -34,8 +34,8 @@ TEST_CASE("Model::Model()", "[variable]")
                 auto* b = m.make_variable(jsolve::Variable::Type::LINEAR, "b");
                 auto* a = m.make_variable(jsolve::Variable::Type::LINEAR, "a");
                 REQUIRE(m.get_variables().size() == 2);
-                REQUIRE(m.get_variables().at(0).get() == a);
-                REQUIRE(m.get_variables().at(1).get() == b);
+                REQUIRE(m.get_variables().at("a").get() == a);
+                REQUIRE(m.get_variables().at("b").get() == b);
             }
 
             SECTION("invalid - same name")
@@ -54,7 +54,7 @@ TEST_CASE("Model::Model()", "[variable]")
         {
             auto* c1 = m.make_constraint(jsolve::Constraint::Type::LESS, "a");
             REQUIRE(m.get_constraints().size() == 1);
-            REQUIRE(m.get_constraints().front().get() == c1);
+            REQUIRE(m.get_constraints().at("a").get() == c1);
         }
 
         SECTION("two constraints")
@@ -64,8 +64,8 @@ TEST_CASE("Model::Model()", "[variable]")
                 auto* b = m.make_constraint(jsolve::Constraint::Type::LESS, "b");
                 auto* a = m.make_constraint(jsolve::Constraint::Type::LESS, "a");
                 REQUIRE(m.get_constraints().size() == 2);
-                REQUIRE(m.get_constraints().at(0).get() == a);
-                REQUIRE(m.get_constraints().at(1).get() == b);
+                REQUIRE(m.get_constraints().at("a").get() == a);
+                REQUIRE(m.get_constraints().at("b").get() == b);
             }
 
             SECTION("invalid - same name")

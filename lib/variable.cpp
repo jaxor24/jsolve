@@ -5,6 +5,12 @@
 
 namespace jsolve
 {
+	Variable::Variable(Type type, const std::string& name)
+		:
+		Counter<Variable>{ name },
+		m_type{ type }
+	{}
+
 	std::ostream& operator<<(std::ostream& os, const Variable& v)
 	{
 		os << v.to_string();

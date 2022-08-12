@@ -7,7 +7,6 @@ TEST_CASE("variable::variable()", "[variable]")
 {
     SECTION("valid construction")
     {
-        REQUIRE_NOTHROW(jsolve::Variable{ jsolve::Variable::Type::LINEAR });
         REQUIRE_NOTHROW(jsolve::Variable{ jsolve::Variable::Type::LINEAR, "test_variable" });
     }
 }
@@ -25,7 +24,7 @@ TEST_CASE("variable::n_created(), variable::n_alive()", "[variable]")
 
     SECTION("create one")
     {
-        auto v1 = jsolve::Variable{ jsolve::Variable::Type::LINEAR };
+        auto v1 = jsolve::Variable{ jsolve::Variable::Type::LINEAR, "variable" };
         REQUIRE(v1.n_created() == n_already_created + 1);
         REQUIRE(v1.n_alive() == 1);
     }
@@ -34,8 +33,8 @@ TEST_CASE("variable::n_created(), variable::n_alive()", "[variable]")
 
     SECTION("create two")
     {
-        auto v1 = jsolve::Variable{ jsolve::Variable::Type::LINEAR };
-        auto v2 = jsolve::Variable{ jsolve::Variable::Type::LINEAR };
+        auto v1 = jsolve::Variable{ jsolve::Variable::Type::LINEAR, "variable" };
+        auto v2 = jsolve::Variable{ jsolve::Variable::Type::LINEAR, "variable" };
         REQUIRE(v2.n_created() == n_already_created + 2);
         REQUIRE(v2.n_alive() == 2);
     }
@@ -44,7 +43,7 @@ TEST_CASE("variable::n_created(), variable::n_alive()", "[variable]")
 
     SECTION("create copy")
     {
-        auto v1 = jsolve::Variable{ jsolve::Variable::Type::LINEAR };
+        auto v1 = jsolve::Variable{ jsolve::Variable::Type::LINEAR, "variable" };
         auto v2 = v1;
         REQUIRE(v2.n_created() == n_already_created + 2);
         REQUIRE(v2.n_alive() == 2);
@@ -53,7 +52,7 @@ TEST_CASE("variable::n_created(), variable::n_alive()", "[variable]")
 
 TEST_CASE("variable::cost()", "[variable]")
 {
-    auto c = jsolve::Variable{ jsolve::Variable::Type::LINEAR };
+    auto c = jsolve::Variable{ jsolve::Variable::Type::LINEAR, "variable" };
 
     SECTION("getter")
     {
@@ -72,13 +71,13 @@ TEST_CASE("variable::cost()", "[variable]")
 
 TEST_CASE("variable::upper_bound()", "[variable]")
 {
-    auto c = jsolve::Variable{ jsolve::Variable::Type::LINEAR };
+    auto c = jsolve::Variable{ jsolve::Variable::Type::LINEAR, "variable" };
 
     SECTION("getter")
     {
         SECTION("default")
         {
-            REQUIRE(c.upper_bound() == std::numeric_limits<double>::max());
+            REQUIRE(c.upper_bound() == std::numeric_limits<double>::infinity());
         }
     }
 
@@ -91,7 +90,7 @@ TEST_CASE("variable::upper_bound()", "[variable]")
 
 TEST_CASE("variable::lower_bound()", "[variable]")
 {
-    auto c = jsolve::Variable{ jsolve::Variable::Type::LINEAR };
+    auto c = jsolve::Variable{ jsolve::Variable::Type::LINEAR, "variable" };
 
     SECTION("getter")
     {

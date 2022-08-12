@@ -5,6 +5,12 @@
 
 namespace jsolve
 {
+	Constraint::Constraint(Type type, const std::string& name)
+		:
+		Counter<Constraint>{ name },
+		m_type{ type }
+	{}
+
 	std::ostream& operator<<(std::ostream& os, const Constraint& c)
 	{
 		os << c.to_string();
@@ -44,6 +50,11 @@ namespace jsolve
 	const std::map<Variable*, double, Variable::CompareNames>& Constraint::get_entries() const
 	{ 
 		return m_entries; 
+	}
+
+	std::map<Variable*, double, Variable::CompareNames>& Constraint::get_entries()
+	{
+		return m_entries;
 	}
 
 	std::string Constraint::to_string() const

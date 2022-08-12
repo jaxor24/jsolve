@@ -39,4 +39,9 @@ namespace logging
         
         spdlog::register_logger(logger);
     }
+
+    void teardown_logging()
+    {
+        spdlog::shutdown();
+    }
 }

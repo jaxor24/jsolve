@@ -16,6 +16,6 @@ RHS
     RHS1      MYEQN                7
 BOUNDS
  UP BND1      XONE                 4
- LO BND1      YTWO                -1
+ LO BND1      YTWO                 1
  UP BND1      YTWO                 1
 ENDATA
