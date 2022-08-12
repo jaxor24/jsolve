@@ -110,4 +110,47 @@ TEST_CASE("jsolve::mps::read_mps", "[matrix]")
             }
         }
     }
+
+    SECTION("model with free var")
+    {
+        auto model{ jsolve::read_mps(get_mps("example_with_free.mps")) };
+
+        SECTION("attributes")
+        {
+            REQUIRE(model.name() == "Unnamed");
+            REQUIRE(model.get_constraints().size() == 6);
+            REQUIRE(model.get_variables().size() == 6);
+        }
+
+        auto* x1 = model.get_variable("x1");
+        auto* x2p = model.get_variable("FREE_x2_POS");
+        auto* x2n = model.get_variable("FREE_x2_NEG");
+        auto* x3 = model.get_variable("x3");
+        auto* x4p = model.get_variable("FREE_x4_POS");
+        auto* x4n = model.get_variable("FREE_x4_NEG");
+
+        SECTION("variables")
+        {
+            REQUIRE(x1->cost() == -1);
+            REQUIRE(x2p->cost() == -2);
+            REQUIRE(x2n->cost() == 2);
+            REQUIRE(x3->cost() == 4);
+            REQUIRE(x4p->cost() == 3);
+            REQUIRE(x4n->cost() == -3);
+
+            REQUIRE(x1->lower_bound() == 0);
+            REQUIRE(x2p->lower_bound() == 0);
+            REQUIRE(x2n->lower_bound() == 0);
+            REQUIRE(x3->lower_bound() == 1.1);
+            REQUIRE(x4p->lower_bound() == 0);
+            REQUIRE(x4n->lower_bound() == 0);
+
+            REQUIRE(x1->upper_bound() == std::numeric_limits<double>::infinity());
+            REQUIRE(x2p->upper_bound() == std::numeric_limits<double>::infinity());
+            REQUIRE(x2n->upper_bound() == std::numeric_limits<double>::infinity());
+            REQUIRE(x3->upper_bound() == 10);
+            REQUIRE(x4p->upper_bound() == std::numeric_limits<double>::infinity());
+            REQUIRE(x4n->upper_bound() == std::numeric_limits<double>::infinity());
+        }
+    }
 }
