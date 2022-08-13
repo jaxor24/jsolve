@@ -9,7 +9,7 @@ namespace jsolve
 {
 	struct Solution
 	{
-		double objective;
+		double objective{ 0.0 };
 		std::map<std::string, double> variables;
 	};
 
