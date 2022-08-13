@@ -206,8 +206,8 @@ namespace jsolve::simplex
 
 	struct Var
 	{
-		int index;
-		int subscript;
+		int index{ 0 };
+		int subscript{ 0 };
 		bool slack{ false };
 		bool dummy{ false };
 	};
