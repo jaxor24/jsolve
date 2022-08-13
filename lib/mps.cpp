@@ -81,7 +81,8 @@ namespace
 
 	void process_rhs_data_record(jsolve::Model& model, const std::vector<std::string>& words)
 	{
-		auto it = std::cbegin(words);
+		auto it = (words.size() % 2) ? std::cbegin(words) : std::next(std::cbegin(words));
+
 		auto it_end = std::cend(words) - 1;
 
 		for (; it != it_end; ++it)
@@ -105,16 +106,19 @@ namespace
 
 	void process_bounds_data_record(jsolve::Model& model, const std::vector<std::string>& words)
 	{
+		// Bounds record could have 4 entries:
+		// LO INTBOU    GRDTIMN1         -105
+		// or two types of 3 entries:
+		// UP           C03609             14
+		// FR BND       x2
+
 		const auto& bound_type = words.at(0);
-		// const auto& bound_name = words.at(1); // ignored
-
-		auto* variable = model.get_variable(words.at(2));
-
 
 		if (bound_type == "LO")
 		{
 			// Lower bound
-			const auto& bound_value = std::stod(words.at(3));
+			auto* variable = model.get_variable(words.size() == 3 ? words.at(1) : words.at(2));
+			const auto& bound_value = std::stod(words.size() == 3 ? words.at(2) : words.at(3));
 
 			if (bound_value < 0.0)
 			{
@@ -129,7 +133,8 @@ namespace
 		else if (bound_type == "UP")
 		{
 			// Upper bound
-			const auto& bound_value = std::stod(words.at(3));
+			auto* variable = model.get_variable(words.size() == 3 ? words.at(1) : words.at(2));
+			const auto& bound_value = std::stod(words.size() == 3 ? words.at(2) : words.at(3));
 
 			if (bound_value < 0.0)
 			{
@@ -144,7 +149,8 @@ namespace
 		else if (bound_type == "FX")
 		{
 			// Fixed value
-			const auto& bound_value = std::stod(words.at(3));
+			auto* variable = model.get_variable(words.size() == 3 ? words.at(1) : words.at(2));
+			const auto& bound_value = std::stod(words.size() == 3 ? words.at(2) : words.at(3));
 
 			if (bound_value < 0.0)
 			{
@@ -159,6 +165,7 @@ namespace
 		}
 		else if (bound_type == "FR")
 		{
+			auto* variable = model.get_variable(words.at(2));
 			variable->lower_bound() = -std::numeric_limits<double>::infinity();
 			variable->upper_bound() = std::numeric_limits<double>::infinity();
 		}
