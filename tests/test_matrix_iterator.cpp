@@ -8,7 +8,7 @@ TEST_CASE("matrix::iterator", "[matrix]")
 {
     SECTION("1x1 matrix")
     {
-        Matr m1{ 1, 1, 1.0 };
+        Matr m1{1, 1, 1.0};
 
         SECTION("++")
         {
@@ -37,7 +37,7 @@ TEST_CASE("matrix::iterator", "[matrix]")
 
     SECTION("2x2 matrix")
     {
-        Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+        Matr m1{2, 2, 0.0}; // [1 2; 3 4]
         m1(0, 0) = 1;
         m1(0, 1) = 2;
         m1(1, 0) = 3;
@@ -93,7 +93,7 @@ TEST_CASE("matrix::iterator", "[matrix]")
 
     SECTION("1x3 vector")
     {
-        Matr m1{ 1, 3 }; // [1 2 3]
+        Matr m1{1, 3}; // [1 2 3]
         m1(0, 0) = 1;
         m1(0, 1) = 2;
         m1(0, 2) = 3;
@@ -133,7 +133,7 @@ TEST_CASE("matrix::iterator", "[matrix]")
 
     SECTION("3x1 vector")
     {
-        Matr m1{ 3, 1 }; // [1;2;3]
+        Matr m1{3, 1}; // [1;2;3]
         m1(0, 0) = 1;
         m1(1, 0) = 2;
         m1(2, 0) = 3;
@@ -176,7 +176,7 @@ TEST_CASE("matrix::const_iterator", "[matrix]")
 {
     SECTION("1x1 matrix")
     {
-        Matr m1{ 1, 1, 1.0 };
+        Matr m1{1, 1, 1.0};
 
         SECTION("++")
         {
@@ -205,7 +205,7 @@ TEST_CASE("matrix::const_iterator", "[matrix]")
 
     SECTION("2x2 matrix")
     {
-        Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+        Matr m1{2, 2, 0.0}; // [1 2; 3 4]
         m1(0, 0) = 1;
         m1(0, 1) = 2;
         m1(1, 0) = 3;
@@ -261,7 +261,7 @@ TEST_CASE("matrix::const_iterator", "[matrix]")
 
     SECTION("1x3 vector")
     {
-        Matr m1{ 1, 3 }; // [1 2 3]
+        Matr m1{1, 3}; // [1 2 3]
         m1(0, 0) = 1;
         m1(0, 1) = 2;
         m1(0, 2) = 3;
@@ -301,7 +301,7 @@ TEST_CASE("matrix::const_iterator", "[matrix]")
 
     SECTION("3x1 vector")
     {
-        Matr m1{ 3, 1 }; // [1;2;3]
+        Matr m1{3, 1}; // [1;2;3]
         m1(0, 0) = 1;
         m1(1, 0) = 2;
         m1(2, 0) = 3;

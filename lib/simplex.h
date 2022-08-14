@@ -7,5 +7,5 @@
 
 namespace jsolve::simplex
 {
-	std::optional<Solution> primal_solve(const Model& model);
+std::optional<Solution> primal_solve(const Model& model);
 }

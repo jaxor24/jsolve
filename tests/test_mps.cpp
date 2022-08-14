@@ -7,17 +7,18 @@
 
 namespace
 {
-    std::filesystem::path get_mps(std::string file_name)
-    {
-        return std::filesystem::path{ std::source_location::current().file_name() }.remove_filename() / "mps_examples" / file_name;
-    }
+std::filesystem::path get_mps(std::string file_name)
+{
+    return std::filesystem::path{std::source_location::current().file_name()}.remove_filename() / "mps_examples" /
+           file_name;
 }
+} // namespace
 
-TEST_CASE("jsolve::mps::read_mps", "[matrix]") 
+TEST_CASE("jsolve::mps::read_mps", "[matrix]")
 {
     SECTION("model 1")
     {
-        auto model{ jsolve::read_mps(get_mps("example1.mps")) };
+        auto model{jsolve::read_mps(get_mps("example1.mps"))};
 
         SECTION("attributes")
         {
@@ -113,7 +114,7 @@ TEST_CASE("jsolve::mps::read_mps", "[matrix]")
 
     SECTION("model with free var")
     {
-        auto model{ jsolve::read_mps(get_mps("example_with_free.mps")) };
+        auto model{jsolve::read_mps(get_mps("example_with_free.mps"))};
 
         SECTION("attributes")
         {

@@ -2,25 +2,24 @@
 
 #include "logging.h"
 
-#include <tuple>
-#include <limits>
-#include <cmath>
 #include <chrono>
+#include <cmath>
+#include <limits>
 #include <string>
+#include <tuple>
 
 // Basic RAII timer
 
 template <typename Log, typename... Args>
 class Timer
 {
-public:
+  public:
     using Clock = std::chrono::high_resolution_clock;
 
     Timer(Log log, fmt::format_string<Args...> format, Args... args)
-        : 
-        m_start{ Clock::now() },
-        m_log{ log },
-        m_msg{ fmt::format(format, std::forward<Args>(args)...) }
+        : m_start{Clock::now()},
+          m_log{log},
+          m_msg{fmt::format(format, std::forward<Args>(args)...)}
     {
         m_log("(Start) {}", m_msg);
     }
@@ -31,11 +30,10 @@ public:
         m_log("(End) {} ({} ms)", m_msg, dur);
     }
 
-private:
+  private:
     const Clock::time_point m_start;
     Log m_log;
     const std::string m_msg;
-
 };
 
 // Numeric tools
@@ -61,59 +59,58 @@ inline bool approx_greater(double a, double b, double eps = 1e-8)
     return a > b && !approx_equal(a, b, eps);
 }
 
-
 // Python-like enumerate()
 // Ref: http://reedbeta.com/blog/python-like-enumerate-in-cpp17/
 
-template<typename Iterable>
-auto enumerate(Iterable&& iterable) 
+template <typename Iterable>
+auto enumerate(Iterable&& iterable)
 {
     using Iterator = decltype(std::begin(std::declval<Iterable>()));
     using T = decltype(*std::declval<Iterator>());
 
-    struct Enumerated 
+    struct Enumerated
     {
         std::size_t index;
         T element;
     };
 
-    struct Enumerator 
+    struct Enumerator
     {
         Iterator iterator;
         std::size_t index;
 
-        auto operator!=(const Enumerator& other) const 
+        auto operator!=(const Enumerator& other) const
         {
             return iterator != other.iterator;
         }
 
-        auto& operator++() 
+        auto& operator++()
         {
             ++iterator;
             ++index;
             return *this;
         }
 
-        auto operator*() const 
+        auto operator*() const
         {
-            return Enumerated{ index, *iterator };
+            return Enumerated{index, *iterator};
         }
     };
 
-    struct Wrapper 
+    struct Wrapper
     {
         Iterable& iterable;
 
-        [[nodiscard]] auto begin() const 
+        [[nodiscard]] auto begin() const
         {
-            return Enumerator{ std::begin(iterable), 0U };
+            return Enumerator{std::begin(iterable), 0U};
         }
 
-        [[nodiscard]] auto end() const 
+        [[nodiscard]] auto end() const
         {
-            return Enumerator{ std::end(iterable), 0U };
+            return Enumerator{std::end(iterable), 0U};
         }
     };
 
-    return Wrapper{ std::forward<Iterable>(iterable) };
+    return Wrapper{std::forward<Iterable>(iterable)};
 }

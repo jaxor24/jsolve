@@ -2,12 +2,11 @@
 
 #include "model.h"
 
-
 TEST_CASE("Model::Model()", "[variable]")
 {
     SECTION("valid construction")
     {
-        auto m = jsolve::Model{ jsolve::Model::Sense::MIN, "Example" };
+        auto m = jsolve::Model{jsolve::Model::Sense::MIN, "Example"};
 
         REQUIRE(m.name() == "Example");
         REQUIRE(m.sense() == jsolve::Model::Sense::MIN);
@@ -18,7 +17,7 @@ TEST_CASE("Model::Model()", "[variable]")
 
     SECTION("Model::make_variable")
     {
-        auto m = jsolve::Model{ jsolve::Model::Sense::MIN, "Example" };
+        auto m = jsolve::Model{jsolve::Model::Sense::MIN, "Example"};
 
         SECTION("one variable")
         {
@@ -48,7 +47,7 @@ TEST_CASE("Model::Model()", "[variable]")
 
     SECTION("Model::make_constraint")
     {
-        auto m = jsolve::Model{ jsolve::Model::Sense::MIN, "Example" };
+        auto m = jsolve::Model{jsolve::Model::Sense::MIN, "Example"};
 
         SECTION("one constraint")
         {
@@ -78,7 +77,7 @@ TEST_CASE("Model::Model()", "[variable]")
 
     SECTION("Model::objective_name")
     {
-        auto m = jsolve::Model{ jsolve::Model::Sense::MIN, "Example" };
+        auto m = jsolve::Model{jsolve::Model::Sense::MIN, "Example"};
 
         SECTION("basic")
         {
