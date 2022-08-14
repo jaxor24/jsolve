@@ -2,11 +2,11 @@
 #include "catch.hpp"
 #include "logging.h"
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
-	logging::init_logging("off");
+    logging::init_logging("off");
 
-	int result = Catch::Session().run(argc, argv);
+    int result = Catch::Session().run(argc, argv);
 
-	return result;
+    return result;
 }

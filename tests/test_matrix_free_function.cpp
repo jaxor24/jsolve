@@ -8,8 +8,8 @@ TEST_CASE("mult_elem", "[matrix]")
 {
     SECTION("1x1 matrix")
     {
-        Matr m1{ 1, 1, 6 };
-        Matr m2{ 1, 1, -2.5 };
+        Matr m1{1, 1, 6};
+        Matr m2{1, 1, -2.5};
 
         auto result = mult_elem(m1, m2);
 
@@ -20,13 +20,13 @@ TEST_CASE("mult_elem", "[matrix]")
 
     SECTION("2x2 matrix")
     {
-        Matr m1{ 2, 2, 0.0 };
+        Matr m1{2, 2, 0.0};
         m1(0, 0) = -1;
         m1(0, 1) = -2;
         m1(1, 0) = -3;
         m1(1, 1) = -4;
 
-        Matr m2{ 2, 2, 0.0 };
+        Matr m2{2, 2, 0.0};
         m2(0, 0) = 4;
         m2(0, 1) = 3;
         m2(1, 0) = 2;
@@ -44,12 +44,12 @@ TEST_CASE("mult_elem", "[matrix]")
 
     SECTION("1x3 vector")
     {
-        Matr m1{ 1, 3 };
+        Matr m1{1, 3};
         m1(0, 0) = 3;
         m1(0, 1) = 9;
         m1(0, 2) = 18;
 
-        Matr m2{ 1, 3 };
+        Matr m2{1, 3};
         m2(0, 0) = -0.5;
         m2(0, 1) = 0.5;
         m2(0, 2) = 0.0;
@@ -74,8 +74,8 @@ TEST_CASE("div_elem", "[matrix]")
 {
     SECTION("1x1 matrix")
     {
-        Matr m1{ 1, 1, 6 };
-        Matr m2{ 1, 1, -2.5 };
+        Matr m1{1, 1, 6};
+        Matr m2{1, 1, -2.5};
 
         auto result = div_elem(m1, m2);
 
@@ -86,13 +86,13 @@ TEST_CASE("div_elem", "[matrix]")
 
     SECTION("2x2 matrix")
     {
-        Matr m1{ 2, 2, 0.0 };
+        Matr m1{2, 2, 0.0};
         m1(0, 0) = -1;
         m1(0, 1) = -2;
         m1(1, 0) = -3;
         m1(1, 1) = -4;
 
-        Matr m2{ 2, 2, 0.0 };
+        Matr m2{2, 2, 0.0};
         m2(0, 0) = 4;
         m2(0, 1) = 3;
         m2(1, 0) = 2;
@@ -110,12 +110,12 @@ TEST_CASE("div_elem", "[matrix]")
 
     SECTION("1x3 vector")
     {
-        Matr m1{ 1, 3 };
+        Matr m1{1, 3};
         m1(0, 0) = 3;
         m1(0, 1) = 9;
         m1(0, 2) = 18;
 
-        Matr m2{ 1, 3 };
+        Matr m2{1, 3};
         m2(0, 0) = -0.5;
         m2(0, 1) = 0.5;
         m2(0, 2) = 10;

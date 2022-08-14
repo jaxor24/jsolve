@@ -1,7 +1,7 @@
 #include "test_includes.h"
 
-#include "matrix_range.h"
 #include "matrix_error.h"
+#include "matrix_range.h"
 
 TEST_CASE("Range", "[matrix]")
 {
@@ -18,17 +18,16 @@ TEST_CASE("Range", "[matrix]")
     {
         SECTION("valid")
         {
-            Range r{ 1 };
+            Range r{1};
             REQUIRE(r);
             REQUIRE(r.size() == 1);
             REQUIRE(r.start() == 1);
             REQUIRE(r.end() == 1);
         }
 
-
         SECTION("invalid")
         {
-            // todo     
+            // todo
         }
     }
 
@@ -38,7 +37,7 @@ TEST_CASE("Range", "[matrix]")
         {
             SECTION("same start/end")
             {
-                Range r{ 0, 0 };
+                Range r{0, 0};
                 REQUIRE(r);
                 REQUIRE(r.size() == 1);
                 REQUIRE(r.start() == 0);
@@ -47,7 +46,7 @@ TEST_CASE("Range", "[matrix]")
 
             SECTION("different start/end")
             {
-                Range r{ 2, 5 };
+                Range r{2, 5};
                 REQUIRE(r);
                 REQUIRE(r.size() == 4);
                 REQUIRE(r.start() == 2);
@@ -57,7 +56,7 @@ TEST_CASE("Range", "[matrix]")
 
         SECTION("invalid")
         {
-            // todo     
+            // todo
         }
     }
 }

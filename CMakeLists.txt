@@ -16,6 +16,12 @@ if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 	set(CMAKE_VERBOSE_MAKEFILE ON)
 
 	include(CTest)
+
+	find_program(CLANG_TIDY_EXE NAMES "clang-tidy")
+	if (CLANG_TIDY_EXE)
+		# Specify clang-tidy checks here
+		set(CLANG_TIDY_COMMAND "${CLANG_TIDY_EXE}" "-checks=-*, clang-analyzer-*")
+	endif()
 endif()
 
 add_subdirectory("external/CommandLine")

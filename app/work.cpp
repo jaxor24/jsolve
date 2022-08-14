@@ -10,16 +10,16 @@
 
 void go(std::filesystem::path file)
 {
-	auto model{ jsolve::read_mps(file) };
+    auto model{jsolve::read_mps(file)};
 
-	// auto model = models::make_model_7();
+    // auto model = models::make_model_7();
 
-	log()->info(model.to_string());
+    log()->info(model.to_string());
 
-	auto solution{ jsolve::simplex::primal_solve(model) };
+    auto solution{jsolve::simplex::primal_solve(model)};
 
-	if (solution)
-	{
-		jsolve::log_solution(debug_logger(), solution.value());
-	}
+    if (solution)
+    {
+        jsolve::log_solution(debug_logger(), solution.value());
+    }
 }

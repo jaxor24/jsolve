@@ -1,0 +1,8 @@
+---
+BasedOnStyle: Microsoft
+SeparateDefinitionBlocks : Always
+PackConstructorInitializers : Never
+AlwaysBreakTemplateDeclarations : Yes
+AllowShortLambdasOnASingleLine : Inline
+PointerAlignment : Left
+...

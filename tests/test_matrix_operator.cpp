@@ -2,13 +2,13 @@
 
 #include "matrix.h"
 
-#include <stdexcept> 
+#include <stdexcept>
 
 using Matr = Matrix<double>;
 
 TEST_CASE("matrix::operator()", "[matrix]")
 {
-    Matr m{ 10, 5 };
+    Matr m{10, 5};
 
     SECTION("access every element")
     {
@@ -52,7 +52,7 @@ TEST_CASE("matrix::operator()", "[matrix]")
 
 TEST_CASE("matrix::operator==", "[matrix]")
 {
-    Matr m{ 5, 5 , 200.0 };
+    Matr m{5, 5, 200.0};
 
     SECTION("same matrix")
     {
@@ -61,19 +61,19 @@ TEST_CASE("matrix::operator==", "[matrix]")
 
     SECTION("different matrix elements")
     {
-        Matr m2{ 5, 5 , 100.0 };
+        Matr m2{5, 5, 100.0};
         REQUIRE((m == m2) == false);
     }
 
     SECTION("different matrix dimensions")
     {
         {
-            Matr m2{ 4, 5 , 200.0 };
+            Matr m2{4, 5, 200.0};
             REQUIRE((m == m2) == false);
         }
 
         {
-            Matr m2{ 5, 4 , 200.0 };
+            Matr m2{5, 4, 200.0};
             REQUIRE((m == m2) == false);
         }
     }
@@ -81,7 +81,7 @@ TEST_CASE("matrix::operator==", "[matrix]")
 
 TEST_CASE("matrix::operator!=", "[matrix]")
 {
-    Matr m{ 5, 5 , 200.0 };
+    Matr m{5, 5, 200.0};
 
     SECTION("same matrix")
     {
@@ -90,19 +90,19 @@ TEST_CASE("matrix::operator!=", "[matrix]")
 
     SECTION("different matrix elements")
     {
-        Matr m2{ 5, 5 , 100.0 };
+        Matr m2{5, 5, 100.0};
         REQUIRE(m != m2);
     }
 
     SECTION("different matrix dimensions")
     {
         {
-            Matr m2{ 4, 5 , 200.0 };
+            Matr m2{4, 5, 200.0};
             REQUIRE(m != m2);
         }
 
         {
-            Matr m2{ 5, 4 , 200.0 };
+            Matr m2{5, 4, 200.0};
             REQUIRE(m != m2);
         }
     }
@@ -110,11 +110,11 @@ TEST_CASE("matrix::operator!=", "[matrix]")
 
 TEST_CASE("matrix::operator++", "[matrix]")
 {
-    Matr m{ 2, 3 };
+    Matr m{2, 3};
 
     SECTION("prefix")
     {
-        int n_times{ 10 };
+        int n_times{10};
 
         for (auto i = 0; i < n_times; i++)
         {
@@ -133,11 +133,11 @@ TEST_CASE("matrix::operator++", "[matrix]")
 
 TEST_CASE("matrix::operator++(int)", "[matrix]")
 {
-    Matr m{ 2, 3 };
+    Matr m{2, 3};
 
     SECTION("postfix")
     {
-        int n_times{ 10 };
+        int n_times{10};
 
         for (auto i = 0; i < n_times; i++)
         {
@@ -156,11 +156,11 @@ TEST_CASE("matrix::operator++(int)", "[matrix]")
 
 TEST_CASE("matrix::operator--", "[matrix]")
 {
-    Matr m{ 2, 3 };
+    Matr m{2, 3};
 
     SECTION("prefix")
     {
-        int n_times{ 10 };
+        int n_times{10};
 
         for (auto i = 0; i < n_times; i++)
         {
@@ -179,11 +179,11 @@ TEST_CASE("matrix::operator--", "[matrix]")
 
 TEST_CASE("matrix::operator--(int)", "[matrix]")
 {
-    Matr m{ 2, 3 };
+    Matr m{2, 3};
 
     SECTION("postfix")
     {
-        int n_times{ 10 };
+        int n_times{10};
 
         for (auto i = 0; i < n_times; i++)
         {
@@ -206,8 +206,8 @@ TEST_CASE("matrix::operator+=", "[matrix]")
     {
         SECTION("1x1 matrix")
         {
-            Matr m1{ 1, 1, 1.0 };
-            Matr m2{ 1, 1, -5.0 };
+            Matr m1{1, 1, 1.0};
+            Matr m2{1, 1, -5.0};
 
             m1 += m2;
 
@@ -216,13 +216,13 @@ TEST_CASE("matrix::operator+=", "[matrix]")
 
         SECTION("2x2 matrix")
         {
-            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            Matr m1{2, 2, 0.0}; // [1 2; 3 4]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(1, 0) = 3;
             m1(1, 1) = 4;
 
-            Matr m2{ 2, 2, 0.0 };  // [4 3; 2 1]
+            Matr m2{2, 2, 0.0}; // [4 3; 2 1]
             m2(0, 0) = 4;
             m2(0, 1) = 3;
             m2(1, 0) = 2;
@@ -238,12 +238,12 @@ TEST_CASE("matrix::operator+=", "[matrix]")
 
         SECTION("1x3 vector")
         {
-            Matr m1{ 1, 3 }; // [1 2 3]
+            Matr m1{1, 3}; // [1 2 3]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(0, 2) = 3;
 
-            Matr m2{ 1, 3 }; // [-3 -2 -1]
+            Matr m2{1, 3}; // [-3 -2 -1]
             m2(0, 0) = -3;
             m2(0, 1) = -2;
             m2(0, 2) = -1;
@@ -257,12 +257,12 @@ TEST_CASE("matrix::operator+=", "[matrix]")
 
         SECTION("3x1 vector")
         {
-            Matr m1{ 3, 1 }; // [1;2;3]
+            Matr m1{3, 1}; // [1;2;3]
             m1(0, 0) = 1;
             m1(1, 0) = 2;
             m1(2, 0) = 3;
 
-            Matr m2{ 3, 1 }; // [-3;-2;-1]
+            Matr m2{3, 1}; // [-3;-2;-1]
             m2(0, 0) = -3;
             m2(1, 0) = -2;
             m2(2, 0) = -1;
@@ -285,7 +285,7 @@ TEST_CASE("matrix::operator+=", "[matrix]")
     {
         SECTION("1x1 matrix")
         {
-            Matr m1{ 1, 1, 1.0 };
+            Matr m1{1, 1, 1.0};
 
             m1 += 6;
 
@@ -294,7 +294,7 @@ TEST_CASE("matrix::operator+=", "[matrix]")
 
         SECTION("2x2 matrix")
         {
-            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            Matr m1{2, 2, 0.0}; // [1 2; 3 4]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(1, 0) = 3;
@@ -310,7 +310,7 @@ TEST_CASE("matrix::operator+=", "[matrix]")
 
         SECTION("1x3 vector")
         {
-            Matr m1{ 1, 3 }; // [1 2 3]
+            Matr m1{1, 3}; // [1 2 3]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(0, 2) = 3;
@@ -324,7 +324,7 @@ TEST_CASE("matrix::operator+=", "[matrix]")
 
         SECTION("3x1 vector")
         {
-            Matr m1{ 3, 1 }; // [1;2;3]
+            Matr m1{3, 1}; // [1;2;3]
             m1(0, 0) = 1;
             m1(1, 0) = 2;
             m1(2, 0) = 3;
@@ -344,8 +344,8 @@ TEST_CASE("matrix::operator-=", "[matrix]")
     {
         SECTION("1x1 matrix")
         {
-            Matr m1{ 1, 1, 1.0 };
-            Matr m2{ 1, 1, -5.0 };
+            Matr m1{1, 1, 1.0};
+            Matr m2{1, 1, -5.0};
 
             m1 -= m2;
 
@@ -354,13 +354,13 @@ TEST_CASE("matrix::operator-=", "[matrix]")
 
         SECTION("2x2 matrix")
         {
-            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            Matr m1{2, 2, 0.0}; // [1 2; 3 4]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(1, 0) = 3;
             m1(1, 1) = 4;
 
-            Matr m2{ 2, 2, 0.0 };  // [4 3; 2 1]
+            Matr m2{2, 2, 0.0}; // [4 3; 2 1]
             m2(0, 0) = 4;
             m2(0, 1) = 3;
             m2(1, 0) = 2;
@@ -376,12 +376,12 @@ TEST_CASE("matrix::operator-=", "[matrix]")
 
         SECTION("1x3 vector")
         {
-            Matr m1{ 1, 3 }; // [1 2 3]
+            Matr m1{1, 3}; // [1 2 3]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(0, 2) = 3;
 
-            Matr m2{ 1, 3 }; // [-3 -2 -1]
+            Matr m2{1, 3}; // [-3 -2 -1]
             m2(0, 0) = -3;
             m2(0, 1) = -2;
             m2(0, 2) = -1;
@@ -395,12 +395,12 @@ TEST_CASE("matrix::operator-=", "[matrix]")
 
         SECTION("3x1 vector")
         {
-            Matr m1{ 3, 1 }; // [1;2;3]
+            Matr m1{3, 1}; // [1;2;3]
             m1(0, 0) = 1;
             m1(1, 0) = 2;
             m1(2, 0) = 3;
 
-            Matr m2{ 3, 1 }; // [-3;-2;-1]
+            Matr m2{3, 1}; // [-3;-2;-1]
             m2(0, 0) = -3;
             m2(1, 0) = -2;
             m2(2, 0) = -1;
@@ -423,7 +423,7 @@ TEST_CASE("matrix::operator-=", "[matrix]")
     {
         SECTION("1x1 matrix")
         {
-            Matr m1{ 1, 1, 1.0 };
+            Matr m1{1, 1, 1.0};
 
             m1 -= 6;
 
@@ -432,7 +432,7 @@ TEST_CASE("matrix::operator-=", "[matrix]")
 
         SECTION("2x2 matrix")
         {
-            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            Matr m1{2, 2, 0.0}; // [1 2; 3 4]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(1, 0) = 3;
@@ -448,7 +448,7 @@ TEST_CASE("matrix::operator-=", "[matrix]")
 
         SECTION("1x3 vector")
         {
-            Matr m1{ 1, 3 }; // [1 2 3]
+            Matr m1{1, 3}; // [1 2 3]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(0, 2) = 3;
@@ -462,7 +462,7 @@ TEST_CASE("matrix::operator-=", "[matrix]")
 
         SECTION("3x1 vector")
         {
-            Matr m1{ 3, 1 }; // [1;2;3]
+            Matr m1{3, 1}; // [1;2;3]
             m1(0, 0) = 1;
             m1(1, 0) = 2;
             m1(2, 0) = 3;
@@ -482,7 +482,7 @@ TEST_CASE("matrix::operator/=", "[matrix]")
     {
         SECTION("1x1 matrix")
         {
-            Matr m1{ 1, 1, 6 };
+            Matr m1{1, 1, 6};
 
             m1 /= 6;
 
@@ -491,7 +491,7 @@ TEST_CASE("matrix::operator/=", "[matrix]")
 
         SECTION("2x2 matrix")
         {
-            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            Matr m1{2, 2, 0.0}; // [1 2; 3 4]
             m1(0, 0) = -24;
             m1(0, 1) = -18;
             m1(1, 0) = -12;
@@ -507,7 +507,7 @@ TEST_CASE("matrix::operator/=", "[matrix]")
 
         SECTION("1x3 vector")
         {
-            Matr m1{ 1, 3 }; // [1 2 3]
+            Matr m1{1, 3}; // [1 2 3]
             m1(0, 0) = 3;
             m1(0, 1) = 9;
             m1(0, 2) = 18;
@@ -521,7 +521,7 @@ TEST_CASE("matrix::operator/=", "[matrix]")
 
         SECTION("3x1 vector")
         {
-            Matr m1{ 3, 1 }; // [1;2;3]
+            Matr m1{3, 1}; // [1;2;3]
             m1(0, 0) = 3;
             m1(1, 0) = 9;
             m1(2, 0) = 18;
@@ -547,11 +547,11 @@ TEST_CASE("matrix::operator*=", "[matrix]")
     {
         SECTION("[1x1] LHS")
         {
-            Matr m1{ 1, 1, 1.0 };
+            Matr m1{1, 1, 1.0};
 
             SECTION("[1x1] RHS")
             {
-                Matr m2{ 1, 1, -5.0 };
+                Matr m2{1, 1, -5.0};
 
                 m1 *= m2;
 
@@ -562,7 +562,7 @@ TEST_CASE("matrix::operator*=", "[matrix]")
 
             SECTION("[1x4] RHS")
             {
-                Matr m2{ 1, 4, 0.0 };
+                Matr m2{1, 4, 0.0};
                 m2(0, 0) = 1;
                 m2(0, 1) = 2;
                 m2(0, 2) = 3;
@@ -581,7 +581,7 @@ TEST_CASE("matrix::operator*=", "[matrix]")
 
         SECTION("[2x2] LHS")
         {
-            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            Matr m1{2, 2, 0.0}; // [1 2; 3 4]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(1, 0) = 3;
@@ -589,7 +589,7 @@ TEST_CASE("matrix::operator*=", "[matrix]")
 
             SECTION("[2x2] RHS")
             {
-                Matr m2{ 2, 2, 0.0 };  // [4 3; 2 1]
+                Matr m2{2, 2, 0.0}; // [4 3; 2 1]
                 m2(0, 0) = 4;
                 m2(0, 1) = 3;
                 m2(1, 0) = 2;
@@ -607,7 +607,7 @@ TEST_CASE("matrix::operator*=", "[matrix]")
 
             SECTION("[2x1] RHS")
             {
-                Matr m2{ 2, 1, 0.0 };  // [-1; -2]
+                Matr m2{2, 1, 0.0}; // [-1; -2]
                 m2(0, 0) = -1;
                 m2(1, 0) = -2;
 
@@ -622,14 +622,14 @@ TEST_CASE("matrix::operator*=", "[matrix]")
 
         SECTION("[1x3] LHS")
         {
-            Matr m1{ 1, 3 }; // [1 2 3]
+            Matr m1{1, 3}; // [1 2 3]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(0, 2) = 3;
 
             SECTION("[3x1] RHS")
             {
-                Matr m2{ 3, 1 }; // [3;2;1]
+                Matr m2{3, 1}; // [3;2;1]
                 m2(0, 0) = 3;
                 m2(1, 0) = 2;
                 m2(2, 0) = 1;
@@ -653,7 +653,7 @@ TEST_CASE("matrix::operator*=", "[matrix]")
     {
         SECTION("1x1 matrix")
         {
-            Matr m1{ 1, 1, 1.0 };
+            Matr m1{1, 1, 1.0};
 
             m1 *= 6;
 
@@ -662,7 +662,7 @@ TEST_CASE("matrix::operator*=", "[matrix]")
 
         SECTION("2x2 matrix")
         {
-            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            Matr m1{2, 2, 0.0}; // [1 2; 3 4]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(1, 0) = 3;
@@ -678,7 +678,7 @@ TEST_CASE("matrix::operator*=", "[matrix]")
 
         SECTION("1x3 vector")
         {
-            Matr m1{ 1, 3 }; // [1 2 3]
+            Matr m1{1, 3}; // [1 2 3]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(0, 2) = 3;
@@ -692,7 +692,7 @@ TEST_CASE("matrix::operator*=", "[matrix]")
 
         SECTION("3x1 vector")
         {
-            Matr m1{ 3, 1 }; // [1;2;3]
+            Matr m1{3, 1}; // [1;2;3]
             m1(0, 0) = 1;
             m1(1, 0) = 2;
             m1(2, 0) = 3;
@@ -712,8 +712,8 @@ TEST_CASE("operator+", "[matrix]")
     {
         SECTION("1x1 matrix")
         {
-            Matr m1{ 1, 1, 1.0 };
-            Matr m2{ 1, 1, -5.0 };
+            Matr m1{1, 1, 1.0};
+            Matr m2{1, 1, -5.0};
 
             auto result = m1 + m2;
 
@@ -722,13 +722,13 @@ TEST_CASE("operator+", "[matrix]")
 
         SECTION("2x2 matrix")
         {
-            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            Matr m1{2, 2, 0.0}; // [1 2; 3 4]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(1, 0) = 3;
             m1(1, 1) = 4;
 
-            Matr m2{ 2, 2, 0.0 };  // [4 3; 2 1]
+            Matr m2{2, 2, 0.0}; // [4 3; 2 1]
             m2(0, 0) = 4;
             m2(0, 1) = 3;
             m2(1, 0) = 2;
@@ -744,12 +744,12 @@ TEST_CASE("operator+", "[matrix]")
 
         SECTION("1x3 vector")
         {
-            Matr m1{ 1, 3 }; // [1 2 3]
+            Matr m1{1, 3}; // [1 2 3]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(0, 2) = 3;
 
-            Matr m2{ 1, 3 }; // [-3 -2 -1]
+            Matr m2{1, 3}; // [-3 -2 -1]
             m2(0, 0) = -3;
             m2(0, 1) = -2;
             m2(0, 2) = -1;
@@ -763,12 +763,12 @@ TEST_CASE("operator+", "[matrix]")
 
         SECTION("3x1 vector")
         {
-            Matr m1{ 3, 1 }; // [1;2;3]
+            Matr m1{3, 1}; // [1;2;3]
             m1(0, 0) = 1;
             m1(1, 0) = 2;
             m1(2, 0) = 3;
 
-            Matr m2{ 3, 1 }; // [-3;-2;-1]
+            Matr m2{3, 1}; // [-3;-2;-1]
             m2(0, 0) = -3;
             m2(1, 0) = -2;
             m2(2, 0) = -1;
@@ -791,7 +791,7 @@ TEST_CASE("operator+", "[matrix]")
     {
         SECTION("1x1 matrix")
         {
-            Matr m1{ 1, 1, 1.0 };
+            Matr m1{1, 1, 1.0};
 
             auto result = m1 + 6;
 
@@ -800,7 +800,7 @@ TEST_CASE("operator+", "[matrix]")
 
         SECTION("2x2 matrix")
         {
-            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            Matr m1{2, 2, 0.0}; // [1 2; 3 4]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(1, 0) = 3;
@@ -816,7 +816,7 @@ TEST_CASE("operator+", "[matrix]")
 
         SECTION("1x3 vector")
         {
-            Matr m1{ 1, 3 }; // [1 2 3]
+            Matr m1{1, 3}; // [1 2 3]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(0, 2) = 3;
@@ -830,7 +830,7 @@ TEST_CASE("operator+", "[matrix]")
 
         SECTION("3x1 vector")
         {
-            Matr m1{ 3, 1 }; // [1;2;3]
+            Matr m1{3, 1}; // [1;2;3]
             m1(0, 0) = 1;
             m1(1, 0) = 2;
             m1(2, 0) = 3;
@@ -850,8 +850,8 @@ TEST_CASE("operator-", "[matrix]")
     {
         SECTION("1x1 matrix")
         {
-            Matr m1{ 1, 1, 1.0 };
-            Matr m2{ 1, 1, -5.0 };
+            Matr m1{1, 1, 1.0};
+            Matr m2{1, 1, -5.0};
 
             auto result = m1 - m2;
 
@@ -860,13 +860,13 @@ TEST_CASE("operator-", "[matrix]")
 
         SECTION("2x2 matrix")
         {
-            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            Matr m1{2, 2, 0.0}; // [1 2; 3 4]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(1, 0) = 3;
             m1(1, 1) = 4;
 
-            Matr m2{ 2, 2, 0.0 };  // [4 3; 2 1]
+            Matr m2{2, 2, 0.0}; // [4 3; 2 1]
             m2(0, 0) = 4;
             m2(0, 1) = 3;
             m2(1, 0) = 2;
@@ -882,12 +882,12 @@ TEST_CASE("operator-", "[matrix]")
 
         SECTION("1x3 vector")
         {
-            Matr m1{ 1, 3 }; // [1 2 3]
+            Matr m1{1, 3}; // [1 2 3]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(0, 2) = 3;
 
-            Matr m2{ 1, 3 }; // [-3 -2 -1]
+            Matr m2{1, 3}; // [-3 -2 -1]
             m2(0, 0) = -3;
             m2(0, 1) = -2;
             m2(0, 2) = -1;
@@ -901,12 +901,12 @@ TEST_CASE("operator-", "[matrix]")
 
         SECTION("3x1 vector")
         {
-            Matr m1{ 3, 1 }; // [1;2;3]
+            Matr m1{3, 1}; // [1;2;3]
             m1(0, 0) = 1;
             m1(1, 0) = 2;
             m1(2, 0) = 3;
 
-            Matr m2{ 3, 1 }; // [-3;-2;-1]
+            Matr m2{3, 1}; // [-3;-2;-1]
             m2(0, 0) = -3;
             m2(1, 0) = -2;
             m2(2, 0) = -1;
@@ -929,7 +929,7 @@ TEST_CASE("operator-", "[matrix]")
     {
         SECTION("1x1 matrix")
         {
-            Matr m1{ 1, 1, 1.0 };
+            Matr m1{1, 1, 1.0};
 
             auto result = m1 - 6;
 
@@ -938,7 +938,7 @@ TEST_CASE("operator-", "[matrix]")
 
         SECTION("2x2 matrix")
         {
-            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            Matr m1{2, 2, 0.0}; // [1 2; 3 4]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(1, 0) = 3;
@@ -954,7 +954,7 @@ TEST_CASE("operator-", "[matrix]")
 
         SECTION("1x3 vector")
         {
-            Matr m1{ 1, 3 }; // [1 2 3]
+            Matr m1{1, 3}; // [1 2 3]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(0, 2) = 3;
@@ -968,7 +968,7 @@ TEST_CASE("operator-", "[matrix]")
 
         SECTION("3x1 vector")
         {
-            Matr m1{ 3, 1 }; // [1;2;3]
+            Matr m1{3, 1}; // [1;2;3]
             m1(0, 0) = 1;
             m1(1, 0) = 2;
             m1(2, 0) = 3;
@@ -988,11 +988,11 @@ TEST_CASE("operator*", "[matrix]")
     {
         SECTION("[1x1] LHS")
         {
-            Matr m1{ 1, 1, 1.0 };
+            Matr m1{1, 1, 1.0};
 
             SECTION("[1x1] RHS")
             {
-                Matr m2{ 1, 1, -5.0 };
+                Matr m2{1, 1, -5.0};
 
                 auto result = m1 * m2;
 
@@ -1003,7 +1003,7 @@ TEST_CASE("operator*", "[matrix]")
 
             SECTION("[1x4] RHS")
             {
-                Matr m2{ 1, 4, 0.0 };
+                Matr m2{1, 4, 0.0};
                 m2(0, 0) = 1;
                 m2(0, 0) = 2;
                 m2(0, 0) = 3;
@@ -1022,7 +1022,7 @@ TEST_CASE("operator*", "[matrix]")
 
         SECTION("[2x2] LHS")
         {
-            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            Matr m1{2, 2, 0.0}; // [1 2; 3 4]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(1, 0) = 3;
@@ -1030,7 +1030,7 @@ TEST_CASE("operator*", "[matrix]")
 
             SECTION("[2x2] RHS")
             {
-                Matr m2{ 2, 2, 0.0 };  // [4 3; 2 1]
+                Matr m2{2, 2, 0.0}; // [4 3; 2 1]
                 m2(0, 0) = 4;
                 m2(0, 1) = 3;
                 m2(1, 0) = 2;
@@ -1048,7 +1048,7 @@ TEST_CASE("operator*", "[matrix]")
 
             SECTION("[2x1] RHS")
             {
-                Matr m2{ 2, 1, 0.0 };  // [-1; -2]
+                Matr m2{2, 1, 0.0}; // [-1; -2]
                 m2(0, 0) = -1;
                 m2(1, 0) = -2;
 
@@ -1063,14 +1063,14 @@ TEST_CASE("operator*", "[matrix]")
 
         SECTION("[1x3] LHS")
         {
-            Matr m1{ 1, 3 }; // [1 2 3]
+            Matr m1{1, 3}; // [1 2 3]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(0, 2) = 3;
 
             SECTION("[3x1] RHS")
             {
-                Matr m2{ 3, 1 }; // [3;2;1]
+                Matr m2{3, 1}; // [3;2;1]
                 m2(0, 0) = 3;
                 m2(1, 0) = 2;
                 m2(2, 0) = 1;
@@ -1094,7 +1094,7 @@ TEST_CASE("operator*", "[matrix]")
     {
         SECTION("1x1 matrix")
         {
-            Matr m1{ 1, 1, 1.0 };
+            Matr m1{1, 1, 1.0};
 
             auto result = m1 * 6;
 
@@ -1103,7 +1103,7 @@ TEST_CASE("operator*", "[matrix]")
 
         SECTION("2x2 matrix")
         {
-            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            Matr m1{2, 2, 0.0}; // [1 2; 3 4]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(1, 0) = 3;
@@ -1119,7 +1119,7 @@ TEST_CASE("operator*", "[matrix]")
 
         SECTION("1x3 vector")
         {
-            Matr m1{ 1, 3 }; // [1 2 3]
+            Matr m1{1, 3}; // [1 2 3]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(0, 2) = 3;
@@ -1133,7 +1133,7 @@ TEST_CASE("operator*", "[matrix]")
 
         SECTION("3x1 vector")
         {
-            Matr m1{ 3, 1 }; // [1;2;3]
+            Matr m1{3, 1}; // [1;2;3]
             m1(0, 0) = 1;
             m1(1, 0) = 2;
             m1(2, 0) = 3;
@@ -1150,7 +1150,7 @@ TEST_CASE("operator*", "[matrix]")
     {
         SECTION("1x1 matrix")
         {
-            Matr m1{ 1, 1, 1.0 };
+            Matr m1{1, 1, 1.0};
 
             auto result = 6 * m1;
 
@@ -1159,7 +1159,7 @@ TEST_CASE("operator*", "[matrix]")
 
         SECTION("2x2 matrix")
         {
-            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            Matr m1{2, 2, 0.0}; // [1 2; 3 4]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(1, 0) = 3;
@@ -1175,7 +1175,7 @@ TEST_CASE("operator*", "[matrix]")
 
         SECTION("1x3 vector")
         {
-            Matr m1{ 1, 3 }; // [1 2 3]
+            Matr m1{1, 3}; // [1 2 3]
             m1(0, 0) = 1;
             m1(0, 1) = 2;
             m1(0, 2) = 3;
@@ -1189,7 +1189,7 @@ TEST_CASE("operator*", "[matrix]")
 
         SECTION("3x1 vector")
         {
-            Matr m1{ 3, 1 }; // [1;2;3]
+            Matr m1{3, 1}; // [1;2;3]
             m1(0, 0) = 1;
             m1(1, 0) = 2;
             m1(2, 0) = 3;
@@ -1209,7 +1209,7 @@ TEST_CASE("operator/", "[matrix]")
     {
         SECTION("1x1 matrix")
         {
-            Matr m1{ 1, 1, 6 };
+            Matr m1{1, 1, 6};
 
             auto result = m1 / 6;
 
@@ -1218,7 +1218,7 @@ TEST_CASE("operator/", "[matrix]")
 
         SECTION("2x2 matrix")
         {
-            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            Matr m1{2, 2, 0.0}; // [1 2; 3 4]
             m1(0, 0) = -24;
             m1(0, 1) = -18;
             m1(1, 0) = -12;
@@ -1234,7 +1234,7 @@ TEST_CASE("operator/", "[matrix]")
 
         SECTION("1x3 vector")
         {
-            Matr m1{ 1, 3 }; // [1 2 3]
+            Matr m1{1, 3}; // [1 2 3]
             m1(0, 0) = 3;
             m1(0, 1) = 9;
             m1(0, 2) = 18;
@@ -1248,7 +1248,7 @@ TEST_CASE("operator/", "[matrix]")
 
         SECTION("3x1 vector")
         {
-            Matr m1{ 3, 1 }; // [1;2;3]
+            Matr m1{3, 1}; // [1;2;3]
             m1(0, 0) = 3;
             m1(1, 0) = 9;
             m1(2, 0) = 18;
@@ -1274,7 +1274,7 @@ TEST_CASE("operator<", "[matrix]")
     {
         SECTION("1x1 matrix")
         {
-            Matr m1{ 1, 1, 1.0 };
+            Matr m1{1, 1, 1.0};
 
             SECTION("less than 0")
             {
@@ -1306,7 +1306,7 @@ TEST_CASE("operator<", "[matrix]")
 
         SECTION("2x2 matrix")
         {
-            Matr m1{ 2, 2, 0.0 };  // [1 2; 3 4]
+            Matr m1{2, 2, 0.0}; // [1 2; 3 4]
             m1(0, 0) = 0.5;
             m1(0, 1) = 1;
             m1(1, 0) = 1.5;
@@ -1357,7 +1357,7 @@ TEST_CASE("operator>", "[matrix]")
     {
         SECTION("1x1 matrix")
         {
-            Matr m1{ 1, 1, 1.0 };
+            Matr m1{1, 1, 1.0};
 
             SECTION("greater than 0")
             {
@@ -1389,7 +1389,7 @@ TEST_CASE("operator>", "[matrix]")
 
         SECTION("2x2 matrix")
         {
-            Matr m1{ 2, 2, 0.0 };  // [0.5 2; 1.5 2]
+            Matr m1{2, 2, 0.0}; // [0.5 2; 1.5 2]
             m1(0, 0) = 0.5;
             m1(0, 1) = 1;
             m1(1, 0) = 1.5;
