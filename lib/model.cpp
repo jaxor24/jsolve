@@ -9,8 +9,7 @@ namespace jsolve
 		std::runtime_error(message)
 	{}
 
-	ModelError::~ModelError() throw ()
-	{}
+	ModelError::~ModelError() = default;
 
 	Model::Model(Sense sense, const std::string& name)
 		:

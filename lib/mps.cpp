@@ -195,13 +195,13 @@ namespace
 			{
 				// Free variables are replaced with 2 new variables such that original = (variable_positive - variable_negative)
 
-				auto variable_positive = model.make_variable(jsolve::Variable::Type::LINEAR, fmt::format("FREE_{}_POS", variable->name()));
-				auto variable_negative = model.make_variable(jsolve::Variable::Type::LINEAR, fmt::format("FREE_{}_NEG", variable->name()));
+				auto* variable_positive = model.make_variable(jsolve::Variable::Type::LINEAR, fmt::format("FREE_{}_POS", variable->name()));
+				auto* variable_negative = model.make_variable(jsolve::Variable::Type::LINEAR, fmt::format("FREE_{}_NEG", variable->name()));
 
 				variable_positive->cost() = variable->cost();
 				variable_negative->cost() = -variable->cost();
 
-				for (auto& [constraint_name, constraint] : model.get_constraints())
+				for (const auto& [constraint_name, constraint] : model.get_constraints())
 				{
 					auto entry = constraint->get_entries().find(variable.get());
 
@@ -249,8 +249,7 @@ namespace jsolve
 		std::runtime_error(message)
 	{}
 
-	MPSError::~MPSError() throw ()
-	{}
+	MPSError::~MPSError() = default;
 
 	enum class section
 	{

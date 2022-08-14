@@ -10,7 +10,7 @@ namespace jsolve
 	{
 	public:
 		explicit MPSError(const std::string& message);
-		virtual ~MPSError() throw ();
+		virtual ~MPSError();
 	};
 
 	jsolve::Model read_mps(std::filesystem::path path);

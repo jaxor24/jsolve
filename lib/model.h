@@ -16,7 +16,7 @@ namespace jsolve
 	{
 	public:
 		explicit ModelError(const std::string& message);
-		virtual ~ModelError() throw ();
+		virtual ~ModelError();
 	};
 
 	class Model : public Counter<Model>

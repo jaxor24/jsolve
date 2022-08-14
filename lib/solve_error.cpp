@@ -8,6 +8,5 @@ namespace jsolve
 		std::runtime_error(message)
 	{}
 
-	SolveError::~SolveError() throw ()
-	{}
+	SolveError::~SolveError() = default;
 }

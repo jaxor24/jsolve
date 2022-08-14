@@ -7,6 +7,6 @@ namespace jsolve
 	{
 	public:
 		explicit SolveError(const std::string& message);
-		virtual ~SolveError() throw ();
+		virtual ~SolveError();
 	};
 }
