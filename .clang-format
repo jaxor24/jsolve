@@ -5,4 +5,5 @@ PackConstructorInitializers : Never
 AlwaysBreakTemplateDeclarations : Yes
 AllowShortLambdasOnASingleLine : Inline
 PointerAlignment : Left
+AlignAfterOpenBracket: BlockIndent
 ...
