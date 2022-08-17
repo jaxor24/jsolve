@@ -18,29 +18,29 @@ class Constraint : public Counter<Constraint>
         EQUAL
     };
 
-    explicit Constraint(Type type, const std::string &name);
+    explicit Constraint(Type type, const std::string& name);
 
     Type type() const;
-    Type &type();
+    Type& type();
 
     double rhs() const;
-    double &rhs();
+    double& rhs();
 
-    void add_to_lhs(double coeff, Variable *var);
-    void add_to_rhs(double coeff, Variable *var);
+    void add_to_lhs(double coeff, Variable* var);
+    void add_to_rhs(double coeff, Variable* var);
 
-    const std::map<Variable *, double, Variable::CompareNames> &get_entries() const;
-    std::map<Variable *, double, Variable::CompareNames> &get_entries();
+    const std::map<Variable*, double, Variable::CompareNames>& get_entries() const;
+    std::map<Variable*, double, Variable::CompareNames>& get_entries();
 
     std::string to_string() const;
 
-    friend std::ostream &operator<<(std::ostream &os, const Constraint &c);
+    friend std::ostream& operator<<(std::ostream& os, const Constraint& c);
 
   private:
     Type m_type{Type::LESS};
     double m_rhs{0.0};
-    std::map<Variable *, double, Variable::CompareNames> m_entries;
+    std::map<Variable*, double, Variable::CompareNames> m_entries;
 };
 
-std::ostream &operator<<(std::ostream &os, const Constraint &c);
+std::ostream& operator<<(std::ostream& os, const Constraint& c);
 } // namespace jsolve

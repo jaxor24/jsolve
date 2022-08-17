@@ -226,9 +226,10 @@ void post_process_model(jsolve::Model& model)
             if (variable->lower_bound() > 0)
             {
                 // Lower bounds are converted to constraints
-                auto* constraint =
-                    model.make_constraint(jsolve::Constraint::Type::GREAT,
-                                          fmt::format("BND_{}_GEQ_{}", variable->name(), variable->lower_bound()));
+                auto* constraint = model.make_constraint(
+                    jsolve::Constraint::Type::GREAT,
+                    fmt::format("BND_{}_GEQ_{}", variable->name(), variable->lower_bound())
+                );
                 constraint->rhs() = variable->lower_bound();
                 constraint->add_to_lhs(1.0, variable.get());
             }
@@ -236,9 +237,10 @@ void post_process_model(jsolve::Model& model)
             if (variable->upper_bound() < std::numeric_limits<double>::infinity())
             {
                 // Upper bounds are converted to constraints
-                auto* constraint =
-                    model.make_constraint(jsolve::Constraint::Type::LESS,
-                                          fmt::format("BND_{}_LEQ_{}", variable->name(), variable->upper_bound()));
+                auto* constraint = model.make_constraint(
+                    jsolve::Constraint::Type::LESS,
+                    fmt::format("BND_{}_LEQ_{}", variable->name(), variable->upper_bound())
+                );
                 constraint->rhs() = variable->upper_bound();
                 constraint->add_to_lhs(1.0, variable.get());
             }
@@ -334,8 +336,9 @@ std::vector<std::string> split_string(const std::string& line)
     return result;
 }
 
-void process_indicator_record(std::optional<jsolve::Model>& model, const section& section,
-                              const std::vector<std::string>& words)
+void process_indicator_record(
+    std::optional<jsolve::Model>& model, const section& section, const std::vector<std::string>& words
+)
 {
     if (section == section::NAME)
     {
@@ -343,8 +346,9 @@ void process_indicator_record(std::optional<jsolve::Model>& model, const section
     }
 }
 
-void process_data_record(std::optional<jsolve::Model>& model, const section& section,
-                         const std::vector<std::string>& words)
+void process_data_record(
+    std::optional<jsolve::Model>& model, const section& section, const std::vector<std::string>& words
+)
 {
     if (section == section::ROWS)
     {

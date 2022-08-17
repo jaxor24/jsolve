@@ -271,7 +271,8 @@ void Matrix<T>::update(Range rows, Range cols, Matrix sub)
         if (rows.size() != sub.n_rows())
         {
             throw MatrixError(
-                fmt::format("Row range of size is inconsistent with sub matrix", rows.size(), sub.n_rows()));
+                fmt::format("Row range of size is inconsistent with sub matrix", rows.size(), sub.n_rows())
+            );
         }
     }
     else
@@ -280,7 +281,8 @@ void Matrix<T>::update(Range rows, Range cols, Matrix sub)
         if (n_rows() != sub.n_rows())
         {
             throw MatrixError(
-                fmt::format("Cannot update all {} rows with a sub-matrix of {} rows", n_rows(), sub.n_rows()));
+                fmt::format("Cannot update all {} rows with a sub-matrix of {} rows", n_rows(), sub.n_rows())
+            );
         }
     }
 
@@ -290,7 +292,8 @@ void Matrix<T>::update(Range rows, Range cols, Matrix sub)
         if (cols.size() != sub.n_cols())
         {
             throw MatrixError(
-                fmt::format("Col range of size is inconsistent with sub matrix", cols.size(), sub.n_cols()));
+                fmt::format("Col range of size is inconsistent with sub matrix", cols.size(), sub.n_cols())
+            );
         }
     }
     else
@@ -299,7 +302,8 @@ void Matrix<T>::update(Range rows, Range cols, Matrix sub)
         if (n_cols() != sub.n_cols())
         {
             throw MatrixError(
-                fmt::format("Cannot update all {} cols with a sub-matrix of {} cols", n_cols(), sub.n_cols()));
+                fmt::format("Cannot update all {} cols with a sub-matrix of {} cols", n_cols(), sub.n_cols())
+            );
         }
     }
 

@@ -4,7 +4,7 @@
 
 using Matr = Matrix<double>;
 
-static void bench_jsolve(benchmark::State &state)
+static void bench_jsolve(benchmark::State& state)
 {
     auto rows = static_cast<std::size_t>(state.range(0));
     auto cols = static_cast<std::size_t>(state.range(0));

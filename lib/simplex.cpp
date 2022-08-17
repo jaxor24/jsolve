@@ -69,13 +69,15 @@ MatrixModel to_matrix_form(const Model& user_model)
     auto n_total_vars = n_user_vars + n_slack_vars;
 
     // Shield against equal constraints (need 2 slacks)
-    std::for_each(std::begin(user_model.get_constraints()), std::end(user_model.get_constraints()),
-                  [](const auto& pair) {
-                      if (pair.second->type() == Constraint::Type::EQUAL)
-                      {
-                          throw SolveError("EQUAL constraints unsupported");
-                      }
-                  });
+    std::for_each(
+        std::begin(user_model.get_constraints()), std::end(user_model.get_constraints()),
+        [](const auto& pair) {
+            if (pair.second->type() == Constraint::Type::EQUAL)
+            {
+                throw SolveError("EQUAL constraints unsupported");
+            }
+        }
+    );
 
     // Objective vector
     Mat objective{n_total_vars, 1, 0.0};
@@ -153,8 +155,9 @@ Locations init_locations(const Mat& A)
     // Initially, cols of A are the user vars
     for (auto i = 0; i < static_cast<int>(A.n_cols()); i++)
     {
-        locations.non_basics[i] = {i, // These are the only index variables we care about
-                                   i, false, false};
+        locations.non_basics[i] = {
+            i, // These are the only index variables we care about
+            i, false, false};
     }
 
     // Assume phase 1 dummy
@@ -258,8 +261,9 @@ StandardFormModel to_standard_form(const Model& user_model)
     return {objective_phase_1, objective_phase_2, A, rhs, init_locations(A)};
 }
 
-void pivot(std::size_t pivot_row, std::size_t pivot_col, double& obj_phase_1, double& obj_phase_2,
-           StandardFormModel& model)
+void pivot(
+    std::size_t pivot_row, std::size_t pivot_col, double& obj_phase_1, double& obj_phase_2, StandardFormModel& model
+)
 {
     // We can optionally pivot on 2 objectives at the same time
     // If a phase 1 objective is passed, the objective will be updated using it.
@@ -348,8 +352,9 @@ std::optional<std::size_t> get_entering_variable(const Mat& c, bool in_phase_1, 
     }
 }
 
-std::optional<std::size_t> get_leaving_variable(StandardFormModel& model, std::size_t col_idx, bool in_phase_1,
-                                                double eps_zero)
+std::optional<std::size_t> get_leaving_variable(
+    StandardFormModel& model, std::size_t pivot_col, bool in_phase_1, double eps_zero
+)
 {
     // Select variable to leave the basis using Bland's rule.
 
@@ -357,7 +362,7 @@ std::optional<std::size_t> get_leaving_variable(StandardFormModel& model, std::s
     std::optional<double> min_ratio{std::numeric_limits<double>::infinity()};
     std::optional<int> subscript;
 
-    auto Acol = model.A.slice({}, {col_idx}); // TODO - get rid of this
+    auto Acol = model.A.slice({}, {pivot_col}); // TODO - get rid of this
 
     for (const auto [n_row, elem] : enumerate(Acol))
     {
@@ -405,8 +410,9 @@ void log_iteration(int iter, double obj_phase_1, double obj_phase_2, bool in_pha
 {
     int log_every{100};
 
-    std::string progress{fmt::format("It {:8} Obj {:14.6f} {}", iter, obj_phase_2,
-                                     in_phase_1 ? fmt::format("P1 Obj {:14.6f}", obj_phase_1) : "")};
+    std::string progress{fmt::format(
+        "It {:8} Obj {:14.6f} {}", iter, obj_phase_2, in_phase_1 ? fmt::format("P1 Obj {:14.6f}", obj_phase_1) : ""
+    )};
 
     if (iter % log_every == 0)
     {
