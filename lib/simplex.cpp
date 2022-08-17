@@ -24,6 +24,14 @@ struct MatrixModel
     Mat b;
 };
 
+struct StandardFormModel
+{
+    Mat c_phase_1;
+    Mat c_phase_2;
+    Mat A;
+    Mat b;
+};
+
 void verify_matrix_model(MatrixModel model)
 {
     if (model.A.n_rows() != model.b.n_rows())
@@ -114,16 +122,17 @@ MatrixModel to_matrix_form(const Model& user_model)
 
 namespace jsolve::simplex
 {
-MatrixModel to_standard_form(const Model& user_model)
+StandardFormModel to_standard_form(const Model& user_model)
 {
     // Returns A, b and c such that:
     // - objective is maximisation
     // - constaints are LHS <= RHS
     // - vars are non-negative
+    // - a dummy variable is included for a 2 phase algorithm
     // With:
-    // A = n_cons * n_vars
+    // A = n_cons * n_vars (+ 1 dummy)
     // b = n_cons * 1,
-    // c = 1 * n_vars
+    // c = 1 * n_vars (+ 1 dummy)
 
     // Create a new constraint vector with the equality constraints converted to LESS and GREAT pairs.
     std::vector<Constraint> converted_constraints;
@@ -143,24 +152,27 @@ MatrixModel to_standard_form(const Model& user_model)
         }
     }
 
-    auto n_user_vars = user_model.get_variables().size();
-    auto n_user_cons = converted_constraints.size();
+    auto num_vars = user_model.get_variables().size() + 1;
+    auto num_constr = converted_constraints.size();
 
-    // Objective vector
-    Mat objective{1, n_user_vars, 0.0};
+    // Phase 1 objective = max [ 0 ... 0 | -1 ]
+    Mat objective_phase_1{1, num_vars, 0.0};
+    objective_phase_1(0, num_vars - 1) = -1;
 
+    // Phase 2 objective max [ c | 0 ]
+    Mat objective_phase_2{1, num_vars, 0.0};
     for (const auto& [n_var, pair] : enumerate(user_model.get_variables()))
     {
-        objective(0, n_var) = pair.second->cost();
+        objective_phase_2(0, n_var) = pair.second->cost();
     }
 
     if (user_model.sense() == Model::Sense::MIN)
     {
-        objective *= -1;
+        objective_phase_2 *= -1;
     }
 
     // b (RHS) vector
-    Mat rhs{n_user_cons, 1, 0.0};
+    Mat rhs{num_constr, 1, 0.0};
     for (const auto& [n_cons, cons] : enumerate(converted_constraints))
     {
         if (cons.type() == Constraint::Type::GREAT)
@@ -178,29 +190,27 @@ MatrixModel to_standard_form(const Model& user_model)
         }
     }
 
-    // A matrix
-    Mat a{n_user_cons, n_user_vars, 0.0};
+    // Augment A matrix with dummy variable = [ A | -1 ]
+    Mat A{num_constr, num_vars, 0.0};
 
+    // Add constraint entries
     for (const auto& [n_cons, cons] : enumerate(converted_constraints))
     {
         auto scale = cons.type() == Constraint::Type::GREAT ? -1.0 : 1.0;
-
-        // Add original constraint entries
         for (const auto& [n_var, pair] : enumerate(user_model.get_variables()))
         {
             auto found_entry = cons.get_entries().find(pair.second.get());
-
             if (found_entry != std::end(cons.get_entries()))
             {
-                a(n_cons, n_var) = scale * found_entry->second;
+                A(n_cons, n_var) = scale * found_entry->second;
             }
         }
     }
 
-    // log()->info(objective);
-    // log()->info(rhs);
-    // log()->info(a);
-    return {objective, a, rhs};
+    // Set the last column to be 1 for the dummy variable
+    A.update({}, {num_vars - 1}, Mat{num_constr, 1, -1.0});
+
+    return {objective_phase_1, objective_phase_2, A, rhs};
 }
 
 struct Var
@@ -414,27 +424,10 @@ std::optional<Solution> primal_solve(const Model& user_model)
 
     auto model = to_standard_form(user_model);
 
-    // Assume we need both phase 1 and 2 objectives
-    // Add dummy variable as variable n + 1 (extra column on A and c)
-
-    // Phase 1 objective is = max [ 0 | -1]
-    auto c_phase_1 = Mat{model.c.n_rows(), model.c.n_cols() + 1, 0.0};
-    c_phase_1(0, c_phase_1.n_cols() - 1) = -1;
-
-    // Phase 2 objective = max [ c | 0 ]
-    auto c_phase_2 = Mat{model.c.n_rows(), model.c.n_cols() + 1, 0.0};
-    c_phase_2.update({}, {0, model.c.n_cols() - 1}, model.c);
-
-    // Add dummy variable to all constraints
-    auto A_phase_1 = Mat{model.A.n_rows(), model.A.n_cols() + 1, 0.0};
-    A_phase_1.update({0, model.A.n_rows() - 1}, {0, model.A.n_cols() - 1}, model.A);
-    A_phase_1.update({}, {model.A.n_cols()}, Mat{model.A.n_rows(), 1, -1.0});
-
     // Keep track of variable locations
-    auto locations = init_locations(A_phase_1, true);
+    auto locations = init_locations(model.A, true);
 
-    auto A_dict = -1 * A_phase_1; // -1 to convert to dictionary with basic vars on LHS
-    auto b = model.b;
+    model.A *= -1; // -1 to convert to dictionary with basic vars on LHS
 
     bool in_phase_1 = false;
 
@@ -453,30 +446,31 @@ std::optional<Solution> primal_solve(const Model& user_model)
     // Do first pivot of phase 1 variable and most negative RHS row
     if (in_phase_1)
     {
-        log()->debug("c_phase_1 = {}", c_phase_1);
-        log()->debug("c_phase_2 = {}", c_phase_2);
-        log()->debug("A = {}", A_dict);
-        log()->debug("b = {}", b);
+        log()->debug("c_phase_1 = {}", model.c_phase_1);
+        log()->debug("c_phase_2 = {}", model.c_phase_2);
+        log()->debug("A = {}", model.A);
+        log()->debug("b = {}", model.b);
 
-        auto [row_min, row_min_idx] = b.col_min();
-        auto col_idx = c_phase_1.n_cols() - 1;
+        auto [row_min, row_min_idx] = model.b.col_min();
+        auto col_idx = model.c_phase_1.n_cols() - 1;
 
-        pivot(row_min_idx(0, 0), col_idx, locations, obj_phase_1, obj_phase_2, A_dict, b, c_phase_1, c_phase_2);
+        pivot(row_min_idx(0, 0), col_idx, locations, obj_phase_1, obj_phase_2, model.A, model.b, model.c_phase_1,
+              model.c_phase_2);
 
         log_iteration(iter, obj_phase_1, obj_phase_2, in_phase_1);
         iter++;
     }
 
     // Pick the objective we need to use
-    auto& c = in_phase_1 ? c_phase_1 : c_phase_2;
+    auto& c = in_phase_1 ? model.c_phase_1 : model.c_phase_2;
 
     std::optional<std::size_t> entering_idx{};
 
     for (; iter <= max_iter; iter++)
     {
         log()->debug("c = {}", c);
-        log()->debug("A = {}", A_dict);
-        log()->debug("b = {}", b);
+        log()->debug("A = {}", model.A);
+        log()->debug("b = {}", model.b);
 
         entering_idx = get_entering_variable(c, in_phase_1, locations, eps_column);
 
@@ -491,7 +485,7 @@ std::optional<Solution> primal_solve(const Model& user_model)
             {
                 // Switch to phase 2
                 in_phase_1 = false;
-                c = c_phase_2;
+                c = model.c_phase_2;
                 entering_idx = get_entering_variable(c, in_phase_1, locations, eps_column);
             }
         }
@@ -508,8 +502,8 @@ std::optional<Solution> primal_solve(const Model& user_model)
         log()->debug("Objective max coeff {} at col {}", c(0, col_idx), col_idx);
 
         // Grab the corresponding A column
-        auto Acol = A_dict.slice({}, {col_idx});
-        auto leaving_idx = get_leaving_variable(Acol, b, in_phase_1, locations, eps_zero);
+        auto Acol = model.A.slice({}, {col_idx});
+        auto leaving_idx = get_leaving_variable(Acol, model.b, in_phase_1, locations, eps_zero);
 
         if (!leaving_idx)
         {
@@ -519,9 +513,10 @@ std::optional<Solution> primal_solve(const Model& user_model)
 
         auto row_idx = leaving_idx.value();
 
-        log()->debug("Pivot on element {} at {},{}", A_dict(row_idx, col_idx), row_idx, col_idx);
+        log()->debug("Pivot on element {} at {},{}", model.A(row_idx, col_idx), row_idx, col_idx);
 
-        pivot(row_idx, col_idx, locations, obj_phase_1, obj_phase_2, A_dict, b, c_phase_1, c_phase_2);
+        pivot(row_idx, col_idx, locations, obj_phase_1, obj_phase_2, model.A, model.b, model.c_phase_1,
+              model.c_phase_2);
 
         log_iteration(iter, obj_phase_1, obj_phase_2, in_phase_1);
     }
@@ -535,7 +530,7 @@ std::optional<Solution> primal_solve(const Model& user_model)
     {
         if (!var.slack && !var.dummy)
         {
-            sol.variables[user_model.get_variable(var.index)->name()] = b(idx, 0);
+            sol.variables[user_model.get_variable(var.index)->name()] = model.b(idx, 0);
         }
     }
 
