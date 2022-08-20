@@ -265,8 +265,7 @@ void pivot(
     std::size_t pivot_row, std::size_t pivot_col, double& obj_phase_1, double& obj_phase_2, StandardFormModel& model
 )
 {
-    // We can optionally pivot on 2 objectives at the same time
-    // If a phase 1 objective is passed, the objective will be updated using it.
+    // We pivot on both phase 1 and phase 2 objectives.
 
     // Extract rows and cols from A
     auto Acol = model.A.slice({}, {pivot_col});
@@ -424,6 +423,33 @@ void log_iteration(int iter, double obj_phase_1, double obj_phase_2, bool in_pha
     }
 }
 
+Solution extract_solution(const Model& user_model, const StandardFormModel& model, double obj_phase_2)
+{ 
+    // Extract solution for each variable
+
+    Solution sol;
+
+    sol.objective = user_model.sense() == Model::Sense::MIN ? -1.0 * obj_phase_2 : obj_phase_2;
+
+    for (auto& [idx, var] : model.locations.basics)
+    {
+        if (!var.slack && !var.dummy)
+        {
+            sol.variables[user_model.get_variable(var.index)->name()] = model.b(idx, 0);
+        }
+    }
+
+    for (auto& [idx, var] : model.locations.non_basics)
+    {
+        if (!var.slack && !var.dummy)
+        {
+            sol.variables[user_model.get_variable(var.index)->name()] = 0;
+        }
+    }
+
+    return sol;
+}
+
 std::optional<Solution> primal_solve(const Model& user_model)
 {
     // Follows the implementation in Chapter 4 p46. of "Linear Programming" 2014.
@@ -470,6 +496,7 @@ std::optional<Solution> primal_solve(const Model& user_model)
     auto& current_objective = in_phase_1 ? model.c_phase_1 : model.c_phase_2;
 
     std::optional<std::size_t> entering_idx{};
+    std::optional<std::size_t> leaving_idx{};
 
     for (; iter <= max_iter; iter++)
     {
@@ -505,7 +532,7 @@ std::optional<Solution> primal_solve(const Model& user_model)
         log()->debug("Entering variable:");
         log()->debug("Objective max coeff {} at col {}", current_objective(0, col_idx), col_idx);
 
-        auto leaving_idx = get_leaving_variable(model, col_idx, in_phase_1, eps_zero);
+        leaving_idx = get_leaving_variable(model, col_idx, in_phase_1, eps_zero);
 
         if (!leaving_idx)
         {
@@ -522,26 +549,7 @@ std::optional<Solution> primal_solve(const Model& user_model)
         log_iteration(iter, obj_phase_1, obj_phase_2, in_phase_1);
     }
 
-    // Extract solution
-    Solution sol;
-
-    sol.objective = user_model.sense() == Model::Sense::MIN ? -1.0 * obj_phase_2 : obj_phase_2;
-
-    for (auto& [idx, var] : model.locations.basics)
-    {
-        if (!var.slack && !var.dummy)
-        {
-            sol.variables[user_model.get_variable(var.index)->name()] = model.b(idx, 0);
-        }
-    }
-
-    for (auto& [idx, var] : model.locations.non_basics)
-    {
-        if (!var.slack && !var.dummy)
-        {
-            sol.variables[user_model.get_variable(var.index)->name()] = 0;
-        }
-    }
+    Solution sol{extract_solution(user_model, model, obj_phase_2)};
 
     if (iter >= max_iter)
     {
