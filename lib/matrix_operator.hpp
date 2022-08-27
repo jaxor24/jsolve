@@ -6,7 +6,7 @@
 // Access
 
 template <typename T>
-T &Matrix<T>::operator()(const std::size_t row, const std::size_t col)
+T& Matrix<T>::operator()(const std::size_t row, const std::size_t col)
 {
 #ifdef NDEBUG
     return m_data[row * n_cols() + col];
@@ -27,9 +27,9 @@ T Matrix<T>::operator()(const std::size_t row, const std::size_t col) const
 
 // Unary
 template <typename T>
-Matrix<T> &Matrix<T>::operator++()
+Matrix<T>& Matrix<T>::operator++()
 {
-    std::for_each(std::begin(m_data), std::end(m_data), [](auto &elem) { elem++; });
+    std::for_each(std::begin(m_data), std::end(m_data), [](auto& elem) { elem++; });
     return *this;
 }
 
@@ -42,9 +42,9 @@ Matrix<T> Matrix<T>::operator++(int)
 }
 
 template <typename T>
-Matrix<T> &Matrix<T>::operator--()
+Matrix<T>& Matrix<T>::operator--()
 {
-    std::for_each(std::begin(m_data), std::end(m_data), [](auto &elem) { elem--; });
+    std::for_each(std::begin(m_data), std::end(m_data), [](auto& elem) { elem--; });
     return *this;
 }
 
@@ -58,7 +58,7 @@ Matrix<T> Matrix<T>::operator--(int)
 
 // Binary - Matrix
 template <typename T>
-Matrix<T> &Matrix<T>::operator+=(const Matrix<T> &rhs)
+Matrix<T>& Matrix<T>::operator+=(const Matrix<T>& rhs)
 {
     if (n_rows() != rhs.n_rows())
     {
@@ -82,7 +82,7 @@ Matrix<T> &Matrix<T>::operator+=(const Matrix<T> &rhs)
 }
 
 template <typename T>
-Matrix<T> &Matrix<T>::operator-=(const Matrix<T> &rhs)
+Matrix<T>& Matrix<T>::operator-=(const Matrix<T>& rhs)
 {
     if (n_rows() != rhs.n_rows())
     {
@@ -109,12 +109,13 @@ Matrix<T> &Matrix<T>::operator-=(const Matrix<T> &rhs)
 }
 
 template <typename T>
-Matrix<T> &Matrix<T>::operator*=(const Matrix<T> &rhs)
+Matrix<T>& Matrix<T>::operator*=(const Matrix<T>& rhs)
 {
     if (n_cols() != rhs.n_rows())
     {
         throw MatrixError(
-            fmt::format("Cannot multiply dimensions {}x{} and {}x{}", n_rows(), n_cols(), rhs.n_rows(), rhs.n_cols()));
+            fmt::format("Cannot multiply dimensions {}x{} and {}x{}", n_rows(), n_cols(), rhs.n_rows(), rhs.n_cols())
+        );
     }
 
     Matrix result{n_rows(), rhs.n_cols(), 0.0};
@@ -145,21 +146,21 @@ Matrix<T> &Matrix<T>::operator*=(const Matrix<T> &rhs)
 template <typename T>
 Matrix<T> Matrix<T>::operator+=(double x)
 {
-    std::for_each(std::begin(m_data), std::end(m_data), [x](auto &elem) { elem += x; });
+    std::for_each(std::begin(m_data), std::end(m_data), [x](auto& elem) { elem += x; });
     return *this;
 }
 
 template <typename T>
 Matrix<T> Matrix<T>::operator-=(double x)
 {
-    std::for_each(std::begin(m_data), std::end(m_data), [x](auto &elem) { elem -= x; });
+    std::for_each(std::begin(m_data), std::end(m_data), [x](auto& elem) { elem -= x; });
     return *this;
 }
 
 template <typename T>
 Matrix<T> Matrix<T>::operator*=(double x)
 {
-    std::for_each(std::begin(m_data), std::end(m_data), [x](auto &elem) { elem *= x; });
+    std::for_each(std::begin(m_data), std::end(m_data), [x](auto& elem) { elem *= x; });
     return *this;
 }
 
@@ -171,28 +172,28 @@ Matrix<T> Matrix<T>::operator/=(double x)
         throw MatrixError("Scalar division by zero");
     }
 
-    std::for_each(std::begin(m_data), std::end(m_data), [x](auto &elem) { elem /= x; });
+    std::for_each(std::begin(m_data), std::end(m_data), [x](auto& elem) { elem /= x; });
     return *this;
 }
 
 // Free functions -----------------------------------------------------------------
 // Binary - Matrix
 template <typename U>
-Matrix<U> operator+(Matrix<U> lhs, const Matrix<U> &rhs)
+Matrix<U> operator+(Matrix<U> lhs, const Matrix<U>& rhs)
 {
     lhs += rhs;
     return lhs;
 }
 
 template <typename U>
-Matrix<U> operator-(Matrix<U> lhs, const Matrix<U> &rhs)
+Matrix<U> operator-(Matrix<U> lhs, const Matrix<U>& rhs)
 {
     lhs -= rhs;
     return lhs;
 }
 
 template <typename U>
-Matrix<U> operator*(Matrix<U> lhs, const Matrix<U> &rhs)
+Matrix<U> operator*(Matrix<U> lhs, const Matrix<U>& rhs)
 {
     lhs *= rhs;
     return lhs;
@@ -257,19 +258,19 @@ Matrix<U> operator/(double x, Matrix<U> rhs)
 
 // Comparison
 template <typename U>
-bool operator==(const Matrix<U> &lhs, const Matrix<U> &rhs)
+bool operator==(const Matrix<U>& lhs, const Matrix<U>& rhs)
 {
     return lhs.m_data == rhs.m_data;
 }
 
 template <typename U>
-bool operator!=(const Matrix<U> &lhs, const Matrix<U> &rhs)
+bool operator!=(const Matrix<U>& lhs, const Matrix<U>& rhs)
 {
     return !operator==(lhs, rhs);
 }
 
 template <typename U>
-Matrix<U> operator<(const Matrix<U> &lhs, double x)
+Matrix<U> operator<(const Matrix<U>& lhs, double x)
 {
     // Element-wise e < x
 
@@ -287,7 +288,7 @@ Matrix<U> operator<(const Matrix<U> &lhs, double x)
 }
 
 template <typename U>
-Matrix<U> operator>(const Matrix<U> &lhs, double x)
+Matrix<U> operator>(const Matrix<U>& lhs, double x)
 {
     // Element-wise e > x
 

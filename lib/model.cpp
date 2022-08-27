@@ -66,8 +66,10 @@ Constraint* Model::make_constraint(Constraint::Type type, const std::string& nam
 
 std::string Model::to_long_string() const
 {
-    std::string s = fmt::format("Model: {} ({} constraints, {} variables)", name().empty() ? "Unnamed" : name(),
-                                m_constraints.size(), m_variables.size());
+    std::string s = fmt::format(
+        "Model: {} ({} constraints, {} variables)", name().empty() ? "Unnamed" : name(), m_constraints.size(),
+        m_variables.size()
+    );
 
     if (m_variables.empty())
     {
@@ -120,8 +122,10 @@ std::string Model::to_long_string() const
 
 std::string Model::to_string() const
 {
-    std::string s = fmt::format("Model: {} ({}, {} constraints, {} variables)", name().empty() ? "Unnamed" : name(),
-                                sense() == Sense::MIN ? "MIN" : "MAX", m_constraints.size(), m_variables.size());
+    std::string s = fmt::format(
+        "Model: {} ({}, {} constraints, {} variables)", name().empty() ? "Unnamed" : name(),
+        sense() == Sense::MIN ? "MIN" : "MAX", m_constraints.size(), m_variables.size()
+    );
 
     return s;
 }

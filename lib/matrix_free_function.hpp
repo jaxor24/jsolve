@@ -2,7 +2,7 @@
 
 // Free functions - helpers
 template <typename U, typename F = std::multiplies<U>>
-Matrix<U> mult_elem(const Matrix<U> &lhs, const Matrix<U> &rhs, F func = F{})
+Matrix<U> mult_elem(const Matrix<U>& lhs, const Matrix<U>& rhs, F func = F{})
 {
     // Element-wise multiplication
 
@@ -19,7 +19,7 @@ Matrix<U> mult_elem(const Matrix<U> &lhs, const Matrix<U> &rhs, F func = F{})
 }
 
 template <typename U, typename F = std::divides<U>>
-Matrix<U> div_elem(const Matrix<U> &lhs, const Matrix<U> &rhs, F func = F{})
+Matrix<U> div_elem(const Matrix<U>& lhs, const Matrix<U>& rhs, F func = F{})
 {
     // Element-wise division
 
@@ -36,10 +36,10 @@ Matrix<U> div_elem(const Matrix<U> &lhs, const Matrix<U> &rhs, F func = F{})
 }
 
 template <typename T>
-std::ostream &operator<<(std::ostream &os, const Matrix<T> &m)
+std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 {
     os << "[";
-    for (const auto &[n_elem, elem] : enumerate(m.m_data))
+    for (const auto& [n_elem, elem] : enumerate(m.m_data))
     {
         os << elem;
 
