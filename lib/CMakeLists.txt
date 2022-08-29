@@ -8,6 +8,7 @@ set_target_properties(jsolver_lib PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAN
 target_include_directories(jsolver_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(jsolver_lib PUBLIC spdlog)
+target_link_libraries(jsolver_lib PUBLIC mdspan)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")  	
 	target_link_libraries(jsolver_lib PRIVATE tbb)

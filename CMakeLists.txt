@@ -26,6 +26,7 @@ endif()
 
 add_subdirectory("external/CommandLine")
 add_subdirectory("external/spdlog")
+add_subdirectory("external/mdspan")
 
 add_subdirectory("app")
 add_subdirectory("lib")
