@@ -67,26 +67,8 @@ StandardFormModel to_standard_form(const Model& user_model)
     // b = n_cons * 1,
     // c = 1 * n_vars (+ 1 dummy)
 
-    // Create a new constraint vector with the equality constraints converted to LESS and GREAT pairs.
-    std::vector<Constraint> converted_constraints;
-    for (const auto& [n_cons, pair] : enumerate(user_model.get_constraints()))
-    {
-        if (pair.second->type() == Constraint::Type::EQUAL)
-        {
-            converted_constraints.emplace_back(*pair.second.get());
-            converted_constraints.back().type() = Constraint::Type::LESS;
-
-            converted_constraints.emplace_back(*pair.second.get());
-            converted_constraints.back().type() = Constraint::Type::GREAT;
-        }
-        else
-        {
-            converted_constraints.emplace_back(*pair.second.get());
-        }
-    }
-
     auto num_vars = user_model.get_variables().size() + 1;
-    auto num_constr = converted_constraints.size();
+    auto num_constr = user_model.get_constraints().size();
 
     // Phase 1 objective = max [ 0 ... 0 | -1 ]
     Mat objective_phase_1{1, num_vars, 0.0};
@@ -106,16 +88,16 @@ StandardFormModel to_standard_form(const Model& user_model)
 
     // b (RHS) vector
     Mat rhs{num_constr, 1, 0.0};
-    for (const auto& [n_cons, cons] : enumerate(converted_constraints))
+    for (const auto& [n_cons, pair] : enumerate(user_model.get_constraints()))
     {
-        if (cons.type() == Constraint::Type::GREAT)
+        if (pair.second->type() == Constraint::Type::GREAT)
         {
             // 7x + 2y >= 5 becomes -7x - 2y <= -5
-            rhs(n_cons, 0) = -1 * cons.rhs();
+            rhs(n_cons, 0) = -1 * pair.second->rhs();
         }
-        else if (cons.type() == Constraint::Type::LESS)
+        else if (pair.second->type() == Constraint::Type::LESS)
         {
-            rhs(n_cons, 0) = cons.rhs();
+            rhs(n_cons, 0) = pair.second->rhs();
         }
         else
         {
@@ -127,13 +109,13 @@ StandardFormModel to_standard_form(const Model& user_model)
     Mat A{num_constr, num_vars, 0.0};
 
     // Add constraint entries
-    for (const auto& [n_cons, cons] : enumerate(converted_constraints))
+    for (const auto& [n_cons, cons_pair] : enumerate(user_model.get_constraints()))
     {
-        auto scale = cons.type() == Constraint::Type::GREAT ? -1.0 : 1.0;
-        for (const auto& [n_var, pair] : enumerate(user_model.get_variables()))
+        auto scale = cons_pair.second->type() == Constraint::Type::GREAT ? -1.0 : 1.0;
+        for (const auto& [n_var, var_pair] : enumerate(user_model.get_variables()))
         {
-            auto found_entry = cons.get_entries().find(pair.second.get());
-            if (found_entry != std::end(cons.get_entries()))
+            auto found_entry = cons_pair.second->get_entries().find(var_pair.second.get());
+            if (found_entry != std::end(cons_pair.second->get_entries()))
             {
                 A(n_cons, n_var) = scale * found_entry->second;
             }

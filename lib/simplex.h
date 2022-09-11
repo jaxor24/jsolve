@@ -5,8 +5,7 @@
 
 #include <optional>
 
-
 namespace jsolve
 {
-	std::optional<Solution> solve(const Model& model);
+std::optional<Solution> solve(Model& model);
 }

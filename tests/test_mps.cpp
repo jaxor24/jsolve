@@ -1,6 +1,7 @@
 #include "test_includes.h"
 
 #include "mps.h"
+#include "simplex_common.h"
 
 #include <filesystem>
 #include <source_location>
@@ -23,7 +24,7 @@ TEST_CASE("jsolve::mps::read_mps", "[matrix]")
         SECTION("attributes")
         {
             REQUIRE(model.name() == "TESTPROB");
-            REQUIRE(model.get_constraints().size() == 6);
+            REQUIRE(model.get_constraints().size() == 3);
             REQUIRE(model.get_variables().size() == 3);
         }
 
@@ -81,33 +82,67 @@ TEST_CASE("jsolve::mps::read_mps", "[matrix]")
             }
         }
 
-        SECTION("bounds as constraints")
+        SECTION("pre_process_model")
         {
+            jsolve::pre_process_model(model);
+
+            // 3 original
+            // 3 bounds now constraints
+            // 1 from equality constraint
+            REQUIRE(model.get_constraints().size() == 3 + 3 + 1);
+            REQUIRE(model.get_variables().size() == 3);
+
+            SECTION("bounds as constraints")
             {
-                auto* x1_upper_bnd = model.get_constraint("BND_XONE_LEQ_4");
-                REQUIRE(x1_upper_bnd->type() == jsolve::Constraint::Type::LESS);
-                REQUIRE(x1_upper_bnd->rhs() == 4);
-                const auto& x1_upper_bnd_entries = x1_upper_bnd->get_entries();
-                REQUIRE(x1_upper_bnd_entries.size() == 1);
-                REQUIRE(x1_upper_bnd_entries.at(x1) == 1);
+                {
+                    auto* x1_upper_bnd = model.get_constraint("BND_XONE_LEQ_4");
+                    REQUIRE(x1_upper_bnd->type() == jsolve::Constraint::Type::LESS);
+                    REQUIRE(x1_upper_bnd->rhs() == 4);
+                    const auto& x1_upper_bnd_entries = x1_upper_bnd->get_entries();
+                    REQUIRE(x1_upper_bnd_entries.size() == 1);
+                    REQUIRE(x1_upper_bnd_entries.at(x1) == 1);
+                }
+
+                {
+                    auto* y2_upper_bnd = model.get_constraint("BND_YTWO_LEQ_1");
+                    REQUIRE(y2_upper_bnd->type() == jsolve::Constraint::Type::LESS);
+                    REQUIRE(y2_upper_bnd->rhs() == 1);
+                    const auto& y2_upper_bnd_entries = y2_upper_bnd->get_entries();
+                    REQUIRE(y2_upper_bnd_entries.size() == 1);
+                    REQUIRE(y2_upper_bnd_entries.at(y2) == 1);
+                }
+
+                {
+                    auto* y2_lower_bnd = model.get_constraint("BND_YTWO_GEQ_1");
+                    REQUIRE(y2_lower_bnd->type() == jsolve::Constraint::Type::GREAT);
+                    REQUIRE(y2_lower_bnd->rhs() == 1);
+                    const auto& y2_lower_bnd_entries = y2_lower_bnd->get_entries();
+                    REQUIRE(y2_lower_bnd_entries.size() == 1);
+                    REQUIRE(y2_lower_bnd_entries.at(y2) == 1);
+                }
             }
 
+            SECTION("equality constraints split")
             {
-                auto* y2_upper_bnd = model.get_constraint("BND_YTWO_LEQ_1");
-                REQUIRE(y2_upper_bnd->type() == jsolve::Constraint::Type::LESS);
-                REQUIRE(y2_upper_bnd->rhs() == 1);
-                const auto& y2_upper_bnd_entries = y2_upper_bnd->get_entries();
-                REQUIRE(y2_upper_bnd_entries.size() == 1);
-                REQUIRE(y2_upper_bnd_entries.at(y2) == 1);
-            }
+                {
+                    auto* myeqn_geq = model.get_constraint("EQ_CONS_MYEQN_GEQ");
+                    REQUIRE(myeqn_geq->type() == jsolve::Constraint::Type::GREAT);
+                    REQUIRE(myeqn_geq->rhs() == 7);
+                    const auto& entries = myeqn_geq->get_entries();
+                    REQUIRE(entries.size() == 2);
+                    REQUIRE(entries.at(y2) == -1);
+                    REQUIRE(entries.at(z3) == 1);
+                }
 
-            {
-                auto* y2_lower_bnd = model.get_constraint("BND_YTWO_GEQ_1");
-                REQUIRE(y2_lower_bnd->type() == jsolve::Constraint::Type::GREAT);
-                REQUIRE(y2_lower_bnd->rhs() == 1);
-                const auto& y2_lower_bnd_entries = y2_lower_bnd->get_entries();
-                REQUIRE(y2_lower_bnd_entries.size() == 1);
-                REQUIRE(y2_lower_bnd_entries.at(y2) == 1);
+                {
+                    auto* myeqn_geq = model.get_constraint("EQ_CONS_MYEQN_LEQ");
+                    REQUIRE(myeqn_geq->type() == jsolve::Constraint::Type::LESS);
+                    REQUIRE(myeqn_geq->rhs() == 7);
+                    const auto& entries = myeqn_geq->get_entries();
+                    REQUIRE(entries.size() == 2);
+                    REQUIRE(entries.at(y2) == -1);
+                    REQUIRE(entries.at(z3) == 1);
+                }
             }
         }
     }
@@ -116,42 +151,52 @@ TEST_CASE("jsolve::mps::read_mps", "[matrix]")
     {
         auto model{jsolve::read_mps(get_mps("example_with_free.mps"))};
 
-        SECTION("attributes")
+        SECTION("original attributes")
         {
             REQUIRE(model.name() == "Unnamed");
-            REQUIRE(model.get_constraints().size() == 6);
-            REQUIRE(model.get_variables().size() == 6);
+            REQUIRE(model.get_constraints().size() == 4);
+            REQUIRE(model.get_variables().size() == 4);
         }
 
-        auto* x1 = model.get_variable("x1");
-        auto* x2p = model.get_variable("FREE_x2_POS");
-        auto* x2n = model.get_variable("FREE_x2_NEG");
-        auto* x3 = model.get_variable("x3");
-        auto* x4p = model.get_variable("FREE_x4_POS");
-        auto* x4n = model.get_variable("FREE_x4_NEG");
-
-        SECTION("variables")
+        SECTION("pre_process_model")
         {
-            REQUIRE(x1->cost() == -1);
-            REQUIRE(x2p->cost() == -2);
-            REQUIRE(x2n->cost() == 2);
-            REQUIRE(x3->cost() == 4);
-            REQUIRE(x4p->cost() == 3);
-            REQUIRE(x4n->cost() == -3);
+            jsolve::pre_process_model(model);
 
-            REQUIRE(x1->lower_bound() == 0);
-            REQUIRE(x2p->lower_bound() == 0);
-            REQUIRE(x2n->lower_bound() == 0);
-            REQUIRE(x3->lower_bound() == 1.1);
-            REQUIRE(x4p->lower_bound() == 0);
-            REQUIRE(x4n->lower_bound() == 0);
+            // 2 extra constraints from bounds
+            REQUIRE(model.get_constraints().size() == 4 + 2);
+            // 2 extra vars from free variables
+            REQUIRE(model.get_variables().size() == 4 + 2);
 
-            REQUIRE(x1->upper_bound() == std::numeric_limits<double>::infinity());
-            REQUIRE(x2p->upper_bound() == std::numeric_limits<double>::infinity());
-            REQUIRE(x2n->upper_bound() == std::numeric_limits<double>::infinity());
-            REQUIRE(x3->upper_bound() == 10);
-            REQUIRE(x4p->upper_bound() == std::numeric_limits<double>::infinity());
-            REQUIRE(x4n->upper_bound() == std::numeric_limits<double>::infinity());
+            auto* x1 = model.get_variable("x1");
+            auto* x2p = model.get_variable("FREE_x2_POS");
+            auto* x2n = model.get_variable("FREE_x2_NEG");
+            auto* x3 = model.get_variable("x3");
+            auto* x4p = model.get_variable("FREE_x4_POS");
+            auto* x4n = model.get_variable("FREE_x4_NEG");
+
+            SECTION("variables")
+            {
+                REQUIRE(x1->cost() == -1);
+                REQUIRE(x2p->cost() == -2);
+                REQUIRE(x2n->cost() == 2);
+                REQUIRE(x3->cost() == 4);
+                REQUIRE(x4p->cost() == 3);
+                REQUIRE(x4n->cost() == -3);
+
+                REQUIRE(x1->lower_bound() == 0);
+                REQUIRE(x2p->lower_bound() == 0);
+                REQUIRE(x2n->lower_bound() == 0);
+                REQUIRE(x3->lower_bound() == 1.1);
+                REQUIRE(x4p->lower_bound() == 0);
+                REQUIRE(x4n->lower_bound() == 0);
+
+                REQUIRE(x1->upper_bound() == std::numeric_limits<double>::infinity());
+                REQUIRE(x2p->upper_bound() == std::numeric_limits<double>::infinity());
+                REQUIRE(x2n->upper_bound() == std::numeric_limits<double>::infinity());
+                REQUIRE(x3->upper_bound() == 10);
+                REQUIRE(x4p->upper_bound() == std::numeric_limits<double>::infinity());
+                REQUIRE(x4n->upper_bound() == std::numeric_limits<double>::infinity());
+            }
         }
     }
 }
