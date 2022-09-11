@@ -8,7 +8,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 1")
     {
         auto model = models::make_model_1();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(solution.value().objective == 13.0);
@@ -20,7 +20,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 2")
     {
         auto model = models::make_model_2();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(approx_equal(solution.value().objective, -3.0));
@@ -31,7 +31,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 3")
     {
         auto model = models::make_model_3();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(solution.value().objective == 17.0);
@@ -44,7 +44,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 4")
     {
         auto model = models::make_model_4();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(solution.value().objective == 2.0);
@@ -55,7 +55,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 6")
     {
         auto model = models::make_model_6();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(solution.value().objective == 28.0);
@@ -66,7 +66,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 7")
     {
         auto model = models::make_model_7();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(solution.value().objective == 9.0);
@@ -79,7 +79,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 8")
     {
         auto model = models::make_model_8();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(approx_equal(solution.value().objective, 6.0));
@@ -94,7 +94,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 9")
     {
         auto model = models::make_model_9();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(solution.value().objective == 8.5);
@@ -108,7 +108,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 10")
     {
         auto model = models::make_model_10();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(solution.value().objective == 13.0);
@@ -119,7 +119,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 11")
     {
         auto model = models::make_model_11();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(solution.value().objective == 1.0);
@@ -132,7 +132,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 12")
     {
         auto model = models::make_model_12();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(solution.value().objective == 25.0);
@@ -143,7 +143,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 13")
     {
         auto model = models::make_model_13();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(approx_equal(solution.value().objective, 7.0));
@@ -158,7 +158,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 14")
     {
         auto model = models::make_model_14();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(!solution.has_value());
     }
@@ -166,7 +166,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 15")
     {
         auto model = models::make_model_15();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(approx_equal(solution.value().objective, 5.4));
@@ -178,7 +178,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 16")
     {
         auto model = models::make_model_16();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(approx_equal(solution.value().objective, 2.2));
@@ -190,7 +190,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 17")
     {
         auto model = models::make_model_17();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(approx_equal(solution.value().objective, 42));
@@ -203,7 +203,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 18")
     {
         auto model = models::make_model_18();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(approx_equal(solution.value().objective, 51 + (3.0 / 7.0)));
@@ -215,7 +215,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 19")
     {
         auto model = models::make_model_19();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(approx_equal(solution.value().objective, 1.5));
@@ -228,7 +228,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 20")
     {
         auto model = models::make_model_20();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(approx_equal(solution.value().objective, 11));
@@ -240,7 +240,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 21")
     {
         auto model = models::make_model_21();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(!solution.has_value());
     }
@@ -248,7 +248,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 22")
     {
         auto model = models::make_model_22();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
     }
@@ -256,7 +256,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 23")
     {
         auto model = models::make_model_23();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         REQUIRE(solution.has_value());
         REQUIRE(approx_equal(solution.value().objective, 25));
@@ -268,7 +268,7 @@ TEST_CASE("jsolve::simplex::primal_solve", "[matrix]")
     SECTION("model 24")
     {
         auto model = models::make_model_24();
-        auto solution = jsolve::simplex::primal_solve(model);
+        auto solution = jsolve::simplex::solve(model);
 
         double eps = 0.0001;
 
