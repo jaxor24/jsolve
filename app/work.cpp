@@ -10,9 +10,9 @@
 
 void go(std::filesystem::path file)
 {
-    auto model{jsolve::read_mps(file)};
+    // auto model{jsolve::read_mps(file)};
 
-    // auto model = models::make_model_7();
+    auto model = models::make_model_0();
 
     log()->info(model.to_string());
 

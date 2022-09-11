@@ -8,7 +8,14 @@ namespace jsolve
 std::optional<Solution> solve(Model& model)
 {
     pre_process_model(model);
-    return solve_primal_standard(model);
-    // return solve_primal_revised(model);
+
+    if (true)
+    {
+        return solve_primal_standard(model);
+    }
+    else
+    {
+        return solve_primal_revised(model);
+    }
 }
 } // namespace jsolve
