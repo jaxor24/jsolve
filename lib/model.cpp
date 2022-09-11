@@ -172,6 +172,11 @@ void Model::remove_variable(const std::string& name)
     [[maybe_unused]] auto result = m_variables.erase(name);
 }
 
+void Model::remove_constraint(const std::string& name)
+{
+    [[maybe_unused]] auto result = m_constraints.erase(name);
+}
+
 std::ostream& operator<<(std::ostream& os, const Model& m)
 {
     os << m.to_string();

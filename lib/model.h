@@ -44,6 +44,7 @@ class Model : public Counter<Model>
     Constraint* get_constraint(const std::string& name) const;
 
     void remove_variable(const std::string& name);
+    void remove_constraint(const std::string& name);
 
     std::string to_string() const;
     std::string to_long_string() const;
