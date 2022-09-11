@@ -108,6 +108,48 @@ TEST_CASE("matrix::operator!=", "[matrix]")
     }
 }
 
+TEST_CASE("matrix::operator-", "[matrix]")
+{
+    SECTION("1x1 matrix")
+    {
+        Matr m1{1, 1, 1.0};
+
+        auto m2 = -m1;
+
+        REQUIRE(m2(0, 0) == -1.0);
+    }
+
+    SECTION("2x2 matrix")
+    {
+        Matr m1{2, 2, 0.0}; // [1 2; 3 4]
+        m1(0, 0) = 1;
+        m1(0, 1) = 2;
+        m1(1, 0) = 3;
+        m1(1, 1) = 4;
+
+        auto m2 = -m1;
+
+        REQUIRE(m2(0, 0) == -1.0);
+        REQUIRE(m2(0, 1) == -2.0);
+        REQUIRE(m2(1, 0) == -3.0);
+        REQUIRE(m2(1, 1) == -4.0);
+    }
+
+    SECTION("1x3 vector")
+    {
+        Matr m1{1, 3}; // [1 2 3]
+        m1(0, 0) = 1;
+        m1(0, 1) = 2;
+        m1(0, 2) = 3;
+
+        auto m2 = -m1;
+
+        REQUIRE(m2(0, 0) == -1.0);
+        REQUIRE(m2(0, 1) == -2.0);
+        REQUIRE(m2(0, 2) == -3.0);
+    }
+}
+
 TEST_CASE("matrix::operator++", "[matrix]")
 {
     Matr m{2, 3};

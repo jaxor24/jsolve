@@ -78,6 +78,7 @@ class Matrix
     friend bool operator!=(const Matrix<U>& lhs, const Matrix<U>& rhs);
 
     // Unary
+    Matrix operator-();
     Matrix& operator++();
     Matrix operator++(int);
     Matrix& operator--();

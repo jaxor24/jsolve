@@ -27,6 +27,14 @@ T Matrix<T>::operator()(const std::size_t row, const std::size_t col) const
 
 // Unary
 template <typename T>
+Matrix<T> Matrix<T>::operator-()
+{
+    Matrix tmp(*this);
+    tmp *= -1;
+    return tmp;
+}
+
+template <typename T>
 Matrix<T>& Matrix<T>::operator++()
 {
     std::for_each(std::begin(m_data), std::end(m_data), [](auto& elem) { elem++; });
