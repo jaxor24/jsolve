@@ -5,7 +5,8 @@
 
 #include <optional>
 
-namespace jsolve::simplex
+
+namespace jsolve
 {
 	std::optional<Solution> solve(const Model& model);
 }

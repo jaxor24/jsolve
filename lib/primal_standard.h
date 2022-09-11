@@ -5,7 +5,7 @@
 
 #include <optional>
 
-namespace jsolve::simplex
+namespace jsolve
 {
 std::optional<Solution> solve_primal_standard(const Model& model);
 }

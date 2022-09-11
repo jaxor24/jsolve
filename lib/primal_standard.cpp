@@ -139,7 +139,7 @@ MatrixModel to_matrix_form(const Model& user_model)
 
 } // namespace jsolve
 
-namespace jsolve::simplex
+namespace jsolve
 {
 
 Locations init_locations(const Mat& A)
@@ -568,4 +568,4 @@ std::optional<Solution> solve_primal_standard(const Model& user_model)
 
     return sol;
 }
-} // namespace jsolve::simplex
+} // namespace jsolve

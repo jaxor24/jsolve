@@ -16,7 +16,7 @@ void go(std::filesystem::path file)
 
     log()->info(model.to_string());
 
-    auto solution{jsolve::simplex::solve(model)};
+    auto solution{jsolve::solve(model)};
 
     if (solution)
     {

@@ -1,7 +1,8 @@
 #include "simplex.h"
 #include "primal_standard.h"
+#include "primal_revised.h"
 
-namespace jsolve::simplex
+namespace jsolve
 {
 std::optional<Solution> solve(const Model& model)
 {
