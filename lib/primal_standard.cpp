@@ -1,12 +1,11 @@
 #include "primal_standard.h"
 
+#include "simplex_common.h"
+
 #include "constraint.h"
 #include "variable.h"
 
 #include "solve_error.h"
-
-#include "matrix.h"
-#include "tools.h"
 
 #include "logging.h"
 
@@ -14,23 +13,6 @@
 
 namespace jsolve
 {
-using Number = double;
-using Mat = Matrix<Number>;
-
-struct Var
-{
-    int index{0};
-    int subscript{0};
-    bool slack{false};
-    bool dummy{false};
-};
-
-struct Locations
-{
-    std::map<std::size_t, Var> basics;
-    std::map<std::size_t, Var> non_basics;
-};
-
 struct StandardFormModel
 {
     Mat c_phase_1;
