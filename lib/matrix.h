@@ -102,6 +102,7 @@ class Matrix
 };
 
 #include "matrix_free_function.hpp"
+#include "matrix_inverse.hpp"
 #include "matrix_operator.hpp"
 
 // Matrix:: member functions
