@@ -47,6 +47,11 @@ TEST_CASE("swap_rows", "[matrix]")
             REQUIRE(m(1, 0) == -1);
             REQUIRE(m(1, 1) == -2);
         }
+
+        SECTION("invalid dimensions")
+        {
+            REQUIRE_THROWS_AS(swap_rows(m, 2, 2), MatrixError);
+        }
     }
 
     SECTION("1x2 matrix")
@@ -84,6 +89,11 @@ TEST_CASE("swap_rows", "[matrix]")
             REQUIRE(m(0, 0) == 2);
             REQUIRE(m(0, 1) == 1);
         }
+
+        SECTION("invalid dimensions")
+        {
+            REQUIRE_THROWS_AS(swap_rows(m, 3, 4), MatrixError);
+        }
     }
 
     SECTION("3x3 matrix")
@@ -118,6 +128,114 @@ TEST_CASE("swap_rows", "[matrix]")
             REQUIRE(m(2, 0) == 1);
             REQUIRE(m(2, 1) == 2);
             REQUIRE(m(2, 2) == 3);
+        }
+
+        SECTION("invalid dimensions")
+        {
+            REQUIRE_THROWS_AS(swap_rows(m, 4, 4), MatrixError);
+        }
+    }
+}
+
+TEST_CASE("inverse", "[matrix]")
+{
+
+    SECTION("1x1 matrix")
+    {
+        Matr m{1, 1, 6};
+        // [6]
+
+        auto result = inverse(m);
+
+        REQUIRE(result.n_rows() == 1);
+        REQUIRE(result.n_cols() == 1);
+        REQUIRE(result(0, 0) == 1.0 / 6);
+    }
+
+    SECTION("2x2 matrix")
+    {
+        Matr m{2, 2, 0.0};
+        m(0, 0) = -1;
+        m(0, 1) = 3.0 / 2;
+        m(1, 0) = 1;
+        m(1, 1) = -1;
+
+        auto result = inverse(m);
+
+        REQUIRE(result.n_rows() == 2);
+        REQUIRE(result.n_cols() == 2);
+        REQUIRE(result(0, 0) == 2);
+        REQUIRE(result(0, 1) == 3);
+        REQUIRE(result(1, 0) == 2);
+        REQUIRE(result(1, 1) == 2);
+    }
+
+    SECTION("3x3 matrix")
+    {
+        SECTION("A")
+        {
+            Matr m{3, 3, 0.0};
+            m(0, 0) = 2;
+            m(0, 1) = -1;
+            m(0, 2) = 0;
+
+            m(1, 0) = -1;
+            m(1, 1) = 2;
+            m(1, 2) = -1;
+
+            m(2, 0) = 0;
+            m(2, 1) = -1;
+            m(2, 2) = 2;
+
+            auto result = inverse(m);
+
+            REQUIRE(result.n_rows() == 3);
+            REQUIRE(result.n_cols() == 3);
+
+            REQUIRE(approx_equal(result(0, 0), 0.75));
+            REQUIRE(approx_equal(result(0, 1), 0.5));
+            REQUIRE(approx_equal(result(0, 2), 0.25));
+
+            REQUIRE(approx_equal(result(1, 0), 0.5));
+            REQUIRE(approx_equal(result(1, 1), 1));
+            REQUIRE(approx_equal(result(1, 2), 0.5));
+
+            REQUIRE(approx_equal(result(2, 0), 0.25));
+            REQUIRE(approx_equal(result(2, 1), 0.5));
+            REQUIRE(approx_equal(result(2, 2), 0.75));
+        }
+
+        SECTION("B")
+        {
+            Matr m{3, 3, 0.0};
+            m(0, 0) = 1;
+            m(0, 1) = 1;
+            m(0, 2) = 3;
+
+            m(1, 0) = 1;
+            m(1, 1) = 3;
+            m(1, 2) = -3;
+
+            m(2, 0) = -2;
+            m(2, 1) = -4;
+            m(2, 2) = -4;
+
+            auto result = inverse(m);
+
+            REQUIRE(result.n_rows() == 3);
+            REQUIRE(result.n_cols() == 3);
+
+            REQUIRE(approx_equal(result(0, 0), 3));
+            REQUIRE(approx_equal(result(0, 1), 1));
+            REQUIRE(approx_equal(result(0, 2), 1.5));
+
+            REQUIRE(approx_equal(result(1, 0), -1.25));
+            REQUIRE(approx_equal(result(1, 1), -0.25));
+            REQUIRE(approx_equal(result(1, 2), -0.75));
+
+            REQUIRE(approx_equal(result(2, 0), -0.25));
+            REQUIRE(approx_equal(result(2, 1), -0.25));
+            REQUIRE(approx_equal(result(2, 2), -0.25));
         }
     }
 }
