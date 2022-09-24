@@ -31,7 +31,7 @@ jsolve::Model make_model_0()
     // Constraint 3
     auto* c3 = m.make_constraint(jsolve::Constraint::Type::LESS, "C3");
     c3->rhs() = 5;
-    c3->add_to_lhs(5, v2);
+    c3->add_to_lhs(1, v2);
 
     return m;
 }
