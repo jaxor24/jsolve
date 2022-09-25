@@ -274,6 +274,40 @@ std::optional<Solution> solve_primal_revised(const Model& model)
         std::swap(basics[leaving.value()], non_basics[entering.value()]);
     }
 
-    return {};
+    auto primal = primal_obj(c, x_basic, basics);
+
+    Solution sol{};
+
+    sol.objective = model.sense() == Model::Sense::MIN ? -1.0 * primal : primal;
+
+    for (std::size_t curr_idx = 0; curr_idx < x_basic.n_rows(); curr_idx++)
+    {
+        if (!basics[curr_idx].slack && !basics[curr_idx].dummy)
+        {
+            sol.variables[model.get_variable(basics[curr_idx].index)->name()] = x_basic(curr_idx, 0);
+        }
+    }
+
+    for (std::size_t curr_idx = 0; curr_idx < z_non_basic.n_rows(); curr_idx++)
+    {
+        if (!non_basics[curr_idx].slack && !non_basics[curr_idx].dummy)
+        {
+            sol.variables[model.get_variable(non_basics[curr_idx].index)->name()] = z_non_basic(curr_idx, 0);
+        }
+    }
+
+    if (iter >= max_iter)
+    {
+        log()->warn("Iteration limit ({}) reached.", iter);
+    }
+    else
+    {
+        log()->info("Optimal solution found");
+    }
+
+    log()->debug("---------------------------------------");
+    log()->info("Objective = {:.2f} ({} iterations)", sol.objective, iter);
+
+    return sol;
 }
 } // namespace jsolve
