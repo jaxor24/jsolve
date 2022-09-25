@@ -47,11 +47,7 @@ std::optional<std::size_t> choose_leaving(const Mat& x_basic, const Mat& dx, dou
         {
             auto curr_ratio{x_basic(curr_idx, 0) / dx(curr_idx, 0)};
 
-            if (!min_ratio)
-            {
-                min_ratio = curr_ratio;
-            }
-            else if (curr_ratio < min_ratio)
+            if (curr_ratio < min_ratio)
             {
                 min_ratio = curr_ratio;
                 leaving = curr_idx;
