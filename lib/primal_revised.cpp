@@ -72,6 +72,25 @@ double primal_obj(const Mat& c, const Mat& x_basic, const std::vector<VarData>& 
     return primal_obj;
 }
 
+void log_iteration(int iter, double obj_phase_1, double obj_phase_2, bool in_phase_1)
+{
+    int log_every{1};
+
+    std::string progress{fmt::format(
+        "It {:8} Obj {:14.6f} {}", iter, obj_phase_2, in_phase_1 ? fmt::format("P1 Obj {:14.6f}", obj_phase_1) : ""
+    )};
+
+    if (iter % log_every == 0)
+    {
+        log()->info(progress);
+    }
+    else
+    {
+        log()->debug(progress);
+    }
+}
+} // namespace
+
 std::optional<Solution> solve_primal_revised(const Model& model)
 {
     auto num_user_vars = model.get_variables().size();
@@ -192,6 +211,8 @@ std::optional<Solution> solve_primal_revised(const Model& model)
 
     for (; iter <= max_iter; iter++)
     {
+        log_iteration(iter, 0, primal_obj(c, x_basic, basics), false);
+
         // 1. Check optimality
         // 2. Find entering variable
         // Pick minimum (and negative) z_non_basic
