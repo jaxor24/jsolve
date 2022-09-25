@@ -13,6 +13,8 @@
 
 namespace jsolve
 {
+namespace
+{
 struct StandardFormModel
 {
     Mat c_phase_1;
@@ -21,11 +23,6 @@ struct StandardFormModel
     Mat b;
     Locations locations;
 };
-
-} // namespace jsolve
-
-namespace jsolve
-{
 
 Locations init_locations(const Mat& A)
 {
@@ -291,7 +288,7 @@ void log_iteration(int iter, double obj_phase_1, double obj_phase_2, bool in_pha
 }
 
 Solution extract_solution(const Model& user_model, const StandardFormModel& model, double obj_phase_2)
-{ 
+{
     // Extract solution for each variable
 
     Solution sol;
@@ -316,13 +313,13 @@ Solution extract_solution(const Model& user_model, const StandardFormModel& mode
 
     return sol;
 }
+} // namespace
 
 std::optional<Solution> solve_primal_standard(const Model& user_model)
 {
     // Implementation of the 'standard' primal simplex algorithm.
     // i.e. Full computation of the primal dictionary each iteration.
     // Follows the implementation in Chapter 4 p46. of "Linear Programming" 2014.
-
 
     Timer timer{info_logger(), "Primal Simplex Algorithm"};
 
