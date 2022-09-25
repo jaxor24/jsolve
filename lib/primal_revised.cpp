@@ -17,6 +17,8 @@ namespace jsolve
 {
 using Mat = Matrix<double>;
 
+namespace
+{
 std::optional<std::size_t> choose_entering(const Mat& y_non_basic, double EPS2)
 {
     std::optional<std::size_t> entering;
@@ -140,7 +142,7 @@ std::optional<Solution> solve_primal_revised(const Model& model)
         }
     }
 
-    log()->info(A);
+    log()->debug(A);
 
     // Create c column vector = [c | 0]
     Mat c{total_vars, 1, 0.0};
@@ -154,7 +156,7 @@ std::optional<Solution> solve_primal_revised(const Model& model)
         c *= -1;
     }
 
-    log()->info(c);
+    log()->debug(c);
 
     // Create b (RHS) vector
     Mat b{m, 1, 0.0};
@@ -175,7 +177,7 @@ std::optional<Solution> solve_primal_revised(const Model& model)
         }
     }
 
-    log()->info(b);
+    log()->debug(b);
 
     // ----------------------------------------------------------------
     // Simplex Stuff
@@ -184,14 +186,14 @@ std::optional<Solution> solve_primal_revised(const Model& model)
     auto B = A.slice({}, {n, n + m - 1});
     auto N = A.slice({}, {0, n - 1});
 
-    log()->info(B);
-    log()->info(N);
+    log()->debug(B);
+    log()->debug(N);
 
     auto x_basic = b;
     auto z_non_basic = -c.slice({0, n - 1}, {});
 
-    log()->info(x_basic);
-    log()->info(z_non_basic);
+    log()->debug(x_basic);
+    log()->debug(z_non_basic);
 
     // Tolerances
     double EPS1{1e-8};  // Minimum value to consider as exiting var
@@ -220,7 +222,7 @@ std::optional<Solution> solve_primal_revised(const Model& model)
 
         if (!entering)
         {
-            log()->info("Optimal solution found: {}", primal_obj(c, x_basic, basics));
+            // Optimal
             break;
         }
 
@@ -241,8 +243,8 @@ std::optional<Solution> solve_primal_revised(const Model& model)
 
         if (!leaving)
         {
-            log()->info("Unbounded");
-            break;
+            log()->warn("Model is unbounded");
+            return {};
         }
 
         auto t = x_basic(leaving.value(), 0) / dx(leaving.value(), 0);
