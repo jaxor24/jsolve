@@ -19,17 +19,17 @@ using Mat = Matrix<double>;
 
 namespace
 {
-std::optional<std::size_t> choose_entering(const Mat& y_non_basic, double EPS2)
+std::optional<std::size_t> choose_entering(const Mat& z_non_basic, double EPS2)
 {
     std::optional<std::size_t> entering;
     Mat::value_type current_min{-EPS2};
 
-    for (std::size_t curr_idx = 0; curr_idx < y_non_basic.n_rows(); curr_idx++)
+    for (std::size_t curr_idx = 0; curr_idx < z_non_basic.n_rows(); curr_idx++)
     {
-        if (y_non_basic(curr_idx, 0) < current_min)
+        if (z_non_basic(curr_idx, 0) < current_min)
         {
             entering = curr_idx;
-            current_min = y_non_basic(curr_idx, 0);
+            current_min = z_non_basic(curr_idx, 0);
         }
     }
 
