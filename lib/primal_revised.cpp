@@ -195,9 +195,12 @@ std::optional<Solution> solve_primal_revised(const Model& model)
     double EPS1{1e-8};  // Minimum value to consider as exiting var
     double EPS2{1e-12}; // Protection from division by zero
 
-    if (x_basic.max() < -EPS2)
+    bool primal_feasible = x_basic.min() >= EPS2;
+    // bool primal_optimal = z_non_basic.min() <= -EPS2;
+
+    if (!primal_feasible)
     {
-        throw SolveError("Infeasible intial basis");
+        throw SolveError("Primal infeasible intial basis");
     }
 
     // ----------------------------------------------------------------
@@ -222,7 +225,7 @@ std::optional<Solution> solve_primal_revised(const Model& model)
             break;
         }
 
-        // 3. Calculate dx
+        // 3. Calculate dx (FTRAN)
         // dx = inv(B) * N * ej
         // where j = entering index
 
