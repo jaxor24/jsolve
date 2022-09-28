@@ -281,19 +281,19 @@ std::optional<Solution> solve_primal_revised(const Model& model)
 
     sol.objective = model.sense() == Model::Sense::MIN ? -1.0 * primal : primal;
 
-    for (std::size_t curr_idx = 0; curr_idx < x_basic.n_rows(); curr_idx++)
+    for (std::size_t idx{0}; const auto& var_data : basics)
     {
-        if (!basics[curr_idx].slack && !basics[curr_idx].dummy)
+        if (!var_data.slack && !var_data.dummy)
         {
-            sol.variables[model.get_variable(basics[curr_idx].index)->name()] = x_basic(curr_idx, 0);
+            sol.variables[model.get_variable(var_data.index)->name()] = x_basic(idx++, 0);
         }
     }
 
-    for (std::size_t curr_idx = 0; curr_idx < z_non_basic.n_rows(); curr_idx++)
+    for (const auto& var_data : non_basics)
     {
-        if (!non_basics[curr_idx].slack && !non_basics[curr_idx].dummy)
+        if (!var_data.slack && !var_data.dummy)
         {
-            sol.variables[model.get_variable(non_basics[curr_idx].index)->name()] = z_non_basic(curr_idx, 0);
+            sol.variables[model.get_variable(var_data.index)->name()] = 0;
         }
     }
 
