@@ -12,11 +12,11 @@ void go(std::filesystem::path file)
 {
     // auto model{jsolve::read_mps(file)};
 
-    auto model = models::make_model_0();
+    auto model = models::make_model_2();
 
     log()->info(model.to_string());
 
-    auto solution{jsolve::solve(model)};
+    auto solution{jsolve::solve(model, jsolve::alg_type::REVISED)};
 
     if (solution)
     {

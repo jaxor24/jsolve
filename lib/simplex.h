@@ -7,5 +7,11 @@
 
 namespace jsolve
 {
-std::optional<Solution> solve(Model& model);
-}
+enum class alg_type
+{
+    STANDARD,
+    REVISED
+};
+
+std::optional<Solution> solve(Model& model, alg_type alg);
+} // namespace jsolve

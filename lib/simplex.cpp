@@ -5,17 +5,22 @@
 
 namespace jsolve
 {
-std::optional<Solution> solve(Model& model)
+
+std::optional<Solution> solve(Model& model, alg_type alg)
 {
     pre_process_model(model);
 
-    if (true)
+    if (alg == alg_type::STANDARD)
     {
         return solve_primal_standard(model);
     }
-    else
+    else if (alg == alg_type::REVISED)
     {
         return solve_primal_revised(model);
+    }
+    else
+    {
+        throw std::invalid_argument("Unknown algorithm type");
     }
 }
 } // namespace jsolve
