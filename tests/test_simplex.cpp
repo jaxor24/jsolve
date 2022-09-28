@@ -15,12 +15,12 @@ TEST_CASE("jsolve::solve")
         return jsolve::solve(model, jsolve::alg_type::STANDARD);
     };
 
-    // auto revised = [](jsolve::Model& model) {
-    //     return jsolve::solve(model, jsolve::alg_type::REVISED);
-    // };
+    auto revised = [](jsolve::Model& model) {
+        return jsolve::solve(model, jsolve::alg_type::REVISED);
+    };
 
     auto [current_alg, alg_str] = GENERATE_COPY(
-        as<test_data>{}, std::make_pair(standard, "Standard Simplex") // , std::make_pair(revised, "Revised Simplex")
+        as<test_data>{}, std::make_pair(standard, "Standard Simplex"), std::make_pair(revised, "Revised Simplex")
     );
 
     SECTION("model 1")
