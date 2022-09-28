@@ -117,27 +117,6 @@ std::optional<Solution> solve_primal_revised(const Model& model)
         }
     }
 
-    // Setup the variable location data
-    std::vector<VarData> basics;
-    basics.reserve(n);
-    std::vector<VarData> non_basics;
-    non_basics.reserve(m);
-
-    for (int index = 0; index < total_vars; index++)
-    {
-        if (index < n)
-        {
-            non_basics.push_back(
-                {index, // These are the only index variables we care about
-                 index, false, false}
-            );
-        }
-        else
-        {
-            basics.push_back({index, index, true, false});
-        }
-    }
-
     log()->debug(A);
 
     // Create c column vector = [c | 0]
@@ -174,6 +153,27 @@ std::optional<Solution> solve_primal_revised(const Model& model)
     }
 
     log()->debug(b);
+
+    // Setup the initial basis data
+    std::vector<VarData> basics;
+    basics.reserve(n);
+    std::vector<VarData> non_basics;
+    non_basics.reserve(m);
+
+    for (int index = 0; index < total_vars; index++)
+    {
+        if (index < n)
+        {
+            non_basics.push_back(
+                {index, // These are the only index variables we care about
+                 index, false, false}
+            );
+        }
+        else
+        {
+            basics.push_back({index, index, true, false});
+        }
+    }
 
     // ----------------------------------------------------------------
     // Simplex Stuff
