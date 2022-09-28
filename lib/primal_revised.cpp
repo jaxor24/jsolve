@@ -277,6 +277,8 @@ std::optional<Solution> solve_primal_revised(const Model& model)
 
     auto primal = primal_obj(c, x_basic, basics);
 
+    // Extract solution
+
     Solution sol{};
 
     sol.objective = model.sense() == Model::Sense::MIN ? -1.0 * primal : primal;
