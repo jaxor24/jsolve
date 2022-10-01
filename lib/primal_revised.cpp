@@ -287,8 +287,9 @@ std::optional<Solution> solve_primal_revised(const Model& model)
     {
         if (!var_data.slack && !var_data.dummy)
         {
-            sol.variables[model.get_variable(var_data.index)->name()] = x_basic(idx++, 0);
+            sol.variables[model.get_variable(var_data.index)->name()] = x_basic(idx, 0);
         }
+        ++idx;
     }
 
     for (const auto& var_data : non_basics)
