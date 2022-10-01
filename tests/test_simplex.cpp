@@ -164,9 +164,9 @@ TEST_CASE("jsolve::solve")
         auto solution = current_alg(model);
 
         REQUIRE(solution.has_value());
-        REQUIRE(solution.value().objective == 25.0);
-        REQUIRE(solution.value().variables.at("x1") == 5.0);
-        REQUIRE(solution.value().variables.at("x2") == 5.0);
+        REQUIRE(approx_equal(solution.value().objective, 25.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x1"), 5.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x2"), 5.0));
     }
 
     SECTION("model 13")
