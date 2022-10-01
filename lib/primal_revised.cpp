@@ -160,18 +160,18 @@ std::optional<Solution> solve_primal_revised(const Model& model)
     std::vector<VarData> non_basics;
     non_basics.reserve(m);
 
-    for (int index = 0; index < total_vars; index++)
+    for (std::size_t index = 0; index < total_vars; index++)
     {
         if (index < n)
         {
             non_basics.push_back(
-                {index, // These are the only index variables we care about
-                 index, false, false}
+                {static_cast<int>(index), // These are the only index variables we care about
+                 static_cast<int>(index), false, false}
             );
         }
         else
         {
-            basics.push_back({index, index, true, false});
+            basics.push_back({static_cast<int>(index), static_cast<int>(index), true, false});
         }
     }
 
