@@ -1,4 +1,5 @@
 #include "matrix.h"
+#include <iomanip>
 
 // Free functions - helpers
 template <typename U, typename F = std::multiplies<U>>
