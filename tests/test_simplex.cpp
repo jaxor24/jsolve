@@ -55,11 +55,11 @@ TEST_CASE("jsolve::solve")
         auto solution = current_alg(model);
 
         REQUIRE(solution.has_value());
-        REQUIRE(solution.value().objective == 17.0);
-        REQUIRE(solution.value().variables.at("x1") == 2.0);
-        REQUIRE(solution.value().variables.at("x2") == 0.0);
-        REQUIRE(solution.value().variables.at("x3") == 1.0);
-        REQUIRE(solution.value().variables.at("x4") == 0.0);
+        REQUIRE(approx_equal(solution.value().objective, 17.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x1"), 2.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x2"), 0.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x3"), 1.0));
+        REQUIRE(approx_equal(solution.value().variables.at("x4"), 0.0));
     }
 
     SECTION("model 4")
