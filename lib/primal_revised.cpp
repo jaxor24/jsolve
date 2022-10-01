@@ -1,0 +1,317 @@
+#include "primal_revised.h"
+#include "constraint.h"
+#include "simplex_common.h"
+
+#include "variable.h"
+
+#include "solve_error.h"
+
+#include "matrix.h"
+#include "tools.h"
+
+#include "logging.h"
+
+#include <algorithm>
+
+namespace jsolve
+{
+using Mat = Matrix<double>;
+
+namespace
+{
+std::optional<std::size_t> choose_entering(const Mat& z_non_basic, double EPS2)
+{
+    std::optional<std::size_t> entering;
+    Mat::value_type current_min{-EPS2};
+
+    for (std::size_t curr_idx = 0; curr_idx < z_non_basic.n_rows(); curr_idx++)
+    {
+        if (z_non_basic(curr_idx, 0) < current_min)
+        {
+            entering = curr_idx;
+            current_min = z_non_basic(curr_idx, 0);
+        }
+    }
+
+    return entering;
+}
+
+std::optional<std::size_t> choose_leaving(const Mat& x_basic, const Mat& dx, double EPS1)
+{
+    std::optional<std::size_t> leaving;
+    Mat::value_type min_ratio{std::numeric_limits<Mat::value_type>::max()};
+
+    for (std::size_t curr_idx = 0; curr_idx < x_basic.n_rows(); curr_idx++)
+    {
+        if (dx(curr_idx, 0) > EPS1)
+        {
+            auto curr_ratio{x_basic(curr_idx, 0) / dx(curr_idx, 0)};
+
+            if (curr_ratio < min_ratio)
+            {
+                min_ratio = curr_ratio;
+                leaving = curr_idx;
+            }
+        }
+    }
+
+    return leaving;
+}
+
+double primal_obj(const Mat& c, const Mat& x_basic, const std::vector<VarData>& basics)
+{
+    double primal_obj{0.0};
+
+    for (std::size_t curr_idx = 0; curr_idx < x_basic.n_rows(); curr_idx++)
+    {
+        primal_obj += c(basics[curr_idx].index, 0) * x_basic(curr_idx, 0);
+    }
+
+    return primal_obj;
+}
+
+void log_iteration(int iter, double obj_phase_1, double obj_phase_2, bool in_phase_1)
+{
+    int log_every{1};
+
+    std::string progress{fmt::format(
+        "It {:8} Obj {:14.6f} {}", iter, obj_phase_2, in_phase_1 ? fmt::format("P1 Obj {:14.6f}", obj_phase_1) : ""
+    )};
+
+    if (iter % log_every == 0)
+    {
+        log()->info(progress);
+    }
+    else
+    {
+        log()->debug(progress);
+    }
+}
+} // namespace
+
+std::optional<Solution> solve_primal_revised(const Model& model)
+{
+    auto num_user_vars = model.get_variables().size();
+    auto num_constr = model.get_constraints().size();
+
+    auto n = num_user_vars;
+    auto m = num_constr;
+    auto total_vars = n + m;
+
+    Mat A{m, total_vars, 0.0};
+
+    for (const auto& [n_cons, cons_pair] : enumerate(model.get_constraints()))
+    {
+        // Build B as the identity
+        A(n_cons, n + n_cons) = 1.0;
+
+        // Build N using entries from constraints
+        auto scale = cons_pair.second->type() == Constraint::Type::GREAT ? -1.0 : 1.0;
+        for (const auto& [n_var, var_pair] : enumerate(model.get_variables()))
+        {
+            auto found_entry = cons_pair.second->get_entries().find(var_pair.second.get());
+            if (found_entry != std::end(cons_pair.second->get_entries()))
+            {
+                A(n_cons, n_var) = scale * found_entry->second;
+            }
+        }
+    }
+
+    log()->debug(A);
+
+    // Create c column vector = [c | 0]
+    Mat c{total_vars, 1, 0.0};
+    for (const auto& [n_var, pair] : enumerate(model.get_variables()))
+    {
+        c(n_var, 0) = pair.second->cost();
+    }
+
+    if (model.sense() == Model::Sense::MIN)
+    {
+        c *= -1;
+    }
+
+    log()->debug(c);
+
+    // Create b (RHS) vector
+    Mat b{m, 1, 0.0};
+    for (const auto& [n_cons, pair] : enumerate(model.get_constraints()))
+    {
+        if (pair.second->type() == Constraint::Type::GREAT)
+        {
+            // 7x + 2y >= 5 becomes -7x - 2y <= -5
+            b(n_cons, 0) = -1 * pair.second->rhs();
+        }
+        else if (pair.second->type() == Constraint::Type::LESS)
+        {
+            b(n_cons, 0) = pair.second->rhs();
+        }
+        else
+        {
+            // Impossible by construction of vector being iterated.
+        }
+    }
+
+    log()->debug(b);
+
+    // Setup the initial basis data
+    std::vector<VarData> basics;
+    basics.reserve(n);
+    std::vector<VarData> non_basics;
+    non_basics.reserve(m);
+
+    for (std::size_t index = 0; index < total_vars; index++)
+    {
+        if (index < n)
+        {
+            non_basics.push_back(
+                {static_cast<int>(index), // These are the only index variables we care about
+                 static_cast<int>(index), false, false}
+            );
+        }
+        else
+        {
+            basics.push_back({static_cast<int>(index), static_cast<int>(index), true, false});
+        }
+    }
+
+    // ----------------------------------------------------------------
+    // Simplex Stuff
+
+    // For the simplex we need:
+    auto B = A.slice({}, {n, n + m - 1});
+    auto N = A.slice({}, {0, n - 1});
+
+    log()->debug(B);
+    log()->debug(N);
+
+    auto x_basic = b;
+    auto z_non_basic = -c.slice({0, n - 1}, {});
+
+    log()->debug(x_basic);
+    log()->debug(z_non_basic);
+
+    // Tolerances
+    double EPS1{1e-8};  // Minimum value to consider as exiting var
+    double EPS2{1e-12}; // Protection from division by zero
+
+    bool primal_feasible = x_basic.min() >= EPS2;
+    // bool primal_optimal = z_non_basic.min() <= -EPS2;
+
+    if (!primal_feasible)
+    {
+        throw SolveError("Primal infeasible intial basis");
+    }
+
+    // ----------------------------------------------------------------
+    // Main Loop (Primal)
+    // Steps follow Figure 6.1 from Vanderbei, p92.
+
+    int max_iter{10000};
+    int iter{0};
+
+    for (; iter <= max_iter; iter++)
+    {
+        log_iteration(iter, 0, primal_obj(c, x_basic, basics), false);
+
+        // 1. Check optimality
+        // 2. Find entering variable
+        // Pick minimum (and negative) z_non_basic
+        std::optional<std::size_t> entering = choose_entering(z_non_basic, EPS2);
+
+        if (!entering)
+        {
+            // Optimal
+            break;
+        }
+
+        // 3. Calculate dx (FTRAN)
+        // dx = inv(B) * N * ej
+        // where j = entering index
+
+        auto b_inverse_n = inverse(B) * N;
+        auto dx = b_inverse_n.slice({}, {entering.value()});
+
+        log()->debug(dx);
+
+        // 4. Find the leaving variable
+        // 5. Calculate primal step length
+        // t = x/dx
+
+        std::optional<std::size_t> leaving = choose_leaving(x_basic, dx, EPS1);
+
+        if (!leaving)
+        {
+            log()->warn("Model is unbounded");
+            return {};
+        }
+
+        auto t = x_basic(leaving.value(), 0) / dx(leaving.value(), 0);
+
+        // 6. Calculate dz
+        // dz = -1 * transpose(inv(B)*N) * ei
+        // where i = leaving index
+
+        auto dz = -1.0 * (b_inverse_n.slice({leaving.value()}, {})).make_transpose();
+        log()->debug(dz);
+
+        // 7. Calculate dual step lengths
+        // s = z/dz (j)
+        auto s = z_non_basic(entering.value(), 0) / dz(entering.value(), 0);
+
+        // 8. Update primal and dual solutions
+        x_basic = x_basic - t * dx;
+        z_non_basic = z_non_basic - s * dz;
+        x_basic(leaving.value(), 0) = t;
+        z_non_basic(entering.value(), 0) = s;
+
+        // 9. Update variables
+
+        B.update({}, {leaving.value()}, A.slice({}, static_cast<std::size_t>(non_basics[entering.value()].index)));
+        N.update({}, {entering.value()}, A.slice({}, static_cast<std::size_t>(basics[leaving.value()].index)));
+
+        log()->debug(B);
+        log()->debug(N);
+        std::swap(basics[leaving.value()], non_basics[entering.value()]);
+    }
+
+    auto primal = primal_obj(c, x_basic, basics);
+
+    // Extract solution
+
+    Solution sol{};
+
+    sol.objective = model.sense() == Model::Sense::MIN ? -1.0 * primal : primal;
+
+    for (std::size_t idx{0}; const auto& var_data : basics)
+    {
+        if (!var_data.slack && !var_data.dummy)
+        {
+            sol.variables[model.get_variable(var_data.index)->name()] = x_basic(idx, 0);
+        }
+        ++idx;
+    }
+
+    for (const auto& var_data : non_basics)
+    {
+        if (!var_data.slack && !var_data.dummy)
+        {
+            sol.variables[model.get_variable(var_data.index)->name()] = 0;
+        }
+    }
+
+    if (iter >= max_iter)
+    {
+        log()->warn("Iteration limit ({}) reached.", iter);
+    }
+    else
+    {
+        log()->info("Optimal solution found");
+    }
+
+    log()->debug("---------------------------------------");
+    log()->info("Objective = {:.2f} ({} iterations)", sol.objective, iter);
+
+    return sol;
+}
+} // namespace jsolve

@@ -2,6 +2,40 @@
 
 namespace models
 {
+jsolve::Model make_model_0()
+{
+    // Model from:
+    // p86. Linear Programming (2014) Vanderbei.
+
+    auto m = jsolve::Model(jsolve::Model::Sense::MAX, "Example");
+
+    auto* v1 = m.make_variable(jsolve::Variable::Type::LINEAR, "x1");
+    auto* v2 = m.make_variable(jsolve::Variable::Type::LINEAR, "x2");
+
+    // Objective
+    v1->cost() = 4;
+    v2->cost() = 3;
+
+    // Constraint 1
+    auto* c1 = m.make_constraint(jsolve::Constraint::Type::LESS, "C1");
+    c1->rhs() = 1;
+    c1->add_to_lhs(1, v1);
+    c1->add_to_lhs(-1, v2);
+
+    // Constraint 2
+    auto* c2 = m.make_constraint(jsolve::Constraint::Type::LESS, "C2");
+    c2->rhs() = 3;
+    c2->add_to_lhs(2, v1);
+    c2->add_to_lhs(-1, v2);
+
+    // Constraint 3
+    auto* c3 = m.make_constraint(jsolve::Constraint::Type::LESS, "C3");
+    c3->rhs() = 5;
+    c3->add_to_lhs(1, v2);
+
+    return m;
+}
+
 jsolve::Model make_model_1()
 {
     // Model from:

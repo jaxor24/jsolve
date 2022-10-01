@@ -78,6 +78,7 @@ class Matrix
     friend bool operator!=(const Matrix<U>& lhs, const Matrix<U>& rhs);
 
     // Unary
+    Matrix operator-();
     Matrix& operator++();
     Matrix operator++(int);
     Matrix& operator--();
@@ -101,6 +102,7 @@ class Matrix
 };
 
 #include "matrix_free_function.hpp"
+#include "matrix_inverse.hpp"
 #include "matrix_operator.hpp"
 
 // Matrix:: member functions

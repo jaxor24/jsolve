@@ -1,4 +1,5 @@
 #include "matrix.h"
+#include <iomanip>
 
 // Free functions - helpers
 template <typename U, typename F = std::multiplies<U>>
@@ -38,16 +39,18 @@ Matrix<U> div_elem(const Matrix<U>& lhs, const Matrix<U>& rhs, F func = F{})
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 {
+    os << std::fixed << std::setprecision(4);
     os << "[";
     for (const auto& [n_elem, elem] : enumerate(m.m_data))
     {
-        os << elem;
+        os << std::setw(7) << elem;
 
         if (n_elem + 1 != m.m_data.size())
         {
             if ((n_elem + 1) % m.n_cols() == 0)
             {
-                os << ";";
+                os << "\n";
+                os << "  ";
             }
             else
             {
@@ -56,7 +59,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
         }
     }
 
-    os << "]";
+    os << "]\n";
 
     return os;
 }

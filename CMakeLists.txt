@@ -30,7 +30,7 @@ add_subdirectory("external/spdlog")
 add_subdirectory("app")
 add_subdirectory("lib")
 add_subdirectory("data")
-add_subdirectory("benchmarks")
+# add_subdirectory("benchmarks")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
 	find_package(TBB REQUIRED)

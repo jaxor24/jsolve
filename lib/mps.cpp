@@ -176,80 +176,6 @@ void process_bounds_data_record(jsolve::Model& model, const std::vector<std::str
 }
 } // namespace
 
-namespace
-{
-void post_process_model(jsolve::Model& model)
-{
-    // Convert bounds to constraints
-    // Convert free variables to 2 other variables
-
-    auto it = std::begin(model.get_variables());
-
-    while (it != std::end(model.get_variables()))
-    {
-        const auto& variable = it->second;
-
-        if (variable->lower_bound() == -std::numeric_limits<double>::infinity() &&
-            variable->upper_bound() == std::numeric_limits<double>::infinity())
-        {
-            // Free variables are replaced with 2 new variables such that original = (variable_positive -
-            // variable_negative)
-
-            auto* variable_positive =
-                model.make_variable(jsolve::Variable::Type::LINEAR, fmt::format("FREE_{}_POS", variable->name()));
-            auto* variable_negative =
-                model.make_variable(jsolve::Variable::Type::LINEAR, fmt::format("FREE_{}_NEG", variable->name()));
-
-            variable_positive->cost() = variable->cost();
-            variable_negative->cost() = -variable->cost();
-
-            for (const auto& [constraint_name, constraint] : model.get_constraints())
-            {
-                auto entry = constraint->get_entries().find(variable.get());
-
-                if (entry != std::end(constraint->get_entries()))
-                {
-                    // Delete the existing entry
-                    auto coefficient = entry->second;
-                    constraint->get_entries().erase(entry);
-                    // Add the two new variables
-                    constraint->add_to_lhs(coefficient, variable_positive);
-                    constraint->add_to_lhs(-coefficient, variable_negative);
-                }
-            }
-
-            ++it;
-            model.remove_variable(variable->name());
-        }
-        else
-        {
-            if (variable->lower_bound() > 0)
-            {
-                // Lower bounds are converted to constraints
-                auto* constraint = model.make_constraint(
-                    jsolve::Constraint::Type::GREAT,
-                    fmt::format("BND_{}_GEQ_{}", variable->name(), variable->lower_bound())
-                );
-                constraint->rhs() = variable->lower_bound();
-                constraint->add_to_lhs(1.0, variable.get());
-            }
-
-            if (variable->upper_bound() < std::numeric_limits<double>::infinity())
-            {
-                // Upper bounds are converted to constraints
-                auto* constraint = model.make_constraint(
-                    jsolve::Constraint::Type::LESS,
-                    fmt::format("BND_{}_LEQ_{}", variable->name(), variable->upper_bound())
-                );
-                constraint->rhs() = variable->upper_bound();
-                constraint->add_to_lhs(1.0, variable.get());
-            }
-            ++it;
-        }
-    }
-}
-} // namespace
-
 namespace jsolve
 {
 MPSError::MPSError(const std::string& message)
@@ -444,10 +370,6 @@ jsolve::Model read_mps(std::filesystem::path path)
     if (!model)
     {
         throw MPSError("No model created");
-    }
-    else
-    {
-        post_process_model(model.value());
     }
 
     return std::move(model.value());
