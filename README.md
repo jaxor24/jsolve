@@ -1,12 +1,30 @@
 # jsolve
 
-Implementing a basic LP solver. 
+My goal is to implement an LP/MIP solver of increasing complexity, and test out modern C++ features.
 
-Currently has a two phase primal simplex algorithm.
+There are many variations of the algorithm. My approach is:
+
+1. Standard primal algorithm (i.e. full dictionary)
+2. Two phase standard primal algorithm (i.e. handle infeasible starting bases)
+3. Revised primal algorithm (i.e. matrix based approach)
+4. Revised dual algorithm (i.e. matrix based approach)
+5. Two phase revised algorithm (i.e. combine the above to handle infeasible starting bases)
+6. Implement LU factorisation (i.e. avoid computing explicit inverses)
+7. Implement the general simplex algorithm (i.e. handle bounded variables)
+8. Integer programming
+
+Currently working through (5) above.
+
+References used so far:
+- Vanderbei, *Linear Programming*, 2014
+- Chvatal, *Linear Programming*, 1983
+- Winston, *Operations Research*, 2004
+- Bradley, *Applied Mathematical Programming*, 1977
+
 
 Results of running the netlib model suite:
 
-|    Name    |  Rows |  Cols | Non-zeros |  Bytes  | BR |       Optimal | jsolve Result | Iterations |
+|    Name    |  Rows |  Cols | Non-zeros |  Bytes  | BR |       Optimal | jsolve (alg 2)| Iterations |
 |:----------:|:-----:|:-----:|:---------:|:-------:|:--:|--------------:|--------------:|-----------:|
 | 25FV47     | 822   | 1571  | 11127     | 70477   |    |       5501.85 |   error div 0 |            |
 | 80BAU3B    | 2263  | 9799  | 29063     | 298952  | B  |     987232.16 |        mps lb |            |
