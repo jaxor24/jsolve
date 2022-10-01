@@ -262,13 +262,13 @@ std::optional<Solution> solve_primal_revised(const Model& model)
         // 8. Update primal and dual solutions
         x_basic = x_basic - t * dx;
         z_non_basic = z_non_basic - s * dz;
+        x_basic(leaving.value(), 0) = t;
+        z_non_basic(entering.value(), 0) = s;
 
         // 9. Update variables
 
         B.update({}, {leaving.value()}, A.slice({}, static_cast<std::size_t>(non_basics[entering.value()].index)));
         N.update({}, {entering.value()}, A.slice({}, static_cast<std::size_t>(basics[leaving.value()].index)));
-        x_basic(leaving.value(), 0) = t;
-        z_non_basic(entering.value(), 0) = s;
 
         log()->debug(B);
         log()->debug(N);
