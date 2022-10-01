@@ -19,6 +19,28 @@ using Mat = Matrix<double>;
 
 namespace
 {
+struct Parameters
+{
+    int max_iter{10000}; // Stopping criteria - max simplex iterations
+    double EPS1{1e-8};   // Minimum value to consider as exiting var
+    double EPS2{1e-12};  // Protection from division by zero
+};
+
+struct SolveData
+{
+    // Everything we need to do iterations of the revised simplex algorithm.
+
+    Mat A;
+    Mat c;
+    Mat B;
+    Mat N;
+    Mat x_basic;
+    Mat z_non_basic;
+    std::vector<VarData> basics;
+    std::vector<VarData> non_basics;
+    int n_iter{0};
+};
+
 std::optional<std::size_t> choose_entering(const Mat& z_non_basic, double EPS2)
 {
     std::optional<std::size_t> entering;
@@ -87,10 +109,11 @@ void log_iteration(int iter, double obj_phase_1, double obj_phase_2, bool in_pha
         log()->debug(progress);
     }
 }
-} // namespace
 
-std::optional<Solution> solve_primal_revised(const Model& model)
+SolveData init_data(const Model& model)
 {
+    // Setup the variables needed to conduct iterations of the revised simplex algorithm.
+
     auto num_user_vars = model.get_variables().size();
     auto num_constr = model.get_constraints().size();
 
@@ -175,9 +198,6 @@ std::optional<Solution> solve_primal_revised(const Model& model)
         }
     }
 
-    // ----------------------------------------------------------------
-    // Simplex Stuff
-
     // For the simplex we need:
     auto B = A.slice({}, {n, n + m - 1});
     auto N = A.slice({}, {0, n - 1});
@@ -191,38 +211,37 @@ std::optional<Solution> solve_primal_revised(const Model& model)
     log()->debug(x_basic);
     log()->debug(z_non_basic);
 
-    // Tolerances
-    double EPS1{1e-8};  // Minimum value to consider as exiting var
-    double EPS2{1e-12}; // Protection from division by zero
+    return {A, c, B, N, x_basic, z_non_basic, basics, non_basics};
+}
 
-    bool primal_feasible = x_basic.min() >= EPS2;
-    // bool primal_optimal = z_non_basic.min() <= -EPS2;
+bool solve_primal(SolveData& data, Parameters params)
+{
+    // Solve using the primal (revised) simplex algorithm.
+    // Returns true if a solution is present.
 
-    if (!primal_feasible)
-    {
-        throw SolveError("Primal infeasible intial basis");
-    }
+    Mat& A = data.A;
+    Mat& c = data.c;
+    Mat& B = data.B;
+    Mat& N = data.N;
+    Mat& x_basic = data.x_basic;
+    Mat& z_non_basic = data.z_non_basic;
+    std::vector<VarData>& basics = data.basics;
+    std::vector<VarData>& non_basics = data.non_basics;
+    int& iter = data.n_iter;
 
-    // ----------------------------------------------------------------
-    // Main Loop (Primal)
-    // Steps follow Figure 6.1 from Vanderbei, p92.
-
-    int max_iter{10000};
-    int iter{0};
-
-    for (; iter <= max_iter; iter++)
+    for (; iter <= params.max_iter; iter++)
     {
         log_iteration(iter, 0, primal_obj(c, x_basic, basics), false);
 
         // 1. Check optimality
         // 2. Find entering variable
         // Pick minimum (and negative) z_non_basic
-        std::optional<std::size_t> entering = choose_entering(z_non_basic, EPS2);
+        std::optional<std::size_t> entering = choose_entering(z_non_basic, params.EPS2);
 
         if (!entering)
         {
             // Optimal
-            break;
+            return true;
         }
 
         // 3. Calculate dx (FTRAN)
@@ -238,12 +257,12 @@ std::optional<Solution> solve_primal_revised(const Model& model)
         // 5. Calculate primal step length
         // t = x/dx
 
-        std::optional<std::size_t> leaving = choose_leaving(x_basic, dx, EPS1);
+        std::optional<std::size_t> leaving = choose_leaving(x_basic, dx, params.EPS1);
 
         if (!leaving)
         {
             log()->warn("Model is unbounded");
-            return {};
+            return false;
         }
 
         auto t = x_basic(leaving.value(), 0) / dx(leaving.value(), 0);
@@ -275,32 +294,7 @@ std::optional<Solution> solve_primal_revised(const Model& model)
         std::swap(basics[leaving.value()], non_basics[entering.value()]);
     }
 
-    auto primal = primal_obj(c, x_basic, basics);
-
-    // Extract solution
-
-    Solution sol{};
-
-    sol.objective = model.sense() == Model::Sense::MIN ? -1.0 * primal : primal;
-
-    for (std::size_t idx{0}; const auto& var_data : basics)
-    {
-        if (!var_data.slack && !var_data.dummy)
-        {
-            sol.variables[model.get_variable(var_data.index)->name()] = x_basic(idx, 0);
-        }
-        ++idx;
-    }
-
-    for (const auto& var_data : non_basics)
-    {
-        if (!var_data.slack && !var_data.dummy)
-        {
-            sol.variables[model.get_variable(var_data.index)->name()] = 0;
-        }
-    }
-
-    if (iter >= max_iter)
+    if (iter >= params.max_iter)
     {
         log()->warn("Iteration limit ({}) reached.", iter);
     }
@@ -309,9 +303,78 @@ std::optional<Solution> solve_primal_revised(const Model& model)
         log()->info("Optimal solution found");
     }
 
-    log()->debug("---------------------------------------");
-    log()->info("Objective = {:.2f} ({} iterations)", sol.objective, iter);
+    return true;
+}
+
+Solution extract_solution(const Model& model, SolveData& data)
+{
+    // Extract solution from the solve data and put it into the original model.
+
+    Solution sol{};
+
+    auto primal = primal_obj(data.c, data.x_basic, data.basics);
+
+    sol.objective = model.sense() == Model::Sense::MIN ? -1.0 * primal : primal;
+
+    for (std::size_t idx{0}; const auto& var_data : data.basics)
+    {
+        if (!var_data.slack && !var_data.dummy)
+        {
+            sol.variables[model.get_variable(var_data.index)->name()] = data.x_basic(idx, 0);
+        }
+        ++idx;
+    }
+
+    for (const auto& var_data : data.non_basics)
+    {
+        if (!var_data.slack && !var_data.dummy)
+        {
+            sol.variables[model.get_variable(var_data.index)->name()] = 0;
+        }
+    }
 
     return sol;
+}
+
+} // namespace
+
+std::optional<Solution> solve_simplex_revised(const Model& model)
+{
+    // Setup
+    SolveData data{init_data(model)};
+    Parameters params{};
+
+    // Analyse problem
+    bool primal_feasible = data.x_basic.min() >= params.EPS2;
+    bool dual_feasible = data.z_non_basic.min() >= params.EPS2;
+
+    if (primal_feasible)
+    {
+        log()->info("Starting basis is primal feasible");
+    }
+
+    if (dual_feasible)
+    {
+        log()->info("Starting basis is dual feasible");
+    }
+
+    if (!primal_feasible)
+    {
+        throw SolveError("Primal infeasible intial basis");
+    }
+
+    bool has_solution = solve_primal(data, params);
+
+    std::optional<Solution> solution;
+
+    if (has_solution)
+    {
+        solution = extract_solution(model, data);
+
+        log()->debug("---------------------------------------");
+        log()->info("Objective = {:.2f} ({} iterations)", solution->objective, data.n_iter);
+    }
+
+    return solution;
 }
 } // namespace jsolve

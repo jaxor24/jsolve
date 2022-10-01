@@ -7,5 +7,5 @@
 
 namespace jsolve
 {
-std::optional<Solution> solve_primal_revised(const Model& model);
+std::optional<Solution> solve_simplex_revised(const Model& model);
 }

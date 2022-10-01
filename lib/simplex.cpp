@@ -16,7 +16,7 @@ std::optional<Solution> solve(Model& model, alg_type alg)
     }
     else if (alg == alg_type::REVISED)
     {
-        return solve_primal_revised(model);
+        return solve_simplex_revised(model);
     }
     else
     {
