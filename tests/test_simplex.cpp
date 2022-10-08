@@ -1,6 +1,7 @@
 #include "test_includes.h"
 
 #include "models.h"
+#include "mps.h"
 #include "tools.h"
 
 #include <functional>
@@ -331,5 +332,14 @@ TEST_CASE("jsolve::solve")
         REQUIRE(approx_equal(solution.value().variables.at("c4"), 10.5550, eps));
 
         REQUIRE(approx_equal(solution.value().variables.at("pmax"), 11.4, eps));
+    }
+
+    SECTION("model with free vars")
+    {
+        auto model{jsolve::read_mps(get_mps("example_with_free.mps"))};
+        auto solution = current_alg(model);
+
+        REQUIRE(solution.has_value());
+        REQUIRE(approx_equal(solution.value().objective, -5.733333, 1e-4));
     }
 }
