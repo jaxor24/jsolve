@@ -3,18 +3,6 @@
 #include "mps.h"
 #include "simplex_common.h"
 
-#include <filesystem>
-#include <source_location>
-
-namespace
-{
-std::filesystem::path get_mps(std::string file_name)
-{
-    return std::filesystem::path{std::source_location::current().file_name()}.remove_filename() / "mps_examples" /
-           file_name;
-}
-} // namespace
-
 TEST_CASE("jsolve::mps::read_mps", "[matrix]")
 {
     SECTION("model 1")
