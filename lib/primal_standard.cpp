@@ -56,9 +56,8 @@ StandardFormModel to_standard_form(const Model& user_model)
 {
     // Returns A, b and c such that:
     // - objective is maximisation
-    // - constaints are LHS <= RHS
-    // - vars are non-negative
     // - a dummy variable is included for a 2 phase algorithm
+    // - an initial basis is formed with the slacks and dummy variable
     // With:
     // A = n_cons * n_vars (+ 1 dummy)
     // b = n_cons * 1,
@@ -85,20 +84,17 @@ StandardFormModel to_standard_form(const Model& user_model)
 
     // b (RHS) vector
     Mat rhs{num_constr, 1, 0.0};
-    for (const auto& [n_cons, pair] : enumerate(user_model.get_constraints()))
+    for (const auto& [n_cons, cons_pair] : enumerate(user_model.get_constraints()))
     {
-        if (pair.second->type() == Constraint::Type::GREAT)
+        assert(cons_pair.second->type() != Constraint::Type::GREAT); // Impossible from pre-processing
+
+        if (cons_pair.second->type() == Constraint::Type::LESS)
         {
-            // 7x + 2y >= 5 becomes -7x - 2y <= -5
-            rhs(n_cons, 0) = -1 * pair.second->rhs();
-        }
-        else if (pair.second->type() == Constraint::Type::LESS)
-        {
-            rhs(n_cons, 0) = pair.second->rhs();
+            rhs(n_cons, 0) = cons_pair.second->rhs();
         }
         else
         {
-            // Impossible by construction of vector being iterated.
+            rhs(n_cons, 0) = cons_pair.second->rhs();
         }
     }
 
@@ -108,13 +104,14 @@ StandardFormModel to_standard_form(const Model& user_model)
     // Add constraint entries
     for (const auto& [n_cons, cons_pair] : enumerate(user_model.get_constraints()))
     {
-        auto scale = cons_pair.second->type() == Constraint::Type::GREAT ? -1.0 : 1.0;
+        assert(cons_pair.second->type() != Constraint::Type::GREAT); // Impossible from pre-processing
+
         for (const auto& [n_var, var_pair] : enumerate(user_model.get_variables()))
         {
             auto found_entry = cons_pair.second->get_entries().find(var_pair.second.get());
             if (found_entry != std::end(cons_pair.second->get_entries()))
             {
-                A(n_cons, n_var) = scale * found_entry->second;
+                A(n_cons, n_var) = found_entry->second;
             }
         }
     }
