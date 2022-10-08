@@ -6,7 +6,6 @@ using Matr = Matrix<double>;
 
 TEST_CASE("swap_rows", "[matrix]")
 {
-
     SECTION("1x1 matrix")
     {
         Matr m{1, 1, 6};
