@@ -52,6 +52,16 @@ double& Variable::lower_bound()
     return m_lower_bound;
 }
 
+bool Variable::slack() const
+{
+    return m_slack;
+}
+
+bool& Variable::slack()
+{
+    return m_slack;
+}
+
 std::string Variable::to_string() const
 {
     return fmt::format("{}", name().empty() ? fmt::format("v[{}]", n_created()) : name());

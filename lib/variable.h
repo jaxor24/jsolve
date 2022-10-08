@@ -27,6 +27,9 @@ class Variable : public Counter<Variable>
     double lower_bound() const;
     double& lower_bound();
 
+    bool slack() const;
+    bool& slack();
+
     std::string to_string() const;
 
     friend std::ostream& operator<<(std::ostream& os, const Variable& v);
@@ -36,6 +39,7 @@ class Variable : public Counter<Variable>
     double m_cost{0.0};
     double m_lower_bound{0.0};
     double m_upper_bound{std::numeric_limits<double>::infinity()};
+    bool m_slack{false};
 };
 
 std::ostream& operator<<(std::ostream& os, const Variable& v);
