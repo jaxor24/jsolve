@@ -30,6 +30,9 @@ class Variable : public Counter<Variable>
     bool slack() const;
     bool& slack();
 
+    bool artifical() const;
+    bool& artifical();
+
     std::string to_string() const;
 
     friend std::ostream& operator<<(std::ostream& os, const Variable& v);
@@ -40,6 +43,7 @@ class Variable : public Counter<Variable>
     double m_lower_bound{0.0};
     double m_upper_bound{std::numeric_limits<double>::infinity()};
     bool m_slack{false};
+    bool m_artifical{false};
 };
 
 std::ostream& operator<<(std::ostream& os, const Variable& v);
