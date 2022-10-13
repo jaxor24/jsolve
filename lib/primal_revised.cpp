@@ -84,7 +84,7 @@ std::optional<std::size_t> choose_leaving(const Mat& num, const Mat& denom, doub
     return leaving;
 }
 
-double primal_obj(const Mat& c, const Mat& x_basic, const std::vector<VarData>& basics)
+double calc_primal_obj(const Mat& c, const Mat& x_basic, const std::vector<VarData>& basics)
 {
     double primal_obj{0.0};
 
@@ -96,12 +96,32 @@ double primal_obj(const Mat& c, const Mat& x_basic, const std::vector<VarData>& 
     return primal_obj;
 }
 
-void log_iteration(int iter, double obj_phase_1, double obj_phase_2, bool in_phase_1)
+double calc_dual_infeas(const Mat& c, const Mat& x_basic, const std::vector<VarData>& basics)
+{
+    double primal_obj{0.0};
+
+    for (std::size_t curr_idx = 0; curr_idx < x_basic.n_rows(); curr_idx++)
+    {
+        primal_obj += c(basics[curr_idx].index, 0) * x_basic(curr_idx, 0);
+    }
+
+    return primal_obj;
+}
+
+void log_iteration(int iter, const SolveData& data)
 {
     int log_every{1};
 
+    auto sum_if_negative = [](const auto& sum, const auto& current) {
+        return current < 0 ? sum + current : sum;
+    };
+
+    auto primal_obj{calc_primal_obj(data.c, data.x_basic, data.basics)};
+    auto dual_infeas = std::accumulate(std::begin(data.z_non_basic), std::end(data.z_non_basic), 0.0, sum_if_negative);
+    auto primal_infeas = std::accumulate(std::begin(data.x_basic), std::end(data.x_basic), 0.0, sum_if_negative);
+
     std::string progress{fmt::format(
-        "It {:8} Obj {:14.6f} {}", iter, obj_phase_2, in_phase_1 ? fmt::format("P1 Obj {:14.6f}", obj_phase_1) : ""
+        "It {:6} Obj {:12.4f} DInf: {:12.4f} PInf: {:12.4f}", iter, primal_obj, dual_infeas, primal_infeas
     )};
 
     if (iter % log_every == 0)
@@ -112,7 +132,7 @@ void log_iteration(int iter, double obj_phase_1, double obj_phase_2, bool in_pha
     {
         log()->debug(progress);
     }
-}
+} // namespace
 
 SolveData init_data(const Model& model)
 {
@@ -223,7 +243,7 @@ bool solve_primal(SolveData& data, Parameters params)
     // Returns true if a solution is present.
 
     Mat& A = data.A;
-    Mat& c = data.c;
+    // Mat& c = data.c;
     Mat& B = data.B;
     Mat& N = data.N;
     Mat& x_basic = data.x_basic;
@@ -234,7 +254,7 @@ bool solve_primal(SolveData& data, Parameters params)
 
     for (; iter <= params.max_iter; iter++)
     {
-        log_iteration(iter, 0, primal_obj(c, x_basic, basics), false);
+        log_iteration(iter, data);
 
         // 1. Check optimality
         // 2. Find entering variable
@@ -261,7 +281,7 @@ bool solve_primal(SolveData& data, Parameters params)
 
         if (!leaving)
         {
-            log()->warn("Model is unbounded");
+            // Unbounded
             return false;
         }
 
@@ -316,7 +336,7 @@ bool solve_dual(SolveData& data, Parameters params)
     // Returns true if a solution is present.
 
     Mat& A = data.A;
-    Mat& c = data.c;
+    // Mat& c = data.c;
     Mat& B = data.B;
     Mat& N = data.N;
     Mat& x_basic = data.x_basic;
@@ -327,7 +347,7 @@ bool solve_dual(SolveData& data, Parameters params)
 
     for (; iter <= params.max_iter; iter++)
     {
-        log_iteration(iter, 0, primal_obj(c, x_basic, basics), false);
+        log_iteration(iter, data);
 
         // 1. Check optimality
         // 2. Find entering variable
@@ -356,7 +376,7 @@ bool solve_dual(SolveData& data, Parameters params)
 
         if (!leaving)
         {
-            log()->warn("Model is unbounded");
+            // Unbounded
             return false;
         }
 
@@ -412,7 +432,7 @@ Solution extract_solution(const Model& model, SolveData& data)
 
     Solution sol{};
 
-    auto primal = primal_obj(data.c, data.x_basic, data.basics);
+    auto primal = calc_primal_obj(data.c, data.x_basic, data.basics);
 
     sol.objective = model.sense() == Model::Sense::MIN ? -1.0 * primal : primal;
 
@@ -436,6 +456,16 @@ Solution extract_solution(const Model& model, SolveData& data)
     return sol;
 }
 
+bool is_primal_feas(const SolveData& data)
+{
+    return data.x_basic.min() >= 0.0;
+}
+
+bool is_dual_feas(const SolveData& data)
+{
+    return data.z_non_basic.min() >= 0.0;
+}
+
 } // namespace
 
 std::optional<Solution> solve_simplex_revised(const Model& model)
@@ -444,26 +474,78 @@ std::optional<Solution> solve_simplex_revised(const Model& model)
     SolveData data{init_data(model)};
     Parameters params{};
 
-    // Analyse problem
-    bool primal_feasible = data.x_basic.min() >= params.EPS2;
-    bool dual_feasible = data.z_non_basic.min() >= params.EPS2;
-
     bool has_solution{false};
 
-    if (primal_feasible)
+    if (is_primal_feas(data))
     {
         log()->info("Starting basis is primal feasible, using primal simplex algorithm");
         has_solution = solve_primal(data, params);
+
+        if (!has_solution)
+        {
+            log()->warn("Unbounded");
+        }
     }
-    else if (dual_feasible)
+    else if (is_dual_feas(data))
     {
         log()->info("Starting basis is dual feasible, using dual simplex algorithm");
         has_solution = solve_dual(data, params);
+
+        if (!has_solution)
+        {
+            log()->warn("Unbounded");
+        }
     }
     else
     {
-        // Need a phase 1 to handle this
-        throw SolveError("Primal and dual infeasible intial basis");
+        log()->info("Starting basis is primal and dual infeasible, starting phase 1");
+
+        // Change to dummy dual feasible objective (all +1's)
+        auto original_c{data.c};
+        auto original_z_non_basic{data.z_non_basic};
+        data.c = Mat{original_c.n_rows(), original_c.n_cols(), -1};
+
+        for (std::size_t idx{0}; const auto& var : data.non_basics)
+        {
+            data.z_non_basic(idx, 0) = -1.0 * data.c(var.index, 0);
+            idx++;
+        }
+
+        // data.z_non_basic = Mat{original_z_non_basic.n_rows(), original_z_non_basic.n_cols(), 1};
+
+        has_solution = solve_dual(data, params);
+
+        if (has_solution)
+        {
+            log()->info("Restoring objective for phase 2");
+
+            // Restore objective: z_non_basic = transpose(inv(B)*N)*c_b - c_n
+            data.c = original_c;
+
+            auto b_inv_n_t = (inverse(data.B) * data.N).make_transpose();
+
+            log()->debug(b_inv_n_t);
+
+            for (std::size_t idx{0}; const auto& var : data.non_basics)
+            {
+                data.z_non_basic(idx, 0) = -1.0 * data.c(var.index, 0);
+                idx++;
+            }
+
+            for (std::size_t idx{0}; const auto& var : data.basics)
+            {
+                data.z_non_basic.update(
+                    {}, {}, data.z_non_basic.slice({}, {}) + b_inv_n_t.slice({}, idx) * data.c(var.index, 0)
+                );
+                idx++;
+            }
+
+            has_solution = solve_primal(data, params);
+        }
+        else
+        {
+            log()->warn("Infeasible");
+        }
     }
 
     std::optional<Solution> solution;
