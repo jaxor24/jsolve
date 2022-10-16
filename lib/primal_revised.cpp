@@ -171,6 +171,7 @@ SolveData init_data(const Model& model)
 
     if (model.sense() == Model::Sense::MIN)
     {
+        // todo - this making -0
         c *= -1;
     }
 
