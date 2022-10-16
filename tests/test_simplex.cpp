@@ -342,4 +342,17 @@ TEST_CASE("jsolve::solve")
         REQUIRE(solution.has_value());
         REQUIRE(approx_equal(solution.value().objective, -5.733333, 1e-4));
     }
+
+        SECTION("model 25")
+    {
+        INFO("Solver: " << alg_str);
+        auto model = models::make_model_25();
+        auto solution = current_alg(model);
+
+        REQUIRE(solution.has_value());
+        REQUIRE(approx_equal(solution.value().objective, 6));
+        REQUIRE(approx_equal(solution.value().variables.at("x1"), 1));
+        REQUIRE(approx_equal(solution.value().variables.at("x2"), 1));
+        REQUIRE(approx_equal(solution.value().variables.at("x3"), 1));
+    }
 }
