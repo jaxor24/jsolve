@@ -96,18 +96,6 @@ double calc_primal_obj(const Mat& c, const Mat& x_basic, const std::vector<VarDa
     return primal_obj;
 }
 
-double calc_dual_infeas(const Mat& c, const Mat& x_basic, const std::vector<VarData>& basics)
-{
-    double primal_obj{0.0};
-
-    for (std::size_t curr_idx = 0; curr_idx < x_basic.n_rows(); curr_idx++)
-    {
-        primal_obj += c(basics[curr_idx].index, 0) * x_basic(curr_idx, 0);
-    }
-
-    return primal_obj;
-}
-
 void log_iteration(int iter, const SolveData& data)
 {
     int log_every{1};
@@ -467,6 +455,11 @@ bool is_dual_feas(const SolveData& data)
     return data.z_non_basic.min() >= 0.0;
 }
 
+bool has_artifical_vars_in_basis(const SolveData& data)
+{
+    return std::ranges::any_of(data.basics, [](const auto& var) { return var.dummy; });
+}
+
 } // namespace
 
 std::optional<Solution> solve_simplex_revised(const Model& model)
@@ -475,9 +468,23 @@ std::optional<Solution> solve_simplex_revised(const Model& model)
     SolveData data{init_data(model)};
     Parameters params{};
 
+    // We have added artifial variables to the model which cannot be in the basis of an optimal solution
+    // to the original problem. We therefore must therefore drive them out of the basis in these cases.
+    // e.g. Consider a minimisation problem in which the artifical variables are not in the original objective. 
+    // An 'optimal' solution has them soak up all the primal infeasibility and the objective remains zero.
+
     bool has_solution{false};
 
-    if (is_primal_feas(data))
+    bool primal_feas{is_primal_feas(data)};
+    bool dual_feas{is_dual_feas(data)};
+    bool artificial_basis{has_artifical_vars_in_basis(data)};
+
+    if (primal_feas && dual_feas)
+    {
+        log()->info("Starting basis is primal and dual feasible, already optimal");
+        has_solution = true;
+    }
+    else if (primal_feas)
     {
         log()->info("Starting basis is primal feasible, using primal simplex algorithm");
         has_solution = solve_primal(data, params);
@@ -487,7 +494,7 @@ std::optional<Solution> solve_simplex_revised(const Model& model)
             log()->warn("Unbounded");
         }
     }
-    else if (is_dual_feas(data))
+    else if (dual_feas)
     {
         log()->info("Starting basis is dual feasible, using dual simplex algorithm");
         has_solution = solve_dual(data, params);
@@ -515,6 +522,11 @@ std::optional<Solution> solve_simplex_revised(const Model& model)
         // data.z_non_basic = Mat{original_z_non_basic.n_rows(), original_z_non_basic.n_cols(), 1};
 
         has_solution = solve_dual(data, params);
+
+        if (has_artifical_vars_in_basis(data))
+        {
+            // drive from basis routine
+        }
 
         if (has_solution)
         {
@@ -547,6 +559,11 @@ std::optional<Solution> solve_simplex_revised(const Model& model)
         {
             log()->warn("Infeasible");
         }
+    }
+
+    if (artificial_basis)
+    {
+        // drive from basis routine;
     }
 
     std::optional<Solution> solution;
