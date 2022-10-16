@@ -13,10 +13,12 @@ using Mat = Matrix<double>;
 
 struct VarData
 {
-    int index{0};      // The index with respect to the original user model
-    int subscript{0};  // The subscript to use within the simplex algorithm
-    bool slack{false}; // Potentially not needed
+    int index{0};       // The index with respect to the original user model
+    int subscript{0};   // The subscript to use within the simplex algorithm
+    bool slack{false};  // Potentially not needed
     bool dummy{false};
+
+    bool operator==(const VarData&) const = default;
 };
 
 struct Locations

@@ -225,6 +225,20 @@ SolveData init_data(const Model& model)
     return {A, c, B, N, x_basic, z_non_basic, basics, non_basics};
 }
 
+void update_basis(SolveData& data, const VarData& entering, const VarData& leaving)
+{
+    // Swap entering and leaving in the basis.
+    std::size_t entering_idx =
+        std::find(std::begin(data.non_basics), std::end(data.non_basics), entering) - std::begin(data.non_basics);
+
+    std::size_t leaving_idx =
+        std::find(std::begin(data.basics), std::end(data.basics), leaving) - std::begin(data.basics);
+
+    data.B.update({}, {leaving_idx}, data.A.slice({}, static_cast<std::size_t>(entering.index)));
+    data.N.update({}, {entering_idx}, data.A.slice({}, static_cast<std::size_t>(leaving.index)));
+    std::swap(data.basics[leaving_idx], data.non_basics[entering_idx]);
+}
+
 bool solve_primal(SolveData& data, Parameters params)
 {
     // Solve using the primal (revised) simplex algorithm.
@@ -561,9 +575,39 @@ std::optional<Solution> solve_simplex_revised(const Model& model)
         }
     }
 
+    auto get_identity_row = [](std::size_t n, std::size_t row) {
+        // Row is zero based
+        auto m = Mat{1, n, 0};
+        m(0, row) = 1;
+        return m;
+    };
+
     if (artificial_basis)
     {
-        // drive from basis routine;
+        // Routine for driving artifical variables from a basis.
+        // Following Chvatal page 130.
+
+        std::vector<VarData> artif_in_basis;
+        std::ranges::copy_if(data.basics, std::back_inserter(artif_in_basis), [](const auto& var) {
+            return var.dummy;
+        }
+        );
+
+        while (!artif_in_basis.empty())
+        {
+            auto leaving_var = artif_in_basis.back();
+            artif_in_basis.pop_back();
+            auto result = get_identity_row(data.B.n_rows(), leaving_var.index) * inverse(data.B) * data.A;
+
+            for (const auto& entering_var : data.non_basics)
+            {
+                if (std::abs(result(0, entering_var.index)) > 0)
+                {
+                    update_basis(data, entering_var, leaving_var);
+                    break;
+                }
+            }
+        }
     }
 
     std::optional<Solution> solution;
