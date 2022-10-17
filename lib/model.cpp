@@ -169,6 +169,11 @@ Constraint* Model::get_constraint(const std::string& name) const
 
 void Model::remove_variable(const std::string& name)
 {
+    for (auto& [constraint_name, constraint] : m_constraints)
+    {
+        constraint->get_entries().erase(get_variable(name));
+    }
+
     [[maybe_unused]] auto result = m_variables.erase(name);
 }
 
