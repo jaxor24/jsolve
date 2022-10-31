@@ -20,6 +20,8 @@ void init_logging(std::string level)
 
     auto logger = std::make_shared<spdlog::logger>("logger", sinks.begin(), sinks.end());
 
+    logger->set_pattern("[%n][%l] %v");
+
     if (level == "off")
     {
         logger->set_level(spdlog::level::off);
