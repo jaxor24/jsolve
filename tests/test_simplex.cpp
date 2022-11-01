@@ -24,6 +24,18 @@ TEST_CASE("jsolve::solve")
         as<test_data>{}, std::make_pair(standard, "Standard Simplex"), std::make_pair(revised, "Revised Simplex")
     );
 
+    SECTION("model 0")
+    {
+        INFO("Solver: " << alg_str);
+        auto model = models::make_model_0();
+        auto solution = current_alg(model);
+
+        REQUIRE(solution.has_value());
+        REQUIRE(solution.value().objective == 31.0);
+        REQUIRE(solution.value().variables.at("x1") == 4.0);
+        REQUIRE(solution.value().variables.at("x2") == 5.0);
+    }
+
     SECTION("model 1")
     {
         INFO("Solver: " << alg_str);
