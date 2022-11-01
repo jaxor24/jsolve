@@ -1187,7 +1187,7 @@ jsolve::Model make_model_25()
 
 jsolve::Model make_model_26()
 {
-    // Frabicrated model with only EQ constraints
+    // Fabricated model with only EQ constraints
     // Max objective requires two phase plus artifical vars to be driven from basis.
 
     auto m = jsolve::Model(jsolve::Model::Sense::MAX, "JR_EQ_MAX");
