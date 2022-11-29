@@ -138,6 +138,42 @@ TEST_CASE("swap_rows", "[matrix]")
 
 TEST_CASE("inverse", "[matrix]")
 {
+    SECTION("random matrix")
+    {
+        // Generate random matrix
+        auto n = std::size_t{10};
+        auto elements = GENERATE(take(100, chunk(10*10, random(-1000.0, 1000.0))));
+
+        Matr m{n, n, 0.0};
+
+        for (std::size_t i{ 0 } ; auto& e : m)
+        {
+            e = elements[i];
+            i++;
+        }
+
+        // Invert
+        auto identity = m * inverse(m);
+
+        INFO("Matrix: " << identity);
+
+        // Assert it is the identity matrix
+        for (std::size_t i{0}; auto& e : identity)
+        {
+            auto d = std::lldiv(i, n);
+            if (d.quot == d.rem)
+            {
+                // Diagonal
+                CHECK_THAT(e, Catch::Matchers::WithinAbs(1, 1e-8));
+            }
+            else
+            {
+                // Off diagonal
+                CHECK_THAT(e, Catch::Matchers::WithinAbs(0, 1e-8));
+            }
+            i++;
+        }
+    }
 
     SECTION("1x1 matrix")
     {
