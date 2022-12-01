@@ -34,6 +34,10 @@ void init_logging(std::string level)
     {
         logger->set_level(spdlog::level::info);
     }
+    else if (level == "trace")
+    {
+        logger->set_level(spdlog::level::trace);
+    }
     else
     {
         logger->set_level(spdlog::level::info);
