@@ -118,36 +118,32 @@ SolveData init_data(const Model& model)
 {
     // Setup the variables needed to conduct iterations of the revised simplex algorithm.
 
-    auto num_user_vars = model.get_variables().size();
+    auto num_vars = model.get_variables().size();
     auto num_constr = model.get_constraints().size();
 
-    auto n = num_user_vars;
+    auto n = num_vars;
     auto m = num_constr;
-    auto total_vars = n + m;
 
-    Mat A{m, total_vars, 0.0};
+    // Populate A matrix
 
+    Mat A{m, n, 0.0};
     for (const auto& [n_cons, cons_pair] : enumerate(model.get_constraints()))
     {
-        // Build B as the identity
-        A(n_cons, n + n_cons) = 1.0;
-
-        // Build N using entries from constraints
-        auto scale = cons_pair.second->type() == Constraint::Type::GREAT ? -1.0 : 1.0;
+        assert(cons_pair.second->type() == Constraint::Type::EQUAL);
         for (const auto& [n_var, var_pair] : enumerate(model.get_variables()))
         {
             auto found_entry = cons_pair.second->get_entries().find(var_pair.second.get());
             if (found_entry != std::end(cons_pair.second->get_entries()))
             {
-                A(n_cons, n_var) = scale * found_entry->second;
+                A(n_cons, n_var) = found_entry->second;
             }
         }
     }
 
     log()->debug(A);
 
-    // Create c column vector = [c | 0]
-    Mat c{total_vars, 1, 0.0};
+    // Create c column vector = [c]
+    Mat c{n, 1, 0.0};
     for (const auto& [n_var, pair] : enumerate(model.get_variables()))
     {
         c(n_var, 0) = pair.second->cost();
@@ -164,53 +160,55 @@ SolveData init_data(const Model& model)
     Mat b{m, 1, 0.0};
     for (const auto& [n_cons, pair] : enumerate(model.get_constraints()))
     {
-        if (pair.second->type() == Constraint::Type::GREAT)
-        {
-            // 7x + 2y >= 5 becomes -7x - 2y <= -5
-            b(n_cons, 0) = -1 * pair.second->rhs();
-        }
-        else if (pair.second->type() == Constraint::Type::LESS)
-        {
-            b(n_cons, 0) = pair.second->rhs();
-        }
-        else
-        {
-            // Impossible by construction of vector being iterated.
-        }
+        assert(pair.second->type() == Constraint::Type::EQUAL);
+        b(n_cons, 0) = pair.second->rhs();
     }
 
     log()->debug(b);
 
-    // Setup the initial basis data
-    std::vector<VarData> basics;
-    basics.reserve(n);
-    std::vector<VarData> non_basics;
-    non_basics.reserve(m);
+    // Find the initial basis
 
-    for (std::size_t index = 0; index < total_vars; index++)
+    std::size_t basis_size = std::ranges::count_if(model.get_variables(), [](const auto& pair) {
+        return pair.second->slack() || pair.second->artifical();
+    });
+
+    std::vector<VarData> basics;
+    basics.reserve(basis_size);
+    std::vector<VarData> non_basics;
+    non_basics.reserve(n - basis_size);
+
+    Mat B{m, basis_size};
+    Mat N{m, n - basis_size};
+
+    Mat x_basic{b};
+    Mat z_non_basic{n - basis_size, 1};
+
+    // TODO - Clean this up with std::mdspan
+    for (const auto& [n_var, var_pair] : enumerate(model.get_variables()))
     {
-        if (index < n)
+        auto index = static_cast<int>(n_var);
+        if (var_pair.second->artifical())
         {
-            non_basics.push_back(
-                {static_cast<int>(index), // These are the only index variables we care about
-                 static_cast<int>(index), false, false}
-            );
+            basics.push_back({index, index, true, true});
+            B.update({}, {basics.size() - 1}, A.slice({}, {n_var}));
+        }
+        else if (var_pair.second->slack())
+        {
+            basics.push_back({index, index, true, false});
+            B.update({}, {basics.size() - 1}, A.slice({}, {n_var}));
         }
         else
         {
-            basics.push_back({static_cast<int>(index), static_cast<int>(index), true, false});
+            non_basics.push_back({index, index, false, false});
+            N.update({}, {non_basics.size() - 1}, A.slice({}, {n_var}));
+            z_non_basic(non_basics.size() - 1, 0) = -1.0 * c(n_var, 0);
         }
     }
 
     // For the simplex we need:
-    auto B = A.slice({}, {n, n + m - 1});
-    auto N = A.slice({}, {0, n - 1});
 
     log()->debug(B);
     log()->debug(N);
-
-    auto x_basic = b;
-    auto z_non_basic = -c.slice({0, n - 1}, {});
 
     log()->debug(x_basic);
     log()->debug(z_non_basic);
