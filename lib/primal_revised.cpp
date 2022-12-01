@@ -112,9 +112,24 @@ void log_iteration(int iter, const SolveData& data)
         "It {:6} Obj {:12.4f} DInf: {:12.4f} PInf: {:12.4f}", iter, primal_obj, dual_infeas, primal_infeas
     )};
 
+
+    std::set<int> setbasis;
+    for (const auto& e: data.basics)
+    {
+        setbasis.insert(e.index);
+    }
+
+    std::string basis;
+    for (const auto& e : setbasis)
+    {
+        basis += fmt::format("{:4}", e);
+    }
+
+
     if (iter % log_every == 0)
     {
         log()->info(progress);
+        log()->info("Basis: {}", basis);
     }
     else
     {
@@ -274,12 +289,22 @@ bool solve_primal(SolveData& data, Parameters params)
         // dx = inv(B) * N * ej
         // where j = entering index
 
-        auto b_inverse_n = inverse(B) * N;
+        log()->trace(B);
+        log()->trace(N);
+
+        auto inv_b = inverse(B);
+        auto b_inverse_n = inv_b * N;
         auto dx = b_inverse_n.slice({}, {entering.value()});
 
-        log()->debug(dx);
+        log()->trace(inv_b);
+        log()->trace(x_basic);
+        log()->trace(dx);
 
         // 4. Find the leaving variable
+        //std::pair<std::optional<std::size_t>, double> leaving_data = choose_leaving_max(dx, x_basic, params.EPS1);
+
+        //std::optional<std::size_t> leaving = leaving_data.first;
+
         std::optional<std::size_t> leaving = choose_leaving(x_basic, dx, params.EPS1);
 
         if (!leaving)
@@ -287,6 +312,8 @@ bool solve_primal(SolveData& data, Parameters params)
             // Unbounded
             return false;
         }
+
+        log()->debug("Entering: {} Leaving: {}", entering.value(), leaving.value());
 
         // 5. Calculate primal step length
         // t = x/dx
@@ -306,10 +333,13 @@ bool solve_primal(SolveData& data, Parameters params)
 
         // 8. Update primal and dual solutions
         x_basic = x_basic - t * dx;
-        x_basic(leaving.value(), 0) = t;
+        x_basic(leaving.value(), 0) = t;      
 
         z_non_basic = z_non_basic - s * dz;
         z_non_basic(entering.value(), 0) = s;
+
+        log()->debug("t = {}", t);
+        log()->debug("s = {}", s);
 
         // 9. Update variables
         B.update({}, {leaving.value()}, A.slice({}, static_cast<std::size_t>(non_basics[entering.value()].index)));
@@ -441,19 +471,13 @@ Solution extract_solution(const Model& model, SolveData& data)
 
     for (std::size_t idx{0}; const auto& var_data : data.basics)
     {
-        if (!var_data.slack && !var_data.dummy)
-        {
-            sol.variables[model.get_variable(var_data.index)->name()] = data.x_basic(idx, 0);
-        }
+        sol.variables[model.get_variable(var_data.index)->name()] = data.x_basic(idx, 0);
         ++idx;
     }
 
     for (const auto& var_data : data.non_basics)
     {
-        if (!var_data.slack && !var_data.dummy)
-        {
-            sol.variables[model.get_variable(var_data.index)->name()] = 0;
-        }
+        sol.variables[model.get_variable(var_data.index)->name()] = 0;
     }
 
     return sol;
@@ -469,11 +493,42 @@ bool is_dual_feas(const SolveData& data)
     return data.z_non_basic.min() >= 0.0;
 }
 
-bool has_artifical_vars_in_basis(const SolveData& data)
+bool has_artificals_in_basis(const SolveData& data)
 {
     return std::ranges::any_of(data.basics, [](const auto& var) { return var.dummy; });
 }
 
+void remove_artificals_from_basis(SolveData& data)
+{
+    // Routine for driving artifical variables from a basis.
+    // Following Chvatal page 130.
+
+    auto get_identity_row = [](std::size_t n, std::size_t row) {
+        // Row is zero based
+        auto m = Mat{1, n, 0};
+        m(0, row) = 1;
+        return m;
+    };
+
+    std::vector<VarData> artif_in_basis;
+    std::ranges::copy_if(data.basics, std::back_inserter(artif_in_basis), [](const auto& var) { return var.dummy; });
+
+    while (!artif_in_basis.empty())
+    {
+        auto leaving_var = artif_in_basis.back();
+        artif_in_basis.pop_back();
+        auto result = get_identity_row(data.B.n_rows(), leaving_var.index) * inverse(data.B) * data.A;
+
+        for (const auto& entering_var : data.non_basics)
+        {
+            if (std::abs(result(0, entering_var.index)) > 0)
+            {
+                update_basis(data, entering_var, leaving_var);
+                break;
+            }
+        }
+    }
+}
 } // namespace
 
 std::optional<Solution> solve_simplex_revised(const Model& model)
@@ -487,11 +542,29 @@ std::optional<Solution> solve_simplex_revised(const Model& model)
     // e.g. Consider a minimisation problem in which the artifical variables are not in the original objective. 
     // An 'optimal' solution has them soak up all the primal infeasibility and the objective remains zero.
 
+    //// Convert to phase 1 objective
+    //auto original_c{data.c};
+    //auto original_z_non_basic{data.z_non_basic};
+    //data.c = Mat{original_c.n_rows(), original_c.n_cols(), 0};
+
+    //// Set all artificial vars to have -1 coefficient
+    //for (std::size_t idx{0}; const auto& var : data.basics)
+    //{
+    //    data.c(var.index, 0) = -1;
+    //    idx++;
+    //}
+
+    //// Update z_non_basic
+    //for (std::size_t idx{0}; const auto& var : data.non_basics)
+    //{
+    //    data.z_non_basic(idx, 0) = -1.0 * data.c(var.index, 0);
+    //    idx++;
+    //}
+
     bool has_solution{false};
 
     bool primal_feas{is_primal_feas(data)};
     bool dual_feas{is_dual_feas(data)};
-    bool artificial_basis{has_artifical_vars_in_basis(data)};
 
     if (primal_feas && dual_feas)
     {
@@ -537,9 +610,10 @@ std::optional<Solution> solve_simplex_revised(const Model& model)
 
         has_solution = solve_dual(data, params);
 
-        if (has_artifical_vars_in_basis(data))
+        if (has_artificals_in_basis(data))
         {
-            // drive from basis routine
+            log()->info("Removing artificial variables from basis");
+            remove_artificals_from_basis(data);
         }
 
         if (has_solution)
@@ -575,39 +649,11 @@ std::optional<Solution> solve_simplex_revised(const Model& model)
         }
     }
 
-    auto get_identity_row = [](std::size_t n, std::size_t row) {
-        // Row is zero based
-        auto m = Mat{1, n, 0};
-        m(0, row) = 1;
-        return m;
-    };
-
-    if (artificial_basis)
+    if (has_artificals_in_basis(data))
     {
-        // Routine for driving artifical variables from a basis.
-        // Following Chvatal page 130.
-
-        std::vector<VarData> artif_in_basis;
-        std::ranges::copy_if(data.basics, std::back_inserter(artif_in_basis), [](const auto& var) {
-            return var.dummy;
-        }
-        );
-
-        while (!artif_in_basis.empty())
-        {
-            auto leaving_var = artif_in_basis.back();
-            artif_in_basis.pop_back();
-            auto result = get_identity_row(data.B.n_rows(), leaving_var.index) * inverse(data.B) * data.A;
-
-            for (const auto& entering_var : data.non_basics)
-            {
-                if (std::abs(result(0, entering_var.index)) > 0)
-                {
-                    update_basis(data, entering_var, leaving_var);
-                    break;
-                }
-            }
-        }
+        log()->info("Removing artificial variables from basis");
+        remove_artificals_from_basis(data);
+        assert(!has_artificals_in_basis(data));
     }
 
     std::optional<Solution> solution;
@@ -622,4 +668,5 @@ std::optional<Solution> solve_simplex_revised(const Model& model)
 
     return solution;
 }
+
 } // namespace jsolve
