@@ -5,6 +5,7 @@
 #include "variable.h"
 
 #include "solve_error.h"
+#include "solve_gauss.h"
 
 #include "matrix.h"
 #include "tools.h"
@@ -251,8 +252,7 @@ bool solve_primal(SolveData& data, Parameters params)
         // dx = inv(B) * N * ej
         // where j = entering index
 
-        auto b_inverse_n = inverse(B) * N;
-        auto dx = b_inverse_n.slice({}, {entering.value()});
+        auto dx = solve_gauss(B, N.slice({}, {entering.value()}));
 
         log()->debug(dx);
 
@@ -274,7 +274,11 @@ bool solve_primal(SolveData& data, Parameters params)
         // dz = -1 * transpose(inv(B)*N) * ei
         // where i = leaving index
 
-        auto dz = -1.0 * (b_inverse_n.slice({leaving.value()}, {})).make_transpose();
+        auto ei = Mat{B.n_rows(), 1};
+        ei(leaving.value(), 0) = 1;
+        auto v = solve_gauss(B.make_transpose(), ei);
+        auto dz = -1.0 * N.make_transpose() * v;
+
         log()->debug(dz);
 
         // 7. Calculate dual step lengths
@@ -345,8 +349,10 @@ bool solve_dual(SolveData& data, Parameters params)
         // dz = -1 * transpose(inv(B)*N) * ei
         // where i = entering index
 
-        auto b_inverse_n = inverse(B) * N;
-        auto dz = -1.0 * (b_inverse_n.slice({entering.value()}, {})).make_transpose();
+        auto ei = Mat{B.n_rows(), 1};
+        ei(entering.value(), 0) = 1;
+        auto v = solve_gauss(B.make_transpose(), ei);
+        auto dz = -1.0 * N.make_transpose() * v;
 
         log()->debug(dz);
 
@@ -369,7 +375,8 @@ bool solve_dual(SolveData& data, Parameters params)
         // dx = inv(B) * N * ej
         // where j = leaving index
 
-        auto dx = b_inverse_n.slice({}, {leaving.value()});
+        auto dx = solve_gauss(B, N.slice({}, {leaving.value()}));
+
         log()->debug(dx);
 
         // 7. Calculate dual step lengths
