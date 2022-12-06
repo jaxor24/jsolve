@@ -265,6 +265,8 @@ bool solve_primal(SolveData& data, Parameters params)
             return false;
         }
 
+        log()->debug("Entering: {} Leaving: {}", entering.value(), leaving.value());
+
         // 5. Calculate primal step length
         // t = x/dx
 
