@@ -262,7 +262,7 @@ bool solve_primal(SolveData& data, Parameters params)
 
         if (!leaving)
         {
-            log()->warn("Model is unbounded");
+            // Unbounded
             return false;
         }
 
@@ -365,7 +365,7 @@ bool solve_dual(SolveData& data, Parameters params)
 
         if (!leaving)
         {
-            log()->warn("Model is unbounded");
+            // Unbounded
             return false;
         }
 
