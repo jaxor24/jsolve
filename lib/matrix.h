@@ -10,6 +10,7 @@
 #include <iostream>
 #include <numeric>
 #include <optional>
+#include <utility>
 #include <vector>
 
 template <typename T>
@@ -40,6 +41,7 @@ class Matrix
     std::pair<Matrix<T>, Matrix<std::size_t>> col_min() const;
 
     Matrix make_transpose() const;
+    Matrix abs() const;
 
     Matrix slice(Range rows, Range cols) const;
 
@@ -102,7 +104,6 @@ class Matrix
 };
 
 #include "matrix_free_function.hpp"
-#include "matrix_inverse.hpp"
 #include "matrix_operator.hpp"
 
 // Matrix:: member functions
@@ -232,6 +233,14 @@ Matrix<T> Matrix<T>::make_transpose() const
         }
     }
 
+    return result;
+}
+
+template <typename T>
+Matrix<T> Matrix<T>::abs() const
+{
+    Matrix result{*this};
+    std::for_each(std::begin(result.m_data), std::end(result.m_data), [](auto& elem) { elem = std::abs(elem); });
     return result;
 }
 

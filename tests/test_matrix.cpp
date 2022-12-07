@@ -681,6 +681,34 @@ TEST_CASE("matrix::make_transpose", "[matrix]")
     }
 }
 
+TEST_CASE("matrix::abs", "[matrix]")
+{
+    SECTION("1x1 matrix")
+    {
+        Matr m{1, 1, -1.0};
+        auto result = m.abs();
+        REQUIRE(result.n_rows() == m.n_cols());
+        REQUIRE(result.n_cols() == m.n_rows());
+        REQUIRE(result(0, 0) == 1);
+    }
+
+    SECTION("2x2 matrix")
+    {
+        Matr m{2, 2, 0.0};
+        m(0, 0) = 1;
+        m(0, 1) = -2;
+        m(1, 0) = -3;
+        m(1, 1) = 4;
+        auto result = m.abs();
+        REQUIRE(result.n_rows() == m.n_cols());
+        REQUIRE(result.n_cols() == m.n_rows());
+        REQUIRE(result(0, 0) == 1);
+        REQUIRE(result(0, 1) == 2);
+        REQUIRE(result(1, 0) == 3);
+        REQUIRE(result(1, 1) == 4);
+    }
+}
+
 TEST_CASE("matrix::slice", "[matrix]")
 {
     SECTION("3x3 matrix")

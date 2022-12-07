@@ -1145,4 +1145,124 @@ jsolve::Model make_model_24()
 
     return m;
 }
+
+jsolve::Model make_model_25()
+{
+    // Frabicrated model with only EQ constraints
+    // Min objective requires artifical vars to be driven from the basis.
+
+    auto m = jsolve::Model(jsolve::Model::Sense::MIN, "JR_EQ_MIN");
+
+    auto* x1 = m.make_variable(jsolve::Variable::Type::LINEAR, "x1");
+    auto* x2 = m.make_variable(jsolve::Variable::Type::LINEAR, "x2");
+    auto* x3 = m.make_variable(jsolve::Variable::Type::LINEAR, "x3");
+
+    x1->cost() = 1;
+    x2->cost() = 2;
+    x3->cost() = 3;
+
+    {
+        auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "C1");
+        c->rhs() = 2;
+        c->add_to_lhs(1, x1);
+        c->add_to_lhs(1, x2);
+    }
+
+    {
+        auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "C2");
+        c->rhs() = 2;
+        c->add_to_lhs(1, x2);
+        c->add_to_lhs(1, x3);
+    }
+
+    {
+        auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "C3");
+        c->rhs() = 2;
+        c->add_to_lhs(1, x1);
+        c->add_to_lhs(1, x3);
+    }
+
+    return m;
+}
+
+jsolve::Model make_model_26()
+{
+    // Fabricated model with only EQ constraints
+    // Max objective requires two phase plus artifical vars to be driven from basis.
+
+    auto m = jsolve::Model(jsolve::Model::Sense::MAX, "JR_EQ_MAX");
+
+    auto* x1 = m.make_variable(jsolve::Variable::Type::LINEAR, "x1");
+    auto* x2 = m.make_variable(jsolve::Variable::Type::LINEAR, "x2");
+    auto* x3 = m.make_variable(jsolve::Variable::Type::LINEAR, "x3");
+
+    x1->cost() = 1;
+    x2->cost() = 2;
+    x3->cost() = 3;
+
+    {
+        auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "C1");
+        c->rhs() = 2;
+        c->add_to_lhs(1, x1);
+        c->add_to_lhs(1, x2);
+    }
+
+    {
+        auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "C2");
+        c->rhs() = 2;
+        c->add_to_lhs(1, x2);
+        c->add_to_lhs(1, x3);
+    }
+
+    {
+        auto* c = m.make_constraint(jsolve::Constraint::Type::EQUAL, "C3");
+        c->rhs() = 2;
+        c->add_to_lhs(1, x1);
+        c->add_to_lhs(1, x3);
+    }
+
+    return m;
+}
+
+jsolve::Model make_model_27()
+{
+    // Frabicrated model with <= 0 constraints.
+
+    auto m = jsolve::Model(jsolve::Model::Sense::MIN, "JR_LEQ_ZERO");
+
+    auto* x1 = m.make_variable(jsolve::Variable::Type::LINEAR, "x1");
+    auto* x2 = m.make_variable(jsolve::Variable::Type::LINEAR, "x2");
+    auto* x3 = m.make_variable(jsolve::Variable::Type::LINEAR, "x3");
+
+    x1->cost() = -1;
+    x2->cost() = 1;
+    x3->cost() = 1;
+
+    {
+        auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C1");
+        c->rhs() = 0;
+        c->add_to_lhs(-0.8, x1);
+        c->add_to_lhs(0.1, x2);
+        c->add_to_lhs(0.15, x3);
+    }
+
+    {
+        auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C2");
+        c->rhs() = 0;
+        c->add_to_lhs(0.1, x1);
+        c->add_to_lhs(-0.8, x2);
+        c->add_to_lhs(0.15, x3);
+    }
+
+        {
+        auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C3");
+        c->rhs() = 1;
+        c->add_to_lhs(1, x1);
+        c->add_to_lhs(1, x2);
+        c->add_to_lhs(1, x3);
+    }
+
+    return m;
+}
+
 } // namespace models

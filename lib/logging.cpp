@@ -20,6 +20,8 @@ void init_logging(std::string level)
 
     auto logger = std::make_shared<spdlog::logger>("logger", sinks.begin(), sinks.end());
 
+    logger->set_pattern("[%n][%l] %v");
+
     if (level == "off")
     {
         logger->set_level(spdlog::level::off);
@@ -31,6 +33,10 @@ void init_logging(std::string level)
     else if (level == "info")
     {
         logger->set_level(spdlog::level::info);
+    }
+    else if (level == "trace")
+    {
+        logger->set_level(spdlog::level::trace);
     }
     else
     {

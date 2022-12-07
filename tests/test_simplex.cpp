@@ -16,11 +16,25 @@ TEST_CASE("jsolve::solve")
         return jsolve::solve(model, jsolve::alg_type::STANDARD);
     };
 
-    // auto revised = [](jsolve::Model& model) {
-    //     return jsolve::solve(model, jsolve::alg_type::REVISED);
-    // };
+    auto revised = [](jsolve::Model& model) {
+        return jsolve::solve(model, jsolve::alg_type::REVISED);
+    };
 
-    auto [current_alg, alg_str] = GENERATE_COPY(as<test_data>{}, std::make_pair(standard, "Standard Simplex"));
+    auto [current_alg, alg_str] = GENERATE_COPY(
+        as<test_data>{}, std::make_pair(standard, "Standard Simplex"), std::make_pair(revised, "Revised Simplex")
+    );
+
+    SECTION("model 0")
+    {
+        INFO("Solver: " << alg_str);
+        auto model = models::make_model_0();
+        auto solution = current_alg(model);
+
+        REQUIRE(solution.has_value());
+        REQUIRE(solution.value().objective == 31.0);
+        REQUIRE(solution.value().variables.at("x1") == 4.0);
+        REQUIRE(solution.value().variables.at("x2") == 5.0);
+    }
 
     SECTION("model 1")
     {
@@ -339,5 +353,31 @@ TEST_CASE("jsolve::solve")
 
         REQUIRE(solution.has_value());
         REQUIRE(approx_equal(solution.value().objective, -5.733333, 1e-4));
+    }
+
+    SECTION("model 25")
+    {
+        INFO("Solver: " << alg_str);
+        auto model = models::make_model_25();
+        auto solution = current_alg(model);
+
+        REQUIRE(solution.has_value());
+        REQUIRE(approx_equal(solution.value().objective, 6));
+        REQUIRE(approx_equal(solution.value().variables.at("x1"), 1));
+        REQUIRE(approx_equal(solution.value().variables.at("x2"), 1));
+        REQUIRE(approx_equal(solution.value().variables.at("x3"), 1));
+    }
+
+    SECTION("model 26")
+    {
+        INFO("Solver: " << alg_str);
+        auto model = models::make_model_26();
+        auto solution = current_alg(model);
+
+        REQUIRE(solution.has_value());
+        REQUIRE(approx_equal(solution.value().objective, 6));
+        REQUIRE(approx_equal(solution.value().variables.at("x1"), 1));
+        REQUIRE(approx_equal(solution.value().variables.at("x2"), 1));
+        REQUIRE(approx_equal(solution.value().variables.at("x3"), 1));
     }
 }

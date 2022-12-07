@@ -62,6 +62,16 @@ bool& Variable::slack()
     return m_slack;
 }
 
+bool Variable::artifical() const
+{
+    return m_artifical;
+}
+
+bool& Variable::artifical()
+{
+    return m_artifical;
+}
+
 std::string Variable::to_string() const
 {
     return fmt::format("{}", name().empty() ? fmt::format("v[{}]", n_created()) : name());

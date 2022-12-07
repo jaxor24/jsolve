@@ -27,4 +27,7 @@ jsolve::Model make_model_21();
 jsolve::Model make_model_22();
 jsolve::Model make_model_23();
 jsolve::Model make_model_24();
+jsolve::Model make_model_25();
+jsolve::Model make_model_26();
+jsolve::Model make_model_27();
 } // namespace models

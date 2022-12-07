@@ -40,6 +40,7 @@ template <typename T>
 std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 {
     os << std::fixed << std::setprecision(4);
+    os << "\n";
     os << "[";
     for (const auto& [n_elem, elem] : enumerate(m.m_data))
     {
