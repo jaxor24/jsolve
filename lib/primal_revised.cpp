@@ -85,7 +85,7 @@ std::optional<std::size_t> choose_leaving(const Mat& num, const Mat& denom, doub
     return leaving;
 }
 
-double primal_obj(const Mat& c, const Mat& x_basic, const std::vector<VarData>& basics)
+double calc_primal_obj(const Mat& c, const Mat& x_basic, const std::vector<VarData>& basics)
 {
     double primal_obj{0.0};
 
@@ -97,12 +97,20 @@ double primal_obj(const Mat& c, const Mat& x_basic, const std::vector<VarData>& 
     return primal_obj;
 }
 
-void log_iteration(int iter, double obj_phase_1, double obj_phase_2, bool in_phase_1)
+void log_iteration(int iter, const SolveData& data)
 {
     int log_every{1};
 
+    auto sum_if_negative = [](const auto& sum, const auto& current) {
+        return current < 0 ? sum + current : sum;
+    };
+
+    auto primal_obj{calc_primal_obj(data.c, data.x_basic, data.basics)};
+    auto dual_infeas = std::accumulate(std::begin(data.z_non_basic), std::end(data.z_non_basic), 0.0, sum_if_negative);
+    auto primal_infeas = std::accumulate(std::begin(data.x_basic), std::end(data.x_basic), 0.0, sum_if_negative);
+
     std::string progress{fmt::format(
-        "It {:8} Obj {:14.6f} {}", iter, obj_phase_2, in_phase_1 ? fmt::format("P1 Obj {:14.6f}", obj_phase_1) : ""
+        "It {:6} Obj {:12.4f} DInf: {:12.4f} PInf: {:12.4f}", iter, primal_obj, dual_infeas, primal_infeas
     )};
 
     if (iter % log_every == 0)
@@ -113,7 +121,7 @@ void log_iteration(int iter, double obj_phase_1, double obj_phase_2, bool in_pha
     {
         log()->debug(progress);
     }
-}
+} // namespace
 
 SolveData init_data(const Model& model)
 {
@@ -236,7 +244,7 @@ bool solve_primal(SolveData& data, Parameters params)
 
     for (; iter <= params.max_iter; iter++)
     {
-        log_iteration(iter, 0, primal_obj(c, x_basic, basics), false);
+        log_iteration(iter, data);
 
         // 1. Check optimality
         // 2. Find entering variable
@@ -334,7 +342,7 @@ bool solve_dual(SolveData& data, Parameters params)
 
     for (; iter <= params.max_iter; iter++)
     {
-        log_iteration(iter, 0, primal_obj(c, x_basic, basics), false);
+        log_iteration(iter, data);
 
         // 1. Check optimality
         // 2. Find entering variable
@@ -422,7 +430,7 @@ Solution extract_solution(const Model& model, SolveData& data)
 
     Solution sol{};
 
-    auto primal = primal_obj(data.c, data.x_basic, data.basics);
+    auto primal = calc_primal_obj(data.c, data.x_basic, data.basics);
 
     sol.objective = model.sense() == Model::Sense::MIN ? -1.0 * primal : primal;
 
@@ -512,4 +520,5 @@ std::optional<Solution> solve_simplex_revised(const Model& model)
 
     return solution;
 }
+
 } // namespace jsolve
