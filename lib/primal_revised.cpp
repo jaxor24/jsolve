@@ -436,19 +436,13 @@ Solution extract_solution(const Model& model, SolveData& data)
 
     for (std::size_t idx{0}; const auto& var_data : data.basics)
     {
-        if (!var_data.slack && !var_data.dummy)
-        {
-            sol.variables[model.get_variable(var_data.index)->name()] = data.x_basic(idx, 0);
-        }
+        sol.variables[model.get_variable(var_data.index)->name()] = data.x_basic(idx, 0);
         ++idx;
     }
 
     for (const auto& var_data : data.non_basics)
     {
-        if (!var_data.slack && !var_data.dummy)
-        {
-            sol.variables[model.get_variable(var_data.index)->name()] = 0;
-        }
+        sol.variables[model.get_variable(var_data.index)->name()] = 0;
     }
 
     return sol;
