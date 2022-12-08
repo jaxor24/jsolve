@@ -8,11 +8,11 @@ There are many variations of the algorithm. My plan is:
 2. &#9745; Two phase standard primal algorithm (i.e. handle infeasible starting bases)
 3. &#9745; Revised primal algorithm (i.e. matrix based approach, Gaussian elimination)
 4. &#9745; Revised dual algorithm (i.e. matrix based approach, Gaussian elimination)
-5. Two phase revised algorithm (i.e. combine the above to handle infeasible starting bases)
+5. &#9745; Two phase revised algorithm (i.e. combine the above to handle infeasible starting bases)
 6. Replace Gaussian elimination with LU factorisation
 7. General simplex algorithm (i.e. handle bounded variables)
 
-I am currently working through (5) above.
+I have just completed (6) above.
 
 There are many excellent references available. I have used these heavily so far:
 - Vanderbei, *Linear Programming*, 2014
@@ -40,8 +40,8 @@ I am using the classic netlib model suite to test my progress.
 |:----------:|:-----:|:-----:|:---------:|:-------:|:--:|--------------:|--------------:|-----------:|
 | 25FV47     | 822   | 1571  | 11127     | 70477   |    |       5501.85 |error||
 | 80BAU3B    | 2263  | 9799  | 29063     | 298952  | B  |     987232.16 |mps lb||
-| ADLITTLE   | 57    | 97    | 465       | 3690    |    |     225494.96 |159||
-| AFIRO      | 28    | 32    | 88        | 794     |    |       -464.75 |17||
+| ADLITTLE   | 57    | 97    | 465       | 3690    |    |     225494.96 |159|134|
+| AFIRO      | 28    | 32    | 88        | 794     |    |       -464.75 |17|16|
 | AGG        | 489   | 163   | 2541      | 21865   |    |  -35991767.29 |133||
 | AGG2       | 517   | 302   | 4515      | 32552   |    |  -20239252.36 |160||
 | AGG3       | 517   | 302   | 4531      | 32570   |    |   10312115.94 |173||
@@ -78,9 +78,9 @@ I am using the classic netlib model suite to test my progress.
 | GROW15     | 301   | 645   | 5665      | 35041   | B  | -106870941.29 |mps error||
 | GROW22     | 441   | 946   | 8318      | 50789   | B  | -160834336.48 |mps error||
 | GROW7      | 141   | 301   | 2633      | 17043   | B  |  -47787811.82 |mps error||
-| ISRAEL     | 175   | 142   | 2358      | 12109   |    |    -896644.82 |361||
+| ISRAEL     | 175   | 142   | 2358      | 12109   |    |    -896644.82 |361|348|
 | KB2        | 44    | 41    | 291       | 2526    | B  |      -1749.90 |144|175|
-| LOTFI      | 154   | 308   | 1086      | 6718    |    |        -25.26 |308||
+| LOTFI      | 154   | 308   | 1086      | 6718    |    |        -25.26 |308|291|
 | MAROS      | 847   | 1443  | 10006     | 65906   | B  |     -58063.74 |error||
 | MAROS-R7   | 3137  | 9408  | 151120    | 4812587 |    |    1497185.17 |todo||
 | MODSZK1    | 688   | 1620  | 4158      | 40908   | B  |        320.62 |error||
@@ -90,7 +90,7 @@ I am using the classic netlib model suite to test my progress.
 | PILOT4     | 411   | 1000  | 5145      | 40936   | B  |      -2581.14 |mps bounds||
 | PILOT87    | 2031  | 4883  | 73804     | 514192  | B  |        301.71 |mps bounds||
 | PILOTNOV   | 976   | 2172  | 13129     | 89779   | B  |      -4497.28 |timeout||
-| RECIPE     | 92    | 180   | 752       | 6210    | B  |       -266.62 |108||
+| RECIPE     | 92    | 180   | 752       | 6210    | B  |       -266.62 |108|96|
 | SC105      | 106   | 103   | 281       | 3307    |    |        -52.20 |115|120|
 | SC205      | 206   | 203   | 552       | 6380    |    |        -52.20 |297|259|
 | SC50A      | 51    | 48    | 131       | 1615    |    |        -64.58 |53|55|
