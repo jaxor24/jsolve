@@ -461,6 +461,30 @@ bool has_artificals_in_basis(const SolveData& data)
     return std::ranges::any_of(data.basics, [](const auto& var) { return var.dummy; });
 }
 
+void update_primal_objective(SolveData& data, const Mat& objective)
+{
+    data.c = objective;
+
+    // Non-basics vars
+    for (std::size_t idx{0}; const auto& var : data.non_basics)
+    {
+        data.z_non_basic(idx, 0) = -1.0 * data.c(var.index, 0);
+        idx++;
+    }
+
+    // Basic vars
+    auto c_b = Mat{data.basics.size(), 1};
+    for (std::size_t idx{0}; const auto& var : data.basics)
+    {
+        c_b(idx, 0) = data.c(var.index, 0);
+        idx++;
+    }
+
+    auto v = solve_gauss(data.B.make_transpose(), c_b);
+    auto N_t = data.N.make_transpose();
+    data.z_non_basic.update({}, {}, data.z_non_basic + (N_t * v));
+}
+
 } // namespace
 
 std::optional<Solution> solve_simplex_revised(const Model& model)
@@ -502,50 +526,25 @@ std::optional<Solution> solve_simplex_revised(const Model& model)
     {
         log()->info("Starting basis is primal and dual infeasible, starting phase 1 with dummy objective");
 
-        // Change to dummy dual feasible objective (all +1's)
-        auto original_c{data.c};
-        auto original_z_non_basic{data.z_non_basic};
-        data.c = Mat{original_c.n_rows(), original_c.n_cols(), -1};
+        // Change to dummy dual feasible objective (all -1's)
 
-        // z_n = -1 * c_n
-        for (std::size_t idx{0}; const auto& var : data.non_basics)
+        auto original_c = data.c;
+
+        auto dummy_c = Mat{original_c.n_rows(), original_c.n_cols(), 0};
+        for (const auto& var : data.non_basics)
         {
-            data.z_non_basic(idx, 0) = -1.0 * data.c(var.index, 0);
-            idx++;
+            dummy_c(var.index, 0) = -1.0;
         }
 
+        update_primal_objective(data, dummy_c);
         assert(is_dual_feas(data));
-
         has_solution = solve_dual(data, params);
-
         assert(!has_artificals_in_basis(data));
 
         if (has_solution)
         {
             log()->info("Restoring objective for phase 2");
-
-            // Restore objective: z_non_basic = transpose(inv(B)*N)*c_b - c_n
-            data.c = original_c;
-
-            // Basic vars
-            for (std::size_t idx{0}; const auto& var : data.non_basics)
-            {
-                data.z_non_basic(idx, 0) = -1.0 * data.c(var.index, 0);
-                idx++;
-            }
-
-            // Non-basic vars
-            auto c_b = Mat{data.basics.size(), 1};
-            for (std::size_t idx{0}; const auto& var : data.basics)
-            {
-                c_b(idx, 0) = data.c(var.index, 0);
-                idx++;
-            }
-
-            auto v = solve_gauss(data.B.make_transpose(), c_b);
-            auto N_t = data.N.make_transpose();
-            data.z_non_basic.update({}, {}, data.z_non_basic + (N_t * v));
-
+            update_primal_objective(data, original_c);
             has_solution = solve_primal(data, params);
         }
         else
