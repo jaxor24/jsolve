@@ -87,6 +87,19 @@ TEST_CASE("jsolve::solve")
         REQUIRE(solution.value().variables.at("x2") == 0.0);
     }
 
+    SECTION("model 5")
+    {
+        INFO("Solver: " << alg_str);
+        auto model = models::make_model_5();
+        auto solution = current_alg(model);
+
+        REQUIRE(solution.has_value());
+        REQUIRE(solution.value().objective == -3.0);
+        REQUIRE(solution.value().variables.at("x1") == 0.0);
+        REQUIRE(solution.value().variables.at("x2") == 0.5);
+        REQUIRE(solution.value().variables.at("x3") == 1.5);
+    }
+
     SECTION("model 6")
     {
         INFO("Solver: " << alg_str);
