@@ -181,31 +181,6 @@ void convert_to_equality(jsolve::Model& model)
     }
 }
 
-void add_artificial_vars(jsolve::Model& model)
-{
-    // Every constraint must have a positive variable that can be isolated to form an initial basis.
-    // This is either a slack, or an added artifical variable.
-
-    for (auto& [_, constraint] : model.get_constraints())
-    {
-        assert(constraint->type() != Constraint::Type::GREAT); // Impossible from pre-processing
-
-        bool no_slack =
-            std::ranges::none_of(constraint->get_entries(), [](const auto& pair) { return pair.first->slack(); });
-
-        if (no_slack)
-        {
-            // Add an artificial variable
-            auto* artifical_variable =
-                model.make_variable(jsolve::Variable::Type::LINEAR, fmt::format("ARTIFICAL_{}", constraint->name()));
-
-            artifical_variable->artifical() = true;
-
-            constraint->add_to_lhs(1, artifical_variable);
-        }
-    }
-}
-
 void pre_process_model(jsolve::Model& model)
 {
     // Convert the model to the form:
@@ -224,7 +199,5 @@ void pre_process_model(jsolve::Model& model)
     convert_equality_constraints(model);
     convert_geq_to_leq(model);
     convert_to_equality(model);
-
-    add_artificial_vars(model);
 }
 } // namespace jsolve

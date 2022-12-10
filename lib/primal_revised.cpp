@@ -149,7 +149,7 @@ SolveData init_data(const Model& model)
         }
     }
 
-    log()->debug(A);
+    log()->trace(A);
 
     // Create c column vector = [c]
     Mat c{n, 1, 0.0};
@@ -164,7 +164,7 @@ SolveData init_data(const Model& model)
         c *= -1;
     }
 
-    log()->debug(c);
+    log()->trace(c);
 
     // Create b (RHS) vector
     Mat b{m, 1, 0.0};
@@ -174,7 +174,7 @@ SolveData init_data(const Model& model)
         b(n_cons, 0) = pair.second->rhs();
     }
 
-    log()->debug(b);
+    log()->trace(b);
 
     // Find the initial basis
 
@@ -217,11 +217,11 @@ SolveData init_data(const Model& model)
 
     // For the simplex we need:
 
-    log()->debug(B);
-    log()->debug(N);
+    log()->trace(B);
+    log()->trace(N);
 
-    log()->debug(x_basic);
-    log()->debug(z_non_basic);
+    log()->trace(x_basic);
+    log()->trace(z_non_basic);
 
     return {A, c, B, N, x_basic, z_non_basic, basics, non_basics};
 }
@@ -262,7 +262,7 @@ bool solve_primal(SolveData& data, Parameters params)
 
         auto dx = solve_gauss(B, N.slice({}, {entering.value()}));
 
-        log()->debug(dx);
+        log()->trace(dx);
 
         // 4. Find the leaving variable
         std::optional<std::size_t> leaving = choose_leaving(x_basic, dx, params.EPS1);
@@ -270,6 +270,7 @@ bool solve_primal(SolveData& data, Parameters params)
         if (!leaving)
         {
             // Unbounded
+            log()->warn("Unbounded");
             return false;
         }
 
@@ -289,7 +290,7 @@ bool solve_primal(SolveData& data, Parameters params)
         auto v = solve_gauss(B.make_transpose(), ei);
         auto dz = -1.0 * N.make_transpose() * v;
 
-        log()->debug(dz);
+        log()->trace(dz);
 
         // 7. Calculate dual step lengths
         // s = z/dz (j)
@@ -307,19 +308,17 @@ bool solve_primal(SolveData& data, Parameters params)
         N.update({}, {entering.value()}, A.slice({}, static_cast<std::size_t>(basics[leaving.value()].index)));
         std::swap(basics[leaving.value()], non_basics[entering.value()]);
 
-        log()->debug(B);
-        log()->debug(N);
+        log()->trace(B);
+        log()->trace(N);
     }
 
     if (iter >= params.max_iter)
     {
-        log()->warn("Iteration limit ({}) reached.", iter);
-    }
-    else
-    {
-        log()->info("Optimal solution found");
+        log()->warn("Iteration limit ({}) reached", iter);
+        return false;
     }
 
+    log()->info("Optimal solution found");
     return true;
 }
 
@@ -363,7 +362,7 @@ bool solve_dual(SolveData& data, Parameters params)
         auto v = solve_gauss(B.make_transpose(), ei);
         auto dz = -1.0 * N.make_transpose() * v;
 
-        log()->debug(dz);
+        log()->trace(dz);
 
         // 4. Find the leaving variable
 
@@ -372,6 +371,7 @@ bool solve_dual(SolveData& data, Parameters params)
         if (!leaving)
         {
             // Unbounded
+            log()->warn("Unbounded");
             return false;
         }
 
@@ -386,7 +386,7 @@ bool solve_dual(SolveData& data, Parameters params)
 
         auto dx = solve_gauss(B, N.slice({}, {leaving.value()}));
 
-        log()->debug(dx);
+        log()->trace(dx);
 
         // 7. Calculate dual step lengths
         // t = x/dx (i)
@@ -406,19 +406,17 @@ bool solve_dual(SolveData& data, Parameters params)
         N.update({}, {leaving.value()}, A.slice({}, static_cast<std::size_t>(basics[entering.value()].index)));
         std::swap(basics[entering.value()], non_basics[leaving.value()]);
 
-        log()->debug(B);
-        log()->debug(N);
+        log()->trace(B);
+        log()->trace(N);
     }
 
     if (iter >= params.max_iter)
     {
-        log()->warn("Iteration limit ({}) reached.", iter);
-    }
-    else
-    {
-        log()->info("Optimal solution found");
+        log()->warn("Iteration limit ({}) reached", iter);
+        return false;
     }
 
+    log()->info("Optimal solution found");
     return true;
 }
 
@@ -463,6 +461,10 @@ bool has_artificals_in_basis(const SolveData& data)
 
 void update_primal_objective(SolveData& data, const Mat& objective)
 {
+    // Change to a new primal objective and propagate to the dual variables.
+    // So c becomes the new c, and the dual (z) variables are updated by:
+    // z_n = transpose(inv(B)*N)*c_b - c_n
+
     data.c = objective;
 
     // Non-basics vars
@@ -506,27 +508,19 @@ std::optional<Solution> solve_simplex_revised(const Model& model)
     {
         log()->info("Starting basis is primal feasible, using primal simplex algorithm");
         has_solution = solve_primal(data, params);
-
-        if (!has_solution)
-        {
-            log()->warn("Unbounded");
-        }
     }
     else if (dual_feas)
     {
         log()->info("Starting basis is dual feasible, using dual simplex algorithm");
         has_solution = solve_dual(data, params);
-
-        if (!has_solution)
-        {
-            log()->warn("Unbounded");
-        }
     }
     else
     {
         log()->info("Starting basis is primal and dual infeasible, starting phase 1 with dummy objective");
 
-        // Change to dummy dual feasible objective (all -1's)
+        // Use 2 phase procedure:
+        // 1. Change to dummy dual feasible objective (all -1's) and solve using dual simplex
+        // 2. Restore original objective and solve using primal simplex.
 
         auto original_c = data.c;
 
@@ -538,6 +532,7 @@ std::optional<Solution> solve_simplex_revised(const Model& model)
 
         update_primal_objective(data, dummy_c);
         assert(is_dual_feas(data));
+
         has_solution = solve_dual(data, params);
         assert(!has_artificals_in_basis(data));
 
