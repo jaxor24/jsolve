@@ -461,6 +461,10 @@ bool has_artificals_in_basis(const SolveData& data)
 
 void update_primal_objective(SolveData& data, const Mat& objective)
 {
+    // Change to a new primal objective and propagate to the dual variables.
+    // So c becomes the new c, and the dual (z) variables are updated by:
+    // z_n = transpose(inv(B)*N)*c_b - c_n
+
     data.c = objective;
 
     // Non-basics vars
