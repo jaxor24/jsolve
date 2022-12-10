@@ -262,7 +262,7 @@ bool solve_primal(SolveData& data, Parameters params)
 
         auto dx = solve_gauss(B, N.slice({}, {entering.value()}));
 
-        log()->debug(dx);
+        log()->trace(dx);
 
         // 4. Find the leaving variable
         std::optional<std::size_t> leaving = choose_leaving(x_basic, dx, params.EPS1);
@@ -289,7 +289,7 @@ bool solve_primal(SolveData& data, Parameters params)
         auto v = solve_gauss(B.make_transpose(), ei);
         auto dz = -1.0 * N.make_transpose() * v;
 
-        log()->debug(dz);
+        log()->trace(dz);
 
         // 7. Calculate dual step lengths
         // s = z/dz (j)
@@ -307,8 +307,8 @@ bool solve_primal(SolveData& data, Parameters params)
         N.update({}, {entering.value()}, A.slice({}, static_cast<std::size_t>(basics[leaving.value()].index)));
         std::swap(basics[leaving.value()], non_basics[entering.value()]);
 
-        log()->debug(B);
-        log()->debug(N);
+        log()->trace(B);
+        log()->trace(N);
     }
 
     if (iter >= params.max_iter)
@@ -363,7 +363,7 @@ bool solve_dual(SolveData& data, Parameters params)
         auto v = solve_gauss(B.make_transpose(), ei);
         auto dz = -1.0 * N.make_transpose() * v;
 
-        log()->debug(dz);
+        log()->trace(dz);
 
         // 4. Find the leaving variable
 
@@ -386,7 +386,7 @@ bool solve_dual(SolveData& data, Parameters params)
 
         auto dx = solve_gauss(B, N.slice({}, {leaving.value()}));
 
-        log()->debug(dx);
+        log()->trace(dx);
 
         // 7. Calculate dual step lengths
         // t = x/dx (i)
@@ -406,8 +406,8 @@ bool solve_dual(SolveData& data, Parameters params)
         N.update({}, {leaving.value()}, A.slice({}, static_cast<std::size_t>(basics[entering.value()].index)));
         std::swap(basics[entering.value()], non_basics[leaving.value()]);
 
-        log()->debug(B);
-        log()->debug(N);
+        log()->trace(B);
+        log()->trace(N);
     }
 
     if (iter >= params.max_iter)
