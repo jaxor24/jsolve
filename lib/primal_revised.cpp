@@ -270,6 +270,7 @@ bool solve_primal(SolveData& data, Parameters params)
         if (!leaving)
         {
             // Unbounded
+            log()->warn("Unbounded");
             return false;
         }
 
@@ -313,13 +314,11 @@ bool solve_primal(SolveData& data, Parameters params)
 
     if (iter >= params.max_iter)
     {
-        log()->warn("Iteration limit ({}) reached.", iter);
-    }
-    else
-    {
-        log()->info("Optimal solution found");
+        log()->warn("Iteration limit ({}) reached", iter);
+        return false;
     }
 
+    log()->info("Optimal solution found");
     return true;
 }
 
@@ -372,6 +371,7 @@ bool solve_dual(SolveData& data, Parameters params)
         if (!leaving)
         {
             // Unbounded
+            log()->warn("Unbounded");
             return false;
         }
 
@@ -412,13 +412,11 @@ bool solve_dual(SolveData& data, Parameters params)
 
     if (iter >= params.max_iter)
     {
-        log()->warn("Iteration limit ({}) reached.", iter);
-    }
-    else
-    {
-        log()->info("Optimal solution found");
+        log()->warn("Iteration limit ({}) reached", iter);
+        return false;
     }
 
+    log()->info("Optimal solution found");
     return true;
 }
 
@@ -506,21 +504,11 @@ std::optional<Solution> solve_simplex_revised(const Model& model)
     {
         log()->info("Starting basis is primal feasible, using primal simplex algorithm");
         has_solution = solve_primal(data, params);
-
-        if (!has_solution)
-        {
-            log()->warn("Unbounded");
-        }
     }
     else if (dual_feas)
     {
         log()->info("Starting basis is dual feasible, using dual simplex algorithm");
         has_solution = solve_dual(data, params);
-
-        if (!has_solution)
-        {
-            log()->warn("Unbounded");
-        }
     }
     else
     {
