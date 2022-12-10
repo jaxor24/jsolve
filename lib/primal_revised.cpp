@@ -149,7 +149,7 @@ SolveData init_data(const Model& model)
         }
     }
 
-    log()->debug(A);
+    log()->trace(A);
 
     // Create c column vector = [c]
     Mat c{n, 1, 0.0};
@@ -164,7 +164,7 @@ SolveData init_data(const Model& model)
         c *= -1;
     }
 
-    log()->debug(c);
+    log()->trace(c);
 
     // Create b (RHS) vector
     Mat b{m, 1, 0.0};
@@ -174,7 +174,7 @@ SolveData init_data(const Model& model)
         b(n_cons, 0) = pair.second->rhs();
     }
 
-    log()->debug(b);
+    log()->trace(b);
 
     // Find the initial basis
 
@@ -217,11 +217,11 @@ SolveData init_data(const Model& model)
 
     // For the simplex we need:
 
-    log()->debug(B);
-    log()->debug(N);
+    log()->trace(B);
+    log()->trace(N);
 
-    log()->debug(x_basic);
-    log()->debug(z_non_basic);
+    log()->trace(x_basic);
+    log()->trace(z_non_basic);
 
     return {A, c, B, N, x_basic, z_non_basic, basics, non_basics};
 }
