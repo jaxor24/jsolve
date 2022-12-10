@@ -518,7 +518,9 @@ std::optional<Solution> solve_simplex_revised(const Model& model)
     {
         log()->info("Starting basis is primal and dual infeasible, starting phase 1 with dummy objective");
 
-        // Change to dummy dual feasible objective (all -1's)
+        // Use 2 phase procedure:
+        // 1. Change to dummy dual feasible objective (all -1's) and solve using dual simplex
+        // 2. Restore original objective and solve using primal simplex.
 
         auto original_c = data.c;
 
@@ -530,6 +532,7 @@ std::optional<Solution> solve_simplex_revised(const Model& model)
 
         update_primal_objective(data, dummy_c);
         assert(is_dual_feas(data));
+
         has_solution = solve_dual(data, params);
         assert(!has_artificals_in_basis(data));
 
