@@ -208,3 +208,81 @@ TEST_CASE("backward_subs")
         REQUIRE(result(0, 2) == 1);
     }
 }
+
+TEST_CASE("forward_subs")
+{
+    SECTION("1x1 system")
+    {
+        Matr A{1, 1, 5};
+        Matr b{1, 1, 10};
+
+        auto result = jsolve::forward_subs(A, b);
+
+        REQUIRE(result.n_rows() == 1);
+        REQUIRE(result.n_cols() == 1);
+
+        REQUIRE(result(0, 0) == 2);
+    }
+
+    SECTION("2x2 system")
+    {
+        Matr A{2, 2, 0.0};
+
+        A(0, 0) = -10;
+        A(0, 1) = 0;
+        A(1, 0) = 1;
+        A(1, 1) = 2;
+
+        Matr b{2, 1, 0.0};
+
+        b(0, 0) = -5;
+        b(0, 1) = 9;
+
+        auto result = jsolve::forward_subs(A, b);
+
+        REQUIRE(result.n_rows() == 2);
+        REQUIRE(result.n_cols() == 1);
+
+        REQUIRE(result(0, 0) == 0.5);
+        REQUIRE(result(0, 1) == 4.25);
+    }
+
+    SECTION("5x5 matrix")
+    {
+        Matr A{5, 5, 0.0};
+
+        A(0, 0) = 1;
+
+        A(1, 0) = 1.5;
+        A(1, 1) = 1;
+
+        A(2, 0) = -0.5;
+        A(2, 2) = 1;
+
+        A(3, 1) = -1;
+        A(3, 2) = -6;
+        A(3, 3) = 1;
+
+        A(4, 2) = 1;
+        A(4, 4) = 1;
+
+        Matr b{5, 1, 0.0};
+
+        b(0, 0) = 7;
+        b(0, 1) = -2;
+        b(0, 2) = 0;
+        b(0, 3) = 3;
+        b(0, 4) = 0;
+
+        auto result = jsolve::forward_subs(A, b);
+
+        REQUIRE(result.n_rows() == A.n_rows());
+        REQUIRE(result.n_cols() == 1);
+
+        REQUIRE(result(0, 0) == 7);
+        REQUIRE(result(0, 1) == -25.0 / 2);
+        REQUIRE(result(0, 2) == 7.0 / 2);
+        REQUIRE(result(0, 3) == 23.0 / 2);
+        REQUIRE(result(0, 4) == -7.0 / 2);
+    }
+}
