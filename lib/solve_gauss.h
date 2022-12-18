@@ -33,7 +33,7 @@ Matrix<U> solve_gauss(const Matrix<U>& A, const Matrix<U>& b)
         throw SolveError("Cannot solve non-square system");
     }
 
-    if (A.n_rows() != b.n_rows())
+    if (m != b.n_rows())
     {
         throw SolveError("Inputs A and b must have the same number of rows");
     }
