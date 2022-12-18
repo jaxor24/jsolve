@@ -17,7 +17,7 @@ std::pair<Matrix<T>, Matrix<T>> lu_refactor(const Matrix<T>& A)
 
     if (m != n)
     {
-        throw SolveError("Cannot solve non-square system");
+        throw SolveError("Cannot factor non-square matrix");
     }
 
     // Explicit L and U for the moment (pack into A soon)

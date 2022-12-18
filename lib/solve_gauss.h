@@ -40,7 +40,7 @@ Matrix<U> solve_gauss(const Matrix<U>& A, const Matrix<U>& b)
 
     if (b.n_cols() != 1)
     {
-        throw SolveError("Input b must have one row");
+        throw SolveError("Input b must have one column");
     }
 
     // Form augmented matrix
