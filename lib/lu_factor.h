@@ -62,4 +62,43 @@ std::pair<Matrix<T>, Matrix<T>> lu_refactor(const Matrix<T>& A)
 
     return {L, U};
 }
+
+template <typename U>
+Matrix<U> backward_subs(const Matrix<U>& A, const Matrix<U>& b)
+{
+    // Solves Ax = b via backward subsitution, assuming A is upper triangular.
+
+    int m{static_cast<int>(A.n_rows())};
+    int n{static_cast<int>(A.n_cols())};
+
+    if (m != n)
+    {
+        throw SolveError("Cannot solve non-square system");
+    }
+
+    if (m != b.n_rows())
+    {
+        throw SolveError("Inputs A and b must have the same number of rows");
+    }
+
+    if (b.n_cols() != 1)
+    {
+        throw SolveError("Input b must have one column");
+    }
+
+    Matrix<U> x{A.n_rows(), 1};
+
+    for (int i{n - 1}; i >= 0; i--)
+    {
+        U sum{0};
+        for (int j{i + 1}; j < n; j++)
+        {
+            sum += A(i, j) * x(j, 0);
+        }
+        x(i, 0) = (b(i, 0) - sum) / A(i, i);
+    }
+
+    return x;
+}
+
 } // namespace jsolve

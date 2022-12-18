@@ -137,3 +137,74 @@ TEST_CASE("lu_refactor")
         REQUIRE(U(4, 4) == 7);
     }
 }
+
+TEST_CASE("backward_subs")
+{
+    SECTION("1x1 system")
+    {
+        Matr A{1, 1, 5};
+        Matr b{1, 1, 10};
+
+        auto result = jsolve::backward_subs(A, b);
+
+        REQUIRE(result.n_rows() == 1);
+        REQUIRE(result.n_cols() == 1);
+
+        REQUIRE(result(0, 0) == 2);
+    }
+
+    SECTION("2x2 system")
+    {
+        Matr A{2, 2, 0.0};
+
+        A(0, 0) = 1;
+        A(0, 1) = 2;
+        A(1, 0) = 0;
+        A(1, 1) = -10;
+
+        Matr b{2, 1, 0.0};
+
+        b(0, 0) = 6;
+        b(0, 1) = -5;
+
+        auto result = jsolve::backward_subs(A, b);
+
+        REQUIRE(result.n_rows() == 2);
+        REQUIRE(result.n_cols() == 1);
+
+        REQUIRE(result(0, 0) == 5.0);
+        REQUIRE(result(0, 1) == 0.5);
+    }
+
+    SECTION("3x3 matrix")
+    {
+        Matr A{3, 3, 0.0};
+
+        A(0, 0) = 2;
+        A(0, 1) = -1;
+        A(0, 2) = -2;
+
+        A(1, 0) = 0;
+        A(1, 1) = 4;
+        A(1, 2) = -1;
+
+        A(2, 0) = 0;
+        A(2, 1) = 0;
+        A(2, 2) = 3;
+
+        Matr b{3, 1, 0.0};
+
+        b(0, 0) = -1;
+        b(0, 1) = 11;
+        b(0, 2) = 3;
+
+        auto result = jsolve::backward_subs(A, b);
+
+        REQUIRE(result.n_rows() == A.n_rows());
+        REQUIRE(result.n_cols() == 1);
+
+        REQUIRE(result(0, 0) == 2);
+        REQUIRE(result(0, 1) == 3);
+        REQUIRE(result(0, 2) == 1);
+    }
+}
