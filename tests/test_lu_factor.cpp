@@ -28,6 +28,33 @@ TEST_CASE("lu_refactor")
 
         SECTION("3x3 matrix")
         {
+            Matr A{4, 4, 0.0};
+            A(0, 0) = 4;
+            A(0, 1) = 3;
+            A(0, 2) = 4;
+            A(0, 3) = 2;
+
+            A(1, 0) = 1;
+            A(1, 1) = 2;
+            A(1, 2) = 2;
+            A(1, 3) = 4;
+
+            A(2, 0) = 8;
+            A(2, 1) = 9;
+            A(2, 2) = 9;
+            A(2, 3) = 1;
+
+            A(3, 0) = 6;
+            A(3, 1) = 4;
+            A(3, 2) = 8;
+            A(3, 3) = 8;
+
+            auto [L, U, perm] = jsolve::lu_refactor(A);
+            REQUIRE(A == L * U);
+        }
+
+        SECTION("3x3 matrix")
+        {
             Matr A{3, 3, 0.0};
             A(0, 0) = 2;
             A(0, 1) = -1;
