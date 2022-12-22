@@ -7,10 +7,23 @@
 
 namespace jsolve
 {
+
 template <typename T>
-std::pair<Matrix<T>, Matrix<T>> lu_refactor(const Matrix<T>& A)
+struct lu_result
 {
-    // Computes the LU factorisation of A using the Doolittle method.
+    Matrix<T> L;
+    Matrix<T> U;
+    std::vector<std::size_t> perm;
+};
+
+template <typename T>
+lu_result<T> lu_refactor(const Matrix<T>& A)
+{
+    // LU factorisation of A using the Doolittle method with max magnitude partial pivoting.
+    // The row swaps are incorporated into L (so it may not be lower triangular), but LU = A.
+
+    // This uses a permutation vector to track where row swaps in A have occurred, rather than
+    // permuting A itself.
 
     auto m{A.n_rows()};
     auto n{A.n_cols()};
@@ -20,12 +33,31 @@ std::pair<Matrix<T>, Matrix<T>> lu_refactor(const Matrix<T>& A)
         throw SolveError("Cannot factor non-square matrix");
     }
 
-    // Explicit L and U for the moment (pack into A soon)
-    Matrix<T> L{n, n};
-    Matrix<T> U{n, n};
+    lu_result<T> result{.L{n, n}, .U{n, n}, .perm{std::vector<std::size_t>(n, 0)}};
+
+    auto& L = result.L;
+    auto& U = result.U;
+    auto& perm = result.perm;
+
+    // Permutation vector
+    std::iota(std::begin(perm), std::end(perm), 0);
 
     for (std::size_t i{0}; i < n; i++)
     {
+        // Partial pivoting
+        std::size_t p{i};
+        for (std::size_t k{i + 1}; k < n; k++)
+        {
+            if (std::abs(A(perm[k], i)) > std::abs(A(perm[i], i)))
+            {
+                p = k;
+            }
+        }
+        if (p > i)
+        {
+            std::swap(perm[p], perm[i]);
+        }
+
         // Upper, U
         for (std::size_t k{i}; k < n; k++)
         {
@@ -33,10 +65,10 @@ std::pair<Matrix<T>, Matrix<T>> lu_refactor(const Matrix<T>& A)
 
             for (std::size_t j{0}; j < i; j++)
             {
-                sum += L(i, j) * U(j, k);
+                sum += L(perm[i], j) * U(j, k);
             }
 
-            U(i, k) = A(i, k) - sum;
+            U(i, k) = A(perm[i], k) - sum;
         }
 
         // Lower, L
@@ -44,7 +76,7 @@ std::pair<Matrix<T>, Matrix<T>> lu_refactor(const Matrix<T>& A)
         {
             if (i == k)
             {
-                L(i, k) = 1;
+                L(perm[i], k) = 1;
             }
             else
             {
@@ -52,15 +84,15 @@ std::pair<Matrix<T>, Matrix<T>> lu_refactor(const Matrix<T>& A)
 
                 for (std::size_t j{0}; j < i; j++)
                 {
-                    sum += L(k, j) * U(j, i);
+                    sum += L(perm[k], j) * U(j, i);
                 }
 
-                L(k, i) = (A(k, i) - sum) / U(i, i);
+                L(perm[k], i) = (A(perm[k], i) - sum) / U(i, i);
             }
         }
     }
 
-    return {L, U};
+    return result;
 }
 
 template <typename U>
@@ -102,9 +134,9 @@ Matrix<U> backward_subs(const Matrix<U>& A, const Matrix<U>& b)
 }
 
 template <typename U>
-Matrix<U> forward_subs(const Matrix<U>& A, const Matrix<U>& b)
+Matrix<U> forward_subs(const Matrix<U>& A, const Matrix<U>& b, const std::vector<std::size_t>& perm)
 {
-    // Solves Ax = b via forward subsitution, assuming A is lower triangular.
+    // Solves Ax = b by forward substituion, with the row permuations of A and b described by perm.
 
     int m{static_cast<int>(A.n_rows())};
     int n{static_cast<int>(A.n_cols())};
@@ -131,12 +163,21 @@ Matrix<U> forward_subs(const Matrix<U>& A, const Matrix<U>& b)
         U sum{0};
         for (int j{0}; j < i; j++)
         {
-            sum += A(i, j) * x(j, 0);
+            sum += A(perm[i], j) * x(j, 0);
         }
-        x(i, 0) = (b(i, 0) - sum) / A(i, i);
+        x(i, 0) = (b(perm[i], 0) - sum) / A(perm[i], i);
     }
 
     return x;
+}
+
+template <typename U>
+Matrix<U> forward_subs(const Matrix<U>& A, const Matrix<U>& b)
+{
+    // Solves Ax = b by forward substitution. Assumes A is lower diagonal.
+    auto perm = std::vector<std::size_t>(b.n_rows(), 0);
+    std::iota(std::begin(perm), std::end(perm), 0); // [0, 1, ..., n];
+    return forward_subs(A, b, perm);
 }
 
 } // namespace jsolve
