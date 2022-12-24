@@ -48,7 +48,7 @@ lu_result<T> lu_refactor(const Matrix<T>& A)
         std::size_t p{k};
         for (std::size_t t{k + 1}; t < n; t++)
         {
-            if (std::abs(A(perm[t], k)) > std::abs(A(perm[k], k)))
+            if (std::abs(A(perm[t], k)) > std::abs(A(perm[p], k)))
             {
                 p = t;
             }
