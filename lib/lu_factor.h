@@ -17,7 +17,7 @@ struct lu_result
 };
 
 template <typename T>
-lu_result<T> lu_refactor(const Matrix<T>& A)
+lu_result<T> lu_factor(const Matrix<T>& A)
 {
     // LU factorisation of A using the Doolittle method with max magnitude partial pivoting.
     // The row swaps are incorporated into L (so it may not be lower triangular), but LU = A.
