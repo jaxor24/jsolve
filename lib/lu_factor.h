@@ -58,8 +58,6 @@ lu_result<T> lu_refactor(const Matrix<T>& A)
             std::swap(perm[p], perm[k]);
         }
 
-        // Start stuff
-
         // Set the L diagonal
         L(perm[k], k) = 1;
 
