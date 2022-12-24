@@ -5,7 +5,7 @@
 
 using Matr = Matrix<double>;
 
-TEST_CASE("lu_refactor")
+TEST_CASE("lu_factor")
 {
     SECTION("no pivoting")
     {
@@ -13,7 +13,7 @@ TEST_CASE("lu_refactor")
         {
             Matr A{1, 1, 5};
 
-            auto [L, U, perm] = jsolve::lu_refactor(A);
+            auto [L, U, perm] = jsolve::lu_factor(A);
             REQUIRE(A == L * U);
         }
 
@@ -25,7 +25,7 @@ TEST_CASE("lu_refactor")
             A(1, 0) = 2;
             A(1, 1) = 1;
 
-            auto [L, U, perm] = jsolve::lu_refactor(A);
+            auto [L, U, perm] = jsolve::lu_factor(A);
             REQUIRE(A == L * U);
         }
 
@@ -52,7 +52,7 @@ TEST_CASE("lu_refactor")
             A(3, 2) = 8;
             A(3, 3) = 8;
 
-            auto [L, U, perm] = jsolve::lu_refactor(A);
+            auto [L, U, perm] = jsolve::lu_factor(A);
             REQUIRE(A == L * U);
         }
 
@@ -71,7 +71,7 @@ TEST_CASE("lu_refactor")
             A(2, 1) = -2;
             A(2, 2) = 8;
 
-            auto [L, U, perm] = jsolve::lu_refactor(A);
+            auto [L, U, perm] = jsolve::lu_factor(A);
 
             REQUIRE(L.n_rows() == A.n_rows());
             REQUIRE(L.n_cols() == A.n_cols());
@@ -103,7 +103,7 @@ TEST_CASE("lu_refactor")
             A(4, 2) = 1;
             A(4, 4) = 4;
 
-            auto [L, U, perm] = jsolve::lu_refactor(A);
+            auto [L, U, perm] = jsolve::lu_factor(A);
 
             REQUIRE(L.n_rows() == A.n_rows());
             REQUIRE(L.n_cols() == A.n_cols());
@@ -124,7 +124,7 @@ TEST_CASE("lu_refactor")
             A(1, 0) = 2;
             A(1, 1) = 1;
 
-            auto [L, U, perm] = jsolve::lu_refactor(A);
+            auto [L, U, perm] = jsolve::lu_factor(A);
             REQUIRE(A == L * U);
         }
 
@@ -143,7 +143,7 @@ TEST_CASE("lu_refactor")
             A(2, 1) = 235;
             A(2, 2) = 7;
 
-            auto [L, U, perm] = jsolve::lu_refactor(A);
+            auto [L, U, perm] = jsolve::lu_factor(A);
             REQUIRE(A == L * U);
         }
 
@@ -181,7 +181,7 @@ TEST_CASE("lu_refactor")
             A(7, 6) = 2;
             A(7, 7) = 1;
 
-            auto [L, U, perm] = jsolve::lu_refactor(A);
+            auto [L, U, perm] = jsolve::lu_factor(A);
             REQUIRE(A == L * U);
         }
     }
