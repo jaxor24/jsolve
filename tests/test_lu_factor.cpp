@@ -12,8 +12,9 @@ TEST_CASE("lu_refactor")
         SECTION("1x1 system")
         {
             Matr A{1, 1, 5};
-            Matr b{1, 1, 10};
-            // TODO
+
+            auto [L, U, perm] = jsolve::lu_refactor(A);
+            REQUIRE(A == L * U);
         }
 
         SECTION("2x2 matrix")
@@ -23,7 +24,9 @@ TEST_CASE("lu_refactor")
             A(0, 1) = 1;
             A(1, 0) = 2;
             A(1, 1) = 1;
-            // TODO
+
+            auto [L, U, perm] = jsolve::lu_refactor(A);
+            REQUIRE(A == L * U);
         }
 
         SECTION("3x3 matrix")
@@ -76,30 +79,6 @@ TEST_CASE("lu_refactor")
             REQUIRE(U.n_cols() == A.n_cols());
 
             REQUIRE(A == L * U);
-
-            // REQUIRE(L(0, 0) == 1);
-            // REQUIRE(L(0, 1) == 0);
-            // REQUIRE(L(0, 2) == 0);
-
-            // REQUIRE(L(1, 0) == -2);
-            // REQUIRE(L(1, 1) == 1);
-            // REQUIRE(L(1, 2) == 0);
-
-            // REQUIRE(L(2, 0) == -2);
-            // REQUIRE(L(2, 1) == -1);
-            // REQUIRE(L(2, 2) == 1);
-
-            // REQUIRE(U(0, 0) == 2);
-            // REQUIRE(U(0, 1) == -1);
-            // REQUIRE(U(0, 2) == -2);
-
-            // REQUIRE(U(1, 0) == 0);
-            // REQUIRE(U(1, 1) == 4);
-            // REQUIRE(U(1, 2) == -1);
-
-            // REQUIRE(U(2, 0) == 0);
-            // REQUIRE(U(2, 1) == 0);
-            // REQUIRE(U(2, 2) == 3);
         }
 
         SECTION("5x5 matrix")
@@ -132,40 +111,6 @@ TEST_CASE("lu_refactor")
             REQUIRE(U.n_cols() == A.n_cols());
 
             REQUIRE(A == L * U);
-
-            //// Lower
-            // REQUIRE(L(0, 0) == 1);
-
-            // REQUIRE(L(1, 0) == 1.5);
-            // REQUIRE(L(1, 1) == 1);
-
-            // REQUIRE(L(2, 0) == -0.5);
-            // REQUIRE(L(2, 2) == 1);
-
-            // REQUIRE(L(3, 1) == -1);
-            // REQUIRE(L(3, 2) == -6);
-            // REQUIRE(L(3, 3) == 1);
-
-            // REQUIRE(L(4, 2) == 1);
-            // REQUIRE(L(4, 4) == 1);
-
-            //// Upper
-            // REQUIRE(U(0, 0) == 2);
-            // REQUIRE(U(0, 2) == 4);
-            // REQUIRE(U(0, 4) == -2);
-
-            // REQUIRE(U(1, 1) == 1);
-            // REQUIRE(U(1, 2) == -6);
-            // REQUIRE(U(1, 3) == 1);
-            // REQUIRE(U(1, 4) == 3);
-
-            // REQUIRE(U(2, 2) == 1);
-            // REQUIRE(U(2, 4) == -3);
-
-            // REQUIRE(U(3, 3) == 1);
-            // REQUIRE(U(3, 4) == -21);
-
-            // REQUIRE(U(4, 4) == 7);
         }
     }
 
@@ -178,7 +123,9 @@ TEST_CASE("lu_refactor")
             A(0, 1) = 1;
             A(1, 0) = 2;
             A(1, 1) = 1;
-            // TODO
+
+            auto [L, U, perm] = jsolve::lu_refactor(A);
+            REQUIRE(A == L * U);
         }
 
         SECTION("3x3 matrix")
@@ -197,12 +144,44 @@ TEST_CASE("lu_refactor")
             A(2, 2) = 7;
 
             auto [L, U, perm] = jsolve::lu_refactor(A);
+            REQUIRE(A == L * U);
+        }
 
-            REQUIRE(L.n_rows() == A.n_rows());
-            REQUIRE(L.n_cols() == A.n_cols());
-            REQUIRE(U.n_cols() == A.n_rows());
-            REQUIRE(U.n_cols() == A.n_cols());
+        SECTION("8x8 matrix")
+        {
+            Matr A{8, 8, 0.0};
+            A(0, 0) = 1;
+            A(0, 4) = -2;
+            A(0, 6) = 1;
 
+            A(1, 4) = 2;
+            A(1, 6) = -1;
+
+            A(2, 2) = 1;
+            A(2, 4) = 2;
+            A(2, 6) = -1;
+
+            A(3, 3) = 1;
+            A(3, 4) = -2;
+            A(3, 6) = 1;
+
+            A(4, 1) = -1;
+            A(4, 4) = -1;
+
+            A(5, 1) = 1;
+            A(5, 4) = 1;
+            A(5, 5) = 1;
+
+            A(6, 1) = -1;
+            A(6, 4) = -2;
+            A(6, 6) = -2;
+
+            A(7, 1) = 1;
+            A(7, 4) = 2;
+            A(7, 6) = 2;
+            A(7, 7) = 1;
+
+            auto [L, U, perm] = jsolve::lu_refactor(A);
             REQUIRE(A == L * U);
         }
     }
