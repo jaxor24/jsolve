@@ -42,58 +42,55 @@ lu_result<T> lu_factor(const Matrix<T>& A)
     // Permutation vector
     std::iota(std::begin(perm), std::end(perm), 0);
 
-    for (std::size_t k{0}; k < n; k++)
+    for (std::size_t i{0}; i < n; i++)
     {
         // Partial pivoting
-        std::size_t p{k};
-        for (std::size_t t{k + 1}; t < n; t++)
+        std::size_t p{i};
+        for (std::size_t t{i + 1}; t < n; t++)
         {
-            if (std::abs(A(perm[t], k)) > std::abs(A(perm[p], k)))
+            if (std::abs(A(perm[t], i)) > std::abs(A(perm[p], i)))
             {
                 p = t;
             }
         }
-        if (p > k)
+        if (p > i)
         {
-            std::swap(perm[p], perm[k]);
+            std::swap(perm[p], perm[i]);
         }
 
-        // Set the L diagonal
-        L(perm[k], k) = 1;
-
-        // Set the U diagonal
-        {
-            T s1{0.0};
-            for (std::size_t t{0}; t <= k; t++)
-            {
-                s1 += L(perm[k], t) * U(t, k);
-            }
-            U(k, k) = (A(perm[k], k) - s1) / L(perm[k], k);
-        }
-
-        // Upper
-        for (std::size_t j{k + 1}; j < n; j++)
+        // U
+        for (std::size_t k{0}; k < n; k++)
         {
             T sum{0.0};
-            for (std::size_t t{0}; t <= k; t++)
+
+            for (std::size_t j{0}; j < i; j++)
             {
-                sum += L(perm[k], t) * U(t, j);
+                sum += L(perm[i], j) * U(j, k);
             }
-            U(k, j) = (A(perm[k], j) - sum) / L(perm[k], k);
+
+            U(i, k) = A(perm[i], k) - sum;
         }
 
-        // Lower
-        for (std::size_t i{k + 1}; i < n; i++)
+        // U
+        for (std::size_t k{i}; k < n; k++)
         {
-            T sum{0.0};
-            for (std::size_t t{0}; t <= k; t++)
+            if (i == k)
             {
-                sum += L(perm[i], t) * U(t, k);
+                L(perm[i], i) = 1;
             }
-            L(perm[i], k) = (A(perm[i], k) - sum) / U(k, k);
+            else
+            {
+                T sum{0.0};
+
+                for (std::size_t j{0}; j < i; j++)
+                {
+                    sum += L(perm[k], j) * U(j, i);
+                }
+
+                L(perm[k], i) = (A(perm[k], i) - sum) / U(i, i);
+            }
         }
     }
-
     return result;
 }
 
