@@ -16,7 +16,7 @@ T& Matrix<T>::operator()(const std::size_t row, const std::size_t col)
 }
 
 template <typename T>
-T Matrix<T>::operator()(const std::size_t row, const std::size_t col) const
+const T& Matrix<T>::operator()(const std::size_t row, const std::size_t col) const
 {
 #ifdef NDEBUG
     return m_data[row * n_cols() + col];

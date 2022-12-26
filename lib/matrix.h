@@ -67,7 +67,7 @@ class Matrix
 
     // Access
     T& operator()(const std::size_t row, const std::size_t col);
-    T operator()(const std::size_t row, const std::size_t col) const;
+    const T& operator()(const std::size_t row, const std::size_t col) const;
 
     // Put-to
     template <typename U>
