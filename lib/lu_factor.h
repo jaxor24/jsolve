@@ -13,11 +13,26 @@ struct lu_result
 {
     Matrix<T> L;
     Matrix<T> U;
-    std::vector<std::size_t> perm;
+    Matrix<T> P;
+    // std::vector<std::size_t> perm;
 };
 
+template <typename U>
+void my_swap_rows(Matrix<U>& input, std::size_t i, std::size_t j)
+{
+    if (input.n_rows() <= i || input.n_rows() <= j)
+    {
+        throw MatrixError("Swap rows exceed matrix dimensions");
+    }
+
+    for (std::size_t column = 0; column < input.n_cols(); ++column)
+    {
+        std::swap(input(i, column), input(j, column));
+    }
+}
+
 template <typename T>
-lu_result<T> lu_factor(const Matrix<T>& A)
+lu_result<T> lu_factor(Matrix<T> A)
 {
     // LU factorisation of A using the Doolittle method with max magnitude partial pivoting.
     // The row swaps are incorporated into L (so it may not be lower triangular), but LU = A.
@@ -33,64 +48,82 @@ lu_result<T> lu_factor(const Matrix<T>& A)
         throw SolveError("Cannot factor non-square matrix");
     }
 
-    lu_result<T> result{.L{n, n}, .U{n, n}, .perm{std::vector<std::size_t>(n, 0)}};
-
-    auto& L = result.L;
-    auto& U = result.U;
-    auto& perm = result.perm;
+    lu_result<T> result{.L{n, n}, .U{n, n}, .P = eye<T>(n)};
 
     // Permutation vector
+    auto perm = std::vector<std::size_t>(n, 0);
     std::iota(std::begin(perm), std::end(perm), 0);
 
-    for (std::size_t i{0}; i < n; i++)
+    std::size_t imax{0};
+    double tol{1e-9};
+    double maxA{0.0};
+    double absA{0.0};
+
+    for (int i = 0; i < n; i++)
     {
-        // Partial pivoting
-        std::size_t p{i};
-        for (std::size_t t{i + 1}; t < n; t++)
+        // Pivoting
+        maxA = 0.0;
+        imax = i;
+
+        for (int k = i; k < n; k++)
         {
-            if (std::abs(A(perm[t], i)) > std::abs(A(perm[p], i)))
+            absA = std::abs(A(k, i));
+
+            if (absA > maxA)
             {
-                p = t;
+                maxA = absA;
+                imax = k;
             }
         }
-        if (p > i)
+
+        if (maxA < tol)
         {
-            std::swap(perm[p], perm[i]);
+            throw SolveError("LU factor failed, matrix is degenerate");
         }
 
-        // U
-        for (std::size_t k{0}; k < n; k++)
+        if (imax != i)
         {
-            T sum{0.0};
-
-            for (std::size_t j{0}; j < i; j++)
-            {
-                sum += L(perm[i], j) * U(j, k);
-            }
-
-            U(i, k) = A(perm[i], k) - sum;
+            std::swap(perm[i], perm[imax]);
+            my_swap_rows(A, i, imax);
+            my_swap_rows(result.P, i, imax);
         }
 
-        // U
-        for (std::size_t k{i}; k < n; k++)
+        // Factorisation
+        for (int j = i + 1; j < n; j++)
         {
-            if (i == k)
+            A(j, i) = A(j, i) / A(i, i);
+            for (int k = i + 1; k < n; k++)
             {
-                L(perm[i], i) = 1;
-            }
-            else
-            {
-                T sum{0.0};
-
-                for (std::size_t j{0}; j < i; j++)
-                {
-                    sum += L(perm[k], j) * U(j, i);
-                }
-
-                L(perm[k], i) = (A(perm[k], i) - sum) / U(i, i);
+                A(j, k) -= A(j, i) * A(i, k);
             }
         }
     }
+
+    // Extract L, U
+    for (int row = 0; row < n; row++)
+    {
+        for (int col = 0; col < n; col++)
+        {
+            if (row == col)
+            {
+                result.U(row, col) = A(row, col);
+                result.L(row, col) = 1;
+            }
+            else if (row > col)
+            {
+                result.L(row, col) = A(row, col);
+            }
+            else
+            {
+                result.U(row, col) = A(row, col);
+            }
+        }
+    }
+
+    log()->trace(A);
+    log()->trace(result.L);
+    log()->trace(result.U);
+    log()->trace(result.P);
     return result;
 }
 
