@@ -11,22 +11,24 @@ TEST_CASE("lu_factor")
     {
         SECTION("1x1 system")
         {
-            Matr A{1, 1, 5};
+            Matr A{1, 1, 1};
 
-            auto [L, U, perm] = jsolve::lu_factor(A);
-            REQUIRE(A == L * U);
+            auto [L, U, P] = jsolve::lu_factor(A);
+
+            REQUIRE(P * A == L * U);
         }
 
         SECTION("2x2 matrix")
         {
             Matr A{2, 2, 0.0};
-            A(0, 0) = 0;
-            A(0, 1) = 1;
-            A(1, 0) = 2;
-            A(1, 1) = 1;
+            A(0, 0) = 6;
+            A(0, 1) = 4;
+            A(1, 0) = -3;
+            A(1, 1) = -1;
 
-            auto [L, U, perm] = jsolve::lu_factor(A);
-            REQUIRE(A == L * U);
+            auto [L, U, P] = jsolve::lu_factor(A);
+
+            REQUIRE(P * A == L * U);
         }
 
         SECTION("3x3 matrix")
@@ -52,8 +54,9 @@ TEST_CASE("lu_factor")
             A(3, 2) = 8;
             A(3, 3) = 8;
 
-            auto [L, U, perm] = jsolve::lu_factor(A);
-            REQUIRE(A == L * U);
+            auto [L, U, P] = jsolve::lu_factor(A);
+
+            REQUIRE(P * A == L * U);
         }
 
         SECTION("3x3 matrix")
@@ -71,14 +74,9 @@ TEST_CASE("lu_factor")
             A(2, 1) = -2;
             A(2, 2) = 8;
 
-            auto [L, U, perm] = jsolve::lu_factor(A);
+            auto [L, U, P] = jsolve::lu_factor(A);
 
-            REQUIRE(L.n_rows() == A.n_rows());
-            REQUIRE(L.n_cols() == A.n_cols());
-            REQUIRE(U.n_cols() == A.n_rows());
-            REQUIRE(U.n_cols() == A.n_cols());
-
-            REQUIRE(A == L * U);
+            REQUIRE(P * A == L * U);
         }
 
         SECTION("5x5 matrix")
@@ -103,14 +101,9 @@ TEST_CASE("lu_factor")
             A(4, 2) = 1;
             A(4, 4) = 4;
 
-            auto [L, U, perm] = jsolve::lu_factor(A);
+            auto [L, U, P] = jsolve::lu_factor(A);
 
-            REQUIRE(L.n_rows() == A.n_rows());
-            REQUIRE(L.n_cols() == A.n_cols());
-            REQUIRE(U.n_cols() == A.n_rows());
-            REQUIRE(U.n_cols() == A.n_cols());
-
-            REQUIRE(A == L * U);
+            REQUIRE(P * A == L * U);
         }
     }
 
@@ -124,8 +117,9 @@ TEST_CASE("lu_factor")
             A(1, 0) = 2;
             A(1, 1) = 1;
 
-            auto [L, U, perm] = jsolve::lu_factor(A);
-            REQUIRE(A == L * U);
+            auto [L, U, P] = jsolve::lu_factor(A);
+
+            REQUIRE(P * A == L * U);
         }
 
         SECTION("3x3 matrix")
@@ -143,8 +137,9 @@ TEST_CASE("lu_factor")
             A(2, 1) = 235;
             A(2, 2) = 7;
 
-            auto [L, U, perm] = jsolve::lu_factor(A);
-            REQUIRE(A == L * U);
+            auto [L, U, P] = jsolve::lu_factor(A);
+
+            REQUIRE(P * A == L * U);
         }
 
         SECTION("8x8 matrix")
@@ -181,8 +176,9 @@ TEST_CASE("lu_factor")
             A(7, 6) = 2;
             A(7, 7) = 1;
 
-            auto [L, U, perm] = jsolve::lu_factor(A);
-            REQUIRE(A == L * U);
+            auto [L, U, P] = jsolve::lu_factor(A);
+
+            REQUIRE(P * A == L * U);
         }
     }
 }
