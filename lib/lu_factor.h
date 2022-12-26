@@ -55,17 +55,17 @@ lu_result<T> lu_factor(Matrix<T> A)
     std::iota(std::begin(perm), std::end(perm), 0);
 
     std::size_t imax{0};
-    double tol{1e-9};
-    double maxA{0.0};
-    double absA{0.0};
+    T tol{1e-9};
+    T maxA{0.0};
+    T absA{0.0};
 
-    for (int i = 0; i < n; i++)
+    for (std::size_t i{0}; i < n; i++)
     {
         // Pivoting
         maxA = 0.0;
         imax = i;
 
-        for (int k = i; k < n; k++)
+        for (std::size_t k{i}; k < n; k++)
         {
             absA = std::abs(A(k, i));
 
@@ -89,12 +89,12 @@ lu_result<T> lu_factor(Matrix<T> A)
         }
 
         // Factorisation
-        for (int j = i + 1; j < n; j++)
+        for (std::size_t j{i + 1}; j < n; j++)
         {
             A(j, i) = A(j, i) / A(i, i);
-            for (int k = i + 1; k < n; k++)
+            for (std::size_t k{i + 1}; k < n; k++)
             {
-                A(j, k) -= A(j, i) * A(i, k);
+                A(j, k) = A(j, k) - (A(j, i) * A(i, k));
             }
         }
     }
