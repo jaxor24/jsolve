@@ -4,6 +4,7 @@
 
 #include "variable.h"
 
+#include "lu_factor.h"
 #include "solve_error.h"
 #include "solve_gauss.h"
 
@@ -260,7 +261,12 @@ bool solve_primal(SolveData& data, Parameters params)
         // dx = inv(B) * N * ej
         // where j = entering index
 
-        auto dx = solve_gauss(B, N.slice({}, {entering.value()}));
+        // auto dx = solve_gauss(B, N.slice({}, {entering.value()}));
+
+        auto [L, U, P, perm] = jsolve::lu_factor(B);
+
+        auto y = jsolve::forward_subs(L, N.slice({}, {entering.value()}), perm);
+        auto dx = jsolve::backward_subs(U, y);
 
         log()->trace(dx);
 

@@ -307,9 +307,9 @@ Matrix<U> forward_subs(const Matrix<U>& A, const Matrix<U>& b, const std::vector
         U sum{0};
         for (int j{0}; j < i; j++)
         {
-            sum += A(perm[i], j) * x(j, 0);
+            sum += A(i, j) * x(j, 0);
         }
-        x(i, 0) = (b(perm[i], 0) - sum) / A(perm[i], i);
+        x(i, 0) = (b(perm[i], 0) - sum) / A(i, i);
     }
 
     return x;
