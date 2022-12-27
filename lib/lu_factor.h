@@ -35,10 +35,10 @@ template <typename T>
 lu_result<T> lu_factor(Matrix<T> A)
 {
     // LU factorisation of A using the Doolittle method with max magnitude partial pivoting.
-    // The row swaps are incorporated into L (so it may not be lower triangular), but LU = A.
-
-    // This uses a permutation vector to track where row swaps in A have occurred, rather than
-    // permuting A itself.
+    // Returns L, U and P such that LU = PA.
+    // TODO:
+    // - discard P as it is only needed for tests
+    // - avoid explicitly swapping rows of A and work via perm instead
 
     auto m{A.n_rows()};
     auto n{A.n_cols()};
@@ -125,116 +125,6 @@ lu_result<T> lu_factor(Matrix<T> A)
     log()->trace(result.U);
     log()->trace(result.P);
     return result;
-}
-
-template <typename T>
-struct lup_result
-{
-    Matrix<T> A;
-    std::vector<std::size_t> perm;
-};
-
-template <typename T>
-lup_result<T> lup_factor(const Matrix<T>& B)
-{
-    // LU factorisation of A using the Doolittle method with max magnitude partial pivoting.
-    // The row swaps are incorporated into L (so it may not be lower triangular), but LU = A.
-
-    // This uses a permutation vector to track where row swaps in A have occurred, rather than
-    // permuting A itself.
-
-    auto m{B.n_rows()};
-    auto n{B.n_cols()};
-
-    if (m != n)
-    {
-        throw SolveError("Cannot factor non-square matrix");
-    }
-
-    lup_result<T> result{.A{B}, .perm{std::vector<std::size_t>(n, 0)}};
-
-    auto& A = result.A;
-    auto& perm = result.perm;
-
-    std::iota(std::begin(perm), std::end(perm), 0);
-
-    std::size_t imax{0};
-    T tol{1e-9};
-    T maxA{0.0};
-    T absA{0.0};
-
-    for (std::size_t i{0}; i < n; i++)
-    {
-        // Pivoting
-        maxA = 0.0;
-        imax = i;
-
-        for (std::size_t k{i}; k < n; k++)
-        {
-            absA = std::abs(A(k, i));
-
-            if (absA > maxA)
-            {
-                maxA = absA;
-                imax = k;
-            }
-        }
-
-        if (maxA < tol)
-        {
-            throw SolveError("LU factor failed, matrix is degenerate");
-        }
-
-        if (imax != i)
-        {
-            std::swap(perm[i], perm[imax]);
-            my_swap_rows(A, i, imax);
-        }
-
-        // Factorisation
-        for (std::size_t j{i + 1}; j < n; j++)
-        {
-            A(j, i) = A(j, i) / A(i, i);
-            for (std::size_t k{i + 1}; k < n; k++)
-            {
-                A(j, k) = A(j, k) - (A(j, i) * A(i, k));
-            }
-        }
-    }
-
-    return result;
-}
-
-template <typename U>
-Matrix<U> lup_solve(const Matrix<U>& A, const Matrix<U>& b, const std::vector<std::size_t>& perm)
-{
-    // Solves Ax = b, assuming A is a combined LUP matrix.
-
-    Matrix<U> x{A.n_rows(), 1};
-
-    auto n{static_cast<int>(A.n_rows())};
-
-    for (int i = 0; i < n; i++)
-    {
-        x(i, 0) = b(perm[i], 0);
-
-        for (int k = 0; k < i; k++)
-        {
-            x(i, 0) -= A(i, k) * x(k, 0);
-        }
-    }
-
-    for (int i = n - 1; i >= 0; i--)
-    {
-        for (int k = i + 1; k < n; k++)
-        {
-            x(i, 0) -= A(i, k) * x(k, 0);
-        }
-
-        x(i, 0) = x(i, 0) / A(i, i);
-    }
-
-    return x;
 }
 
 template <typename U>
