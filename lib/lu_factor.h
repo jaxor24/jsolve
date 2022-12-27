@@ -237,12 +237,12 @@ Matrix<U> lup_solve(const Matrix<U>& A, const Matrix<U>& b, const std::vector<st
     return x;
 }
 
-//
-
 template <typename U>
-Matrix<U> backward_subs(const Matrix<U>& A, const Matrix<U>& b)
+Matrix<U> backward_subs(const Matrix<U>& A, const Matrix<U>& b, const std::vector<std::size_t>& perm)
 {
-    // Solves Ax = b via backward subsitution, assuming A is upper triangular.
+    // Solves Ax = b via backward substitution including column permutations.
+    // A is assumed to be upper triangular, with col swaps given by perm.
+    // b is a column who's rows are in the original (non-permuted) order.
 
     int m{static_cast<int>(A.n_rows())};
     int n{static_cast<int>(A.n_cols())};
@@ -262,6 +262,11 @@ Matrix<U> backward_subs(const Matrix<U>& A, const Matrix<U>& b)
         throw SolveError("Input b must have one column");
     }
 
+    if (b.n_rows() != perm.size())
+    {
+        throw SolveError("Invalid permutation vector size");
+    }
+
     Matrix<U> x{A.n_rows(), 1};
 
     for (int i{n - 1}; i >= 0; i--)
@@ -274,13 +279,33 @@ Matrix<U> backward_subs(const Matrix<U>& A, const Matrix<U>& b)
         x(i, 0) = (b(i, 0) - sum) / A(i, i);
     }
 
+    // Re-order the solution according to the column permutations
+    // TODO: This is bad - we need to copy x to do this!
+    auto x_original{x};
+
+    for (std::size_t i{0}; i < n; i++)
+    {
+        x(perm[i], 0) = x_original(i, 0);
+    }
+
     return x;
+}
+
+template <typename U>
+Matrix<U> backward_subs(const Matrix<U>& A, const Matrix<U>& b)
+{
+    // Solves Ax = b by forward substitution. Assumes A is lower diagonal.
+    auto perm = std::vector<std::size_t>(b.n_rows(), 0);
+    std::iota(std::begin(perm), std::end(perm), 0); // [0, 1, ..., n];
+    return backward_subs(A, b, perm);
 }
 
 template <typename U>
 Matrix<U> forward_subs(const Matrix<U>& A, const Matrix<U>& b, const std::vector<std::size_t>& perm)
 {
-    // Solves Ax = b by forward substituion, with the row permuations of A and b described by perm.
+    // Solves Ax = b by forward substitution including row permutations.
+    // A is assumed to be lower triangular, with row swaps given by perm.
+    // b is a column who's rows are in the original (non-permuted) order.
 
     int m{static_cast<int>(A.n_rows())};
     int n{static_cast<int>(A.n_cols())};
