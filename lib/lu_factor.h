@@ -294,7 +294,6 @@ Matrix<U> backward_subs(const Matrix<U>& A, const Matrix<U>& b, const std::vecto
 template <typename U>
 Matrix<U> backward_subs(const Matrix<U>& A, const Matrix<U>& b)
 {
-    // Solves Ax = b by forward substitution. Assumes A is lower diagonal.
     auto perm = std::vector<std::size_t>(b.n_rows(), 0);
     std::iota(std::begin(perm), std::end(perm), 0); // [0, 1, ..., n];
     return backward_subs(A, b, perm);
@@ -325,6 +324,11 @@ Matrix<U> forward_subs(const Matrix<U>& A, const Matrix<U>& b, const std::vector
         throw SolveError("Input b must have one column");
     }
 
+    if (b.n_rows() != perm.size())
+    {
+        throw SolveError("Invalid permutation vector size");
+    }
+
     Matrix<U> x{A.n_rows(), 1};
 
     for (int i{0}; i < m; i++)
@@ -343,7 +347,6 @@ Matrix<U> forward_subs(const Matrix<U>& A, const Matrix<U>& b, const std::vector
 template <typename U>
 Matrix<U> forward_subs(const Matrix<U>& A, const Matrix<U>& b)
 {
-    // Solves Ax = b by forward substitution. Assumes A is lower diagonal.
     auto perm = std::vector<std::size_t>(b.n_rows(), 0);
     std::iota(std::begin(perm), std::end(perm), 0); // [0, 1, ..., n];
     return forward_subs(A, b, perm);
