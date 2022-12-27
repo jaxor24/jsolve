@@ -13,7 +13,7 @@ TEST_CASE("lu_factor")
         {
             Matr A{1, 1, 1};
 
-            auto [L, U, P] = jsolve::lu_factor(A);
+            auto [L, U, P, perm] = jsolve::lu_factor(A);
 
             REQUIRE(P * A == L * U);
         }
@@ -26,7 +26,7 @@ TEST_CASE("lu_factor")
             A(1, 0) = -3;
             A(1, 1) = -1;
 
-            auto [L, U, P] = jsolve::lu_factor(A);
+            auto [L, U, P, perm] = jsolve::lu_factor(A);
 
             REQUIRE(P * A == L * U);
         }
@@ -54,7 +54,7 @@ TEST_CASE("lu_factor")
             A(3, 2) = 8;
             A(3, 3) = 8;
 
-            auto [L, U, P] = jsolve::lu_factor(A);
+            auto [L, U, P, perm] = jsolve::lu_factor(A);
 
             REQUIRE(P * A == L * U);
         }
@@ -74,7 +74,7 @@ TEST_CASE("lu_factor")
             A(2, 1) = -2;
             A(2, 2) = 8;
 
-            auto [L, U, P] = jsolve::lu_factor(A);
+            auto [L, U, P, perm] = jsolve::lu_factor(A);
 
             REQUIRE(P * A == L * U);
         }
@@ -101,7 +101,7 @@ TEST_CASE("lu_factor")
             A(4, 2) = 1;
             A(4, 4) = 4;
 
-            auto [L, U, P] = jsolve::lu_factor(A);
+            auto [L, U, P, perm] = jsolve::lu_factor(A);
 
             REQUIRE(P * A == L * U);
         }
@@ -117,7 +117,7 @@ TEST_CASE("lu_factor")
             A(1, 0) = 2;
             A(1, 1) = 1;
 
-            auto [L, U, P] = jsolve::lu_factor(A);
+            auto [L, U, P, perm] = jsolve::lu_factor(A);
 
             REQUIRE(P * A == L * U);
         }
@@ -137,7 +137,7 @@ TEST_CASE("lu_factor")
             A(2, 1) = 235;
             A(2, 2) = 7;
 
-            auto [L, U, P] = jsolve::lu_factor(A);
+            auto [L, U, P, perm] = jsolve::lu_factor(A);
 
             REQUIRE(P * A == L * U);
         }
@@ -176,7 +176,7 @@ TEST_CASE("lu_factor")
             A(7, 6) = 2;
             A(7, 7) = 1;
 
-            auto [L, U, P] = jsolve::lu_factor(A);
+            auto [L, U, P, perm] = jsolve::lu_factor(A);
 
             REQUIRE(P * A == L * U);
         }
