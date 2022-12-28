@@ -68,10 +68,10 @@ def solve_mps(logger, solver, mps, timeout):
 
 
 def main():
-    mps_directory = "netlib/mps"
+    mps_directory = "mps"
     all_mps_files = Path(mps_directory).glob("*.mps")
     solver = Path("C:\\repos\\jsolve\\out\\build\\windows-release\\app\\jsolver_app.exe")
-    max_solve_time = 3
+    max_solve_time = 600
 
     # Logging setup
     queue = mp.Queue(-1)
@@ -85,13 +85,13 @@ def main():
     # Solve MPS files
     for i, mps_file in enumerate(all_mps_files):
         work_callable = partial(solve_mps, solver=solver, mps=mps_file, timeout=max_solve_time)
-
         p = mp.Process(target=worker_process, args=(queue, worker_configurer, mps_file.stem, work_callable))
         p.start()
         p.join()
 
     queue.put_nowait(None)
     listener.join() 
+
 
 if __name__ == '__main__':
     main()
