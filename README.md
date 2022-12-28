@@ -9,8 +9,9 @@ There are many variations of the algorithm. My plan is:
 3. &#9745; Revised primal algorithm (i.e. matrix based approach, Gaussian elimination)
 4. &#9745; Revised dual algorithm (i.e. matrix based approach, Gaussian elimination)
 5. &#9745; Two phase revised algorithm (i.e. combine the above to handle infeasible starting bases)
-6. Replace Gaussian elimination with LU factorisation
-7. General simplex algorithm (i.e. handle bounded variables)
+6. &#9745; Replace Gaussian elimination with LU factorisation
+7. Re-use (update) LU factorisation between iterations
+8. General simplex algorithm (i.e. handle bounded variables)
 
 I have just completed (6) above.
 
@@ -27,6 +28,7 @@ Used:
 - `std::source_location` to locate MPS files
 - `std::ranges` for the range version of functions in `<algorithm>`
 - `std::filesystem` to interact with MPS files
+- `std::execution` used to parallelize matrix multiplication
 
 Want to use:
 - `std::mdspan` to avoid copies within the simplex pivots
