@@ -258,7 +258,7 @@ bool solve_primal(SolveData& data, Parameters params)
         }
 
         // 3. Calculate dx (FTRAN)
-        auto [L, U, P, perm] = jsolve::lu_factor(B);
+        auto [L, U, perm] = jsolve::lu_factor(B);
 
         auto y = jsolve::forward_subs(L, N.slice({}, {entering.value()}), perm);
         auto dx = jsolve::backward_subs(U, y);
@@ -352,7 +352,7 @@ bool solve_dual(SolveData& data, Parameters params)
         }
 
         // 3. Calculate dx (BTRAN)
-        auto [L, U, P, perm] = jsolve::lu_factor(B);
+        auto [L, U, perm] = jsolve::lu_factor(B);
 
         auto ei = Mat{B.n_rows(), 1};
         ei(entering.value(), 0) = 1;

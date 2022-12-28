@@ -13,9 +13,12 @@ TEST_CASE("lu_factor")
         {
             Matr A{1, 1, 1};
 
-            auto [L, U, P, perm] = jsolve::lu_factor(A);
+            auto [L, U, perm] = jsolve::lu_factor(A);
 
-            REQUIRE(P * A == L * U);
+            REQUIRE(L(0, 0) == 1);
+            REQUIRE(U(0, 0) == 1);
+            REQUIRE(perm.size() == 1);
+            REQUIRE(perm.at(0) == 0);
         }
 
         SECTION("2x2 matrix")
@@ -26,37 +29,21 @@ TEST_CASE("lu_factor")
             A(1, 0) = -3;
             A(1, 1) = -1;
 
-            auto [L, U, P, perm] = jsolve::lu_factor(A);
+            auto [L, U, perm] = jsolve::lu_factor(A);
 
-            REQUIRE(P * A == L * U);
-        }
+            REQUIRE(L(0, 0) == 1);
+            REQUIRE(L(0, 1) == 0);
+            REQUIRE(L(1, 0) == -0.5);
+            REQUIRE(L(1, 1) == 1);
 
-        SECTION("3x3 matrix")
-        {
-            Matr A{4, 4, 0.0};
-            A(0, 0) = 4;
-            A(0, 1) = 3;
-            A(0, 2) = 4;
-            A(0, 3) = 2;
+            REQUIRE(U(0, 0) == 6);
+            REQUIRE(U(0, 1) == 4);
+            REQUIRE(U(1, 0) == 0);
+            REQUIRE(U(1, 1) == 1);
 
-            A(1, 0) = 1;
-            A(1, 1) = 2;
-            A(1, 2) = 2;
-            A(1, 3) = 4;
-
-            A(2, 0) = 8;
-            A(2, 1) = 9;
-            A(2, 2) = 9;
-            A(2, 3) = 1;
-
-            A(3, 0) = 6;
-            A(3, 1) = 4;
-            A(3, 2) = 8;
-            A(3, 3) = 8;
-
-            auto [L, U, P, perm] = jsolve::lu_factor(A);
-
-            REQUIRE(P * A == L * U);
+            REQUIRE(perm.size() == 2);
+            REQUIRE(perm.at(0) == 0);
+            REQUIRE(perm.at(1) == 1);
         }
 
         SECTION("3x3 matrix")
@@ -74,36 +61,32 @@ TEST_CASE("lu_factor")
             A(2, 1) = -2;
             A(2, 2) = 8;
 
-            auto [L, U, P, perm] = jsolve::lu_factor(A);
+            auto [L, U, perm] = jsolve::lu_factor(A);
 
-            REQUIRE(P * A == L * U);
-        }
+            REQUIRE(L(0, 0) == 1);
+            REQUIRE(L(0, 1) == 0);
+            REQUIRE(L(0, 2) == 0);
+            REQUIRE(L(1, 0) == 1);
+            REQUIRE(L(1, 1) == 1);
+            REQUIRE(L(1, 2) == 0);
+            REQUIRE(L(2, 0) == -0.5);
+            REQUIRE(L(2, 1) == -0.25);
+            REQUIRE(L(2, 2) == 1);
 
-        SECTION("5x5 matrix")
-        {
-            Matr A{5, 5, 0.0};
+            REQUIRE(U(0, 0) == -4);
+            REQUIRE(U(0, 1) == 6);
+            REQUIRE(U(0, 2) == 3);
+            REQUIRE(U(1, 0) == 0);
+            REQUIRE(U(1, 1) == -8);
+            REQUIRE(U(1, 2) == 5);
+            REQUIRE(U(2, 0) == 0);
+            REQUIRE(U(2, 1) == 0);
+            REQUIRE(U(2, 2) == 0.75);
 
-            A(0, 0) = 2;
-            A(0, 2) = 4;
-            A(0, 4) = -2;
-
-            A(1, 0) = 3;
-            A(1, 1) = 1;
-            A(1, 3) = 1;
-
-            A(2, 0) = -1;
-            A(2, 2) = -1;
-            A(2, 4) = -2;
-
-            A(3, 1) = -1;
-            A(3, 4) = -6;
-
-            A(4, 2) = 1;
-            A(4, 4) = 4;
-
-            auto [L, U, P, perm] = jsolve::lu_factor(A);
-
-            REQUIRE(P * A == L * U);
+            REQUIRE(perm.size() == 3);
+            REQUIRE(perm.at(0) == 1);
+            REQUIRE(perm.at(1) == 2);
+            REQUIRE(perm.at(2) == 0);
         }
     }
 
@@ -117,9 +100,21 @@ TEST_CASE("lu_factor")
             A(1, 0) = 2;
             A(1, 1) = 1;
 
-            auto [L, U, P, perm] = jsolve::lu_factor(A);
+            auto [L, U, perm] = jsolve::lu_factor(A);
 
-            REQUIRE(P * A == L * U);
+            REQUIRE(L(0, 0) == 1);
+            REQUIRE(L(0, 1) == 0);
+            REQUIRE(L(1, 0) == 0);
+            REQUIRE(L(1, 1) == 1);
+
+            REQUIRE(U(0, 0) == 2);
+            REQUIRE(U(0, 1) == 1);
+            REQUIRE(U(1, 0) == 0);
+            REQUIRE(U(1, 1) == 1);
+
+            REQUIRE(perm.size() == 2);
+            REQUIRE(perm.at(0) == 1);
+            REQUIRE(perm.at(1) == 0);
         }
 
         SECTION("3x3 matrix")
@@ -137,9 +132,32 @@ TEST_CASE("lu_factor")
             A(2, 1) = 235;
             A(2, 2) = 7;
 
-            auto [L, U, P, perm] = jsolve::lu_factor(A);
+            auto [L, U, perm] = jsolve::lu_factor(A);
 
-            REQUIRE(P * A == L * U);
+            REQUIRE(L(0, 0) == 1);
+            REQUIRE(L(0, 1) == 0);
+            REQUIRE(L(0, 2) == 0);
+            REQUIRE(L(1, 0) == 0.75);
+            REQUIRE(L(1, 1) == 1);
+            REQUIRE(L(1, 2) == 0);
+            REQUIRE(L(2, 0) == 0.25);
+            REQUIRE(approx_equal(L(2, 1), 0.360583, 1e-6));
+            REQUIRE(L(2, 2) == 1);
+
+            REQUIRE(U(0, 0) == 4);
+            REQUIRE(U(0, 1) == 235);
+            REQUIRE(U(0, 2) == 7);
+            REQUIRE(U(1, 0) == 0);
+            REQUIRE(U(1, 1) == -171.25);
+            REQUIRE(U(1, 2) == -11.25);
+            REQUIRE(U(2, 0) == 0);
+            REQUIRE(U(2, 1) == 0);
+            REQUIRE(approx_equal(U(2, 2), 24.306569, 1e-6));
+
+            REQUIRE(perm.size() == 3);
+            REQUIRE(perm.at(0) == 2);
+            REQUIRE(perm.at(1) == 1);
+            REQUIRE(perm.at(2) == 0);
         }
 
         SECTION("8x8 matrix")
@@ -176,9 +194,56 @@ TEST_CASE("lu_factor")
             A(7, 6) = 2;
             A(7, 7) = 1;
 
-            auto [L, U, P, perm] = jsolve::lu_factor(A);
+            auto [L, U, perm] = jsolve::lu_factor(A);
 
-            REQUIRE(P * A == L * U);
+            // Diagonal
+            REQUIRE(L(0, 0) == 1);
+            REQUIRE(L(1, 1) == 1);
+            REQUIRE(L(2, 2) == 1);
+            REQUIRE(L(3, 3) == 1);
+            REQUIRE(L(4, 4) == 1);
+            REQUIRE(L(5, 5) == 1);
+            REQUIRE(L(6, 6) == 1);
+            REQUIRE(L(7, 7) == 1);
+
+            // Lower triangle
+            REQUIRE(L(5, 1) == -1);
+            REQUIRE(L(6, 1) == 1);
+            REQUIRE(L(7, 1) == -1);
+            REQUIRE(L(6, 4) == -0.5);
+            REQUIRE(L(7, 4) == 0.5);
+            REQUIRE(L(7, 6) == -1);
+
+            // Diagonal
+            REQUIRE(U(0, 0) == 1);
+            REQUIRE(U(1, 1) == -1);
+            REQUIRE(U(2, 2) == 1);
+            REQUIRE(U(3, 3) == 1);
+            REQUIRE(U(4, 4) == 2);
+            REQUIRE(U(5, 5) == 1);
+            REQUIRE(U(6, 6) == -2.5);
+            REQUIRE(U(7, 7) == 1);
+
+            // Upper triangle
+            REQUIRE(U(0, 4) == -2);
+            REQUIRE(U(1, 4) == -1);
+            REQUIRE(U(2, 4) == 2);
+            REQUIRE(U(3, 4) == -2);
+
+            REQUIRE(U(0, 6) == 1);
+            REQUIRE(U(2, 6) == -1);
+            REQUIRE(U(3, 6) == 1);
+            REQUIRE(U(4, 6) == -1);
+
+            REQUIRE(perm.size() == 8);
+            REQUIRE(perm.at(0) == 0);
+            REQUIRE(perm.at(1) == 4);
+            REQUIRE(perm.at(2) == 2);
+            REQUIRE(perm.at(3) == 3);
+            REQUIRE(perm.at(4) == 1);
+            REQUIRE(perm.at(5) == 5);
+            REQUIRE(perm.at(6) == 6);
+            REQUIRE(perm.at(7) == 7);
         }
     }
 }

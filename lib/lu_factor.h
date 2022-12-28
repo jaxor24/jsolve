@@ -13,7 +13,6 @@ struct lu_result
 {
     Matrix<T> L;
     Matrix<T> U;
-    Matrix<T> P;
     std::vector<std::size_t> perm;
 };
 
@@ -34,7 +33,7 @@ lu_result<T> lu_factor(Matrix<T> A)
         throw SolveError("Cannot factor non-square matrix");
     }
 
-    lu_result<T> result{.L{n, n}, .U{n, n}, .P = eye<T>(n), .perm{std::vector<std::size_t>(n, 0)}};
+    lu_result<T> result{.L{n, n}, .U{n, n}, .perm{std::vector<std::size_t>(n, 0)}};
 
     // Permutation vector
     auto& perm = result.perm;
@@ -71,7 +70,6 @@ lu_result<T> lu_factor(Matrix<T> A)
         {
             std::swap(perm[i], perm[imax]);
             swap_rows(A, i, imax);
-            swap_rows(result.P, i, imax);
         }
 
         // Factorisation
@@ -109,7 +107,6 @@ lu_result<T> lu_factor(Matrix<T> A)
     log()->trace(A);
     log()->trace(result.L);
     log()->trace(result.U);
-    log()->trace(result.P);
     return result;
 }
 
