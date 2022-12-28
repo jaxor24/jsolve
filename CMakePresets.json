@@ -10,6 +10,7 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+        "CMAKE_CXX_COMPILER": "g++",
         "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -Werror"
       },
       "vendor": {
@@ -27,7 +28,6 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
         "CMAKE_CXX_COMPILER": "clang++",
-        "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -Werror"
       },
       "vendor": {

@@ -4,8 +4,8 @@
 
 #include "variable.h"
 
+#include "lu_factor.h"
 #include "solve_error.h"
-#include "solve_gauss.h"
 
 #include "matrix.h"
 #include "tools.h"
@@ -257,10 +257,10 @@ bool solve_primal(SolveData& data, Parameters params)
         }
 
         // 3. Calculate dx (FTRAN)
-        // dx = inv(B) * N * ej
-        // where j = entering index
+        auto [L, U, perm] = jsolve::lu_factor(B);
 
-        auto dx = solve_gauss(B, N.slice({}, {entering.value()}));
+        auto y = jsolve::forward_subs(L, N.slice({}, {entering.value()}), perm);
+        auto dx = jsolve::backward_subs(U, y);
 
         log()->trace(dx);
 
@@ -281,16 +281,13 @@ bool solve_primal(SolveData& data, Parameters params)
 
         auto t = x_basic(leaving.value(), 0) / dx(leaving.value(), 0);
 
-        // 6. Calculate dz
-        // dz = -1 * transpose(inv(B)*N) * ei
-        // where i = leaving index
-
+        // 6. Calculate dz (BTRAN)
         auto ei = Mat{B.n_rows(), 1};
         ei(leaving.value(), 0) = 1;
-        auto v = solve_gauss(B.make_transpose(), ei);
-        auto dz = -1.0 * N.make_transpose() * v;
 
-        log()->trace(dz);
+        auto w = forward_subs(U.make_transpose(), ei);
+        auto v = backward_subs(L.make_transpose(), w, perm);
+        auto dz = -1.0 * N.make_transpose() * v;
 
         // 7. Calculate dual step lengths
         // s = z/dz (j)
@@ -354,12 +351,13 @@ bool solve_dual(SolveData& data, Parameters params)
         }
 
         // 3. Calculate dx (BTRAN)
-        // dz = -1 * transpose(inv(B)*N) * ei
-        // where i = entering index
+        auto [L, U, perm] = jsolve::lu_factor(B);
 
         auto ei = Mat{B.n_rows(), 1};
         ei(entering.value(), 0) = 1;
-        auto v = solve_gauss(B.make_transpose(), ei);
+
+        auto w = forward_subs(U.make_transpose(), ei);
+        auto v = backward_subs(L.make_transpose(), w, perm);
         auto dz = -1.0 * N.make_transpose() * v;
 
         log()->trace(dz);
@@ -381,10 +379,9 @@ bool solve_dual(SolveData& data, Parameters params)
         auto s = z_non_basic(leaving.value(), 0) / dz(leaving.value(), 0);
 
         // 6. Calculate dx (FTRAN)
-        // dx = inv(B) * N * ej
-        // where j = leaving index
 
-        auto dx = solve_gauss(B, N.slice({}, {leaving.value()}));
+        auto y = jsolve::forward_subs(L, N.slice({}, {leaving.value()}), perm);
+        auto dx = jsolve::backward_subs(U, y);
 
         log()->trace(dx);
 
@@ -482,7 +479,10 @@ void update_primal_objective(SolveData& data, const Mat& objective)
         idx++;
     }
 
-    auto v = solve_gauss(data.B.make_transpose(), c_b);
+    auto [L, U, perm] = jsolve::lu_factor(data.B.make_transpose());
+    auto y = jsolve::forward_subs(L, c_b, perm);
+    auto v = jsolve::backward_subs(U, y);
+
     auto N_t = data.N.make_transpose();
     data.z_non_basic.update({}, {}, data.z_non_basic + (N_t * v));
 }
