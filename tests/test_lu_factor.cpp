@@ -317,6 +317,43 @@ TEST_CASE("backward_subs")
         REQUIRE(result(0, 1) == 3);
         REQUIRE(result(0, 2) == 1);
     }
+
+    SECTION("5x5 matrix")
+    {
+        Matr U{5, 5, 0.0};
+
+        U(0, 0) = -1;
+        U(0, 3) = -6;
+
+        U(1, 1) = 1;
+        U(1, 3) = 4;
+
+        U(2, 2) = -1;
+        U(2, 3) = 2;
+
+        U(3, 3) = -14;
+
+        U(4, 4) = 1;
+
+        Matr b{5, 1, 0.0};
+
+        b(0, 0) = 3;
+        b(0, 1) = 0;
+        b(0, 2) = 0;
+        b(0, 3) = 7;
+        b(0, 4) = 1;
+
+        auto result = jsolve::backward_subs(U, b, {1, 2, 0, 4, 3});
+
+        REQUIRE(result.n_rows() == 5);
+        REQUIRE(result.n_cols() == 1);
+
+        REQUIRE(result(0, 0) == -1);
+        REQUIRE(result(0, 1) == 0);
+        REQUIRE(result(0, 2) == 2);
+        REQUIRE(result(0, 3) == 1);
+        REQUIRE(result(0, 4) == -0.5);
+    }
 }
 
 TEST_CASE("forward_subs")
@@ -394,5 +431,44 @@ TEST_CASE("forward_subs")
         REQUIRE(result(0, 2) == 7.0 / 2);
         REQUIRE(result(0, 3) == 23.0 / 2);
         REQUIRE(result(0, 4) == -7.0 / 2);
+    }
+
+    SECTION("5x5 matrix")
+    {
+        Matr L{5, 5, 0.0};
+
+        L(0, 0) = 1;
+
+        L(1, 1) = 1;
+
+        L(2, 1) = -1;
+        L(2, 2) = 1;
+
+        L(3, 1) = 4;
+        L(3, 2) = -2;
+        L(3, 3) = 1;
+
+        L(4, 0) = -1;
+        L(4, 2) = -3;
+        L(4, 4) = 1;
+
+        Matr b{5, 1, 0.0};
+
+        b(0, 0) = 7;
+        b(0, 1) = -2;
+        b(0, 2) = 0;
+        b(0, 3) = 3;
+        b(0, 4) = 0;
+
+        auto result = jsolve::forward_subs(L, b, {3, 4, 2, 0, 1});
+
+        REQUIRE(result.n_rows() == 5);
+        REQUIRE(result.n_cols() == 1);
+
+        REQUIRE(result(0, 0) == 3);
+        REQUIRE(result(0, 1) == 0);
+        REQUIRE(result(0, 2) == 0);
+        REQUIRE(result(0, 3) == 7);
+        REQUIRE(result(0, 4) == 1);
     }
 }
