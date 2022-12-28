@@ -24,7 +24,7 @@ struct Parameters
 {
     int max_iter{10000}; // Stopping criteria - max simplex iterations
     double EPS1{1e-8};   // Minimum value to consider as exiting var
-    double EPS2{1e-8};   // Protection from division by zero
+    double EPS2{1e-5};   // Protection from division by zero
 };
 
 struct SolveData
@@ -248,6 +248,7 @@ bool solve_primal(SolveData& data, Parameters params)
         // 1. Check optimality
         // 2. Find entering variable
         // Pick minimum (and negative) z_non_basic
+
         std::optional<std::size_t> entering = choose_entering(z_non_basic, params.EPS2);
 
         if (!entering)
