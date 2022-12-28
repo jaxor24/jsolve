@@ -11,6 +11,14 @@ namespace jsolve
 template <typename T>
 struct lu_result
 {
+    lu_result(std::size_t n)
+        : L{n, n},
+          U{n, n},
+          perm(n, 0)
+    {
+        std::iota(std::begin(perm), std::end(perm), 0);
+    }
+
     Matrix<T> L;
     Matrix<T> U;
     std::vector<std::size_t> perm;
@@ -32,11 +40,10 @@ lu_result<T> lu_factor(Matrix<T> A)
         throw SolveError("Cannot factor non-square matrix");
     }
 
-    lu_result<T> result{.L{n, n}, .U{n, n}, .perm{std::vector<std::size_t>(n, 0)}};
+    lu_result<T> result{n};
 
     // Permutation vector
     auto& perm = result.perm;
-    std::iota(std::begin(perm), std::end(perm), 0);
 
     std::size_t imax{0};
     T tol{1e-9};
@@ -83,9 +90,9 @@ lu_result<T> lu_factor(Matrix<T> A)
     }
 
     // Extract L, U
-    for (int row = 0; row < n; row++)
+    for (std::size_t row{0}; row < n; row++)
     {
-        for (int col = 0; col < n; col++)
+        for (std::size_t col{0}; col < n; col++)
         {
             if (row == col)
             {
@@ -116,15 +123,12 @@ Matrix<U> backward_subs(const Matrix<U>& A, const Matrix<U>& b, const std::vecto
     // A is assumed to be upper triangular, with col swaps given by perm.
     // b is a column who's rows are in the original (non-permuted) order.
 
-    int m{static_cast<int>(A.n_rows())};
-    int n{static_cast<int>(A.n_cols())};
-
-    if (m != n)
+    if (A.n_rows() != A.n_cols())
     {
         throw SolveError("Cannot solve non-square system");
     }
 
-    if (m != b.n_rows())
+    if (A.n_rows() != b.n_rows())
     {
         throw SolveError("Inputs A and b must have the same number of rows");
     }
@@ -138,6 +142,9 @@ Matrix<U> backward_subs(const Matrix<U>& A, const Matrix<U>& b, const std::vecto
     {
         throw SolveError("Invalid permutation vector size");
     }
+
+    // int used here due to reverse iteration below
+    int n{static_cast<int>(A.n_rows())};
 
     Matrix<U> x{A.n_rows(), 1};
 
@@ -155,7 +162,7 @@ Matrix<U> backward_subs(const Matrix<U>& A, const Matrix<U>& b, const std::vecto
     // TODO: This is bad - we need to copy x to do this!
     auto x_original{x};
 
-    for (std::size_t i{0}; i < n; i++)
+    for (int i{0}; i < n; i++)
     {
         x(perm[i], 0) = x_original(i, 0);
     }
@@ -178,15 +185,12 @@ Matrix<U> forward_subs(const Matrix<U>& A, const Matrix<U>& b, const std::vector
     // A is assumed to be lower triangular, with row swaps given by perm.
     // b is a column who's rows are in the original (non-permuted) order.
 
-    int m{static_cast<int>(A.n_rows())};
-    int n{static_cast<int>(A.n_cols())};
-
-    if (m != n)
+    if (A.n_rows() != A.n_cols())
     {
         throw SolveError("Cannot solve non-square system");
     }
 
-    if (m != b.n_rows())
+    if (A.n_rows() != b.n_rows())
     {
         throw SolveError("Inputs A and b must have the same number of rows");
     }
@@ -201,9 +205,11 @@ Matrix<U> forward_subs(const Matrix<U>& A, const Matrix<U>& b, const std::vector
         throw SolveError("Invalid permutation vector size");
     }
 
+    auto n{A.n_rows()};
+
     Matrix<U> x{A.n_rows(), 1};
 
-    for (std::size_t i{0}; i < m; i++)
+    for (std::size_t i{0}; i < n; i++)
     {
         U sum{0};
         for (std::size_t j{0}; j < i; j++)
