@@ -3,21 +3,6 @@
 
 // Free functions - helpers
 
-template <typename T>
-Matrix<T> eye(std::size_t n)
-{
-    // Constructs an identity matrix.
-
-    Matrix<T> m{n, n, 0};
-
-    for (std::size_t i{0}; i < n; i++)
-    {
-        m(i, i) = 1;
-    }
-
-    return m;
-}
-
 template <typename U>
 void swap_rows(Matrix<U>& input, std::size_t i, std::size_t j)
 {
