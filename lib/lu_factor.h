@@ -20,9 +20,8 @@ template <typename T>
 lu_result<T> lu_factor(Matrix<T> A)
 {
     // LU factorisation of A using the Doolittle method with max magnitude partial pivoting.
-    // Returns L, U and P such that LU = PA.
+    // Returns L, U and a row permutation vector.
     // TODO:
-    // - discard P as it is only needed for tests
     // - avoid explicitly swapping rows of A and work via perm instead
 
     auto m{A.n_rows()};
@@ -204,10 +203,10 @@ Matrix<U> forward_subs(const Matrix<U>& A, const Matrix<U>& b, const std::vector
 
     Matrix<U> x{A.n_rows(), 1};
 
-    for (int i{0}; i < m; i++)
+    for (std::size_t i{0}; i < m; i++)
     {
         U sum{0};
-        for (int j{0}; j < i; j++)
+        for (std::size_t j{0}; j < i; j++)
         {
             sum += A(i, j) * x(j, 0);
         }
