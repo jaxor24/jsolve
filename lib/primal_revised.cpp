@@ -489,62 +489,6 @@ void update_primal_objective(SolveData& data, const Mat& objective)
 
 std::optional<Solution> solve_simplex_revised(const Model& model)
 {
-    //// Forward
-    // Mat L{5, 5, 0.0};
-
-    // L(0, 0) = 1;
-
-    // L(1, 1) = 1;
-
-    // L(2, 1) = -1;
-    // L(2, 2) = 1;
-
-    // L(3, 1) = 4;
-    // L(3, 2) = -2;
-    // L(3, 3) = 1;
-
-    // L(4, 0) = -1;
-    // L(4, 2) = -3;
-    // L(4, 4) = 1;
-
-    // Mat bl{5, 1, 0.0};
-
-    // bl(0, 0) = 7;
-    // bl(0, 1) = -2;
-    // bl(0, 2) = 0;
-    // bl(0, 3) = 3;
-    // bl(0, 4) = 0;
-
-    // auto r1 = jsolve::forward_subs(L, bl, {3, 4, 2, 0, 1});
-    // log()->info(r1);
-
-    //// Backward
-    // Mat U{5, 5, 0.0};
-
-    // U(0, 0) = -1;
-    // U(0, 3) = -6;
-
-    // U(1, 1) = 1;
-    // U(1, 3) = 4;
-
-    // U(2, 2) = -1;
-    // U(2, 3) = 2;
-
-    // U(3, 3) = -14;
-
-    // U(4, 4) = 1;
-
-    // Mat bu{5, 1, 0.0};
-
-    // bu(0, 0) = 3;
-    // bu(0, 1) = 0;
-    // bu(0, 2) = 0;
-    // bu(0, 3) = 7;
-    // bu(0, 4) = 1;
-
-    // auto r2 = jsolve::backward_subs(U, bu, {1, 2, 0, 4, 3});
-    // log()->info(r2);
-
     // Setup
     SolveData data{init_data(model)};
     Parameters params{};
