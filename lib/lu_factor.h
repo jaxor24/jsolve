@@ -17,20 +17,6 @@ struct lu_result
     std::vector<std::size_t> perm;
 };
 
-template <typename U>
-void my_swap_rows(Matrix<U>& input, std::size_t i, std::size_t j)
-{
-    if (input.n_rows() <= i || input.n_rows() <= j)
-    {
-        throw MatrixError("Swap rows exceed matrix dimensions");
-    }
-
-    for (std::size_t column = 0; column < input.n_cols(); ++column)
-    {
-        std::swap(input(i, column), input(j, column));
-    }
-}
-
 template <typename T>
 lu_result<T> lu_factor(Matrix<T> A)
 {
@@ -84,8 +70,8 @@ lu_result<T> lu_factor(Matrix<T> A)
         if (imax != i)
         {
             std::swap(perm[i], perm[imax]);
-            my_swap_rows(A, i, imax);
-            my_swap_rows(result.P, i, imax);
+            swap_rows(A, i, imax);
+            swap_rows(result.P, i, imax);
         }
 
         // Factorisation
