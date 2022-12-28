@@ -6,7 +6,6 @@
 
 #include "lu_factor.h"
 #include "solve_error.h"
-#include "solve_gauss.h"
 
 #include "matrix.h"
 #include "tools.h"
@@ -480,7 +479,10 @@ void update_primal_objective(SolveData& data, const Mat& objective)
         idx++;
     }
 
-    auto v = solve_gauss(data.B.make_transpose(), c_b);
+    auto [L, U, perm] = jsolve::lu_factor(data.B.make_transpose());
+    auto y = jsolve::forward_subs(L, c_b, perm);
+    auto v = jsolve::backward_subs(U, y);
+
     auto N_t = data.N.make_transpose();
     data.z_non_basic.update({}, {}, data.z_non_basic + (N_t * v));
 }
