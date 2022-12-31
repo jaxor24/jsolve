@@ -12,13 +12,13 @@ static void bench_jsolve(benchmark::State& state)
 
     for (auto _ : state)
     {
-        benchmark::DoNotOptimize(mat.slice({}, {rows - 1, rows - 1}));
+        benchmark::DoNotOptimize(mat.make_transpose());
     }
 
     state.SetComplexityN(state.range(0));
 }
 
 // Register the function as a benchmark
-BENCHMARK(bench_jsolve)->RangeMultiplier(2)->Range(1, 1 << 10)->Complexity(benchmark::oN);
+BENCHMARK(bench_jsolve)->DenseRange(1, 1000, 10)->Complexity(benchmark::oN);
 
 BENCHMARK_MAIN();
