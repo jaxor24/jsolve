@@ -225,11 +225,11 @@ Matrix<T> Matrix<T>::make_transpose() const
 {
     Matrix result{n_cols(), n_rows()};
 
-    for (auto [n_row, row] : enumerate_rows())
+    for (std::size_t i{0}; i < n_rows(); ++i)
     {
-        for (auto [n_col, elem] : enumerate(row))
+        for (std::size_t j{0}; j < n_cols(); ++j)
         {
-            result(n_col, n_row) = elem;
+            result(j, i) = operator()(i, j);
         }
     }
 

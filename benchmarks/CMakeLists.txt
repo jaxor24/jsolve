@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 include(google/GoogleBenchmark.cmake)
 
-add_executable (jsolver_bench "bench.cpp" "bench.h")
+add_executable(jsolver_bench "bench.cpp" "bench.h")
 
 target_link_libraries(jsolver_bench PRIVATE benchmark::benchmark)
 target_link_libraries(jsolver_bench PRIVATE jsolver_lib)
