@@ -28,9 +28,8 @@ template <typename T>
 lu_result<T> lu_factor(Matrix<T> A)
 {
     // LU factorisation of A using the Doolittle method with max magnitude partial pivoting.
+    // Uses a permuation vector to avoid swapping rows of A.
     // Returns L, U and a row permutation vector.
-    // TODO:
-    // - avoid explicitly swapping rows of A and work via perm instead
 
     auto m{A.n_rows()};
     auto n{A.n_cols()};
@@ -58,7 +57,7 @@ lu_result<T> lu_factor(Matrix<T> A)
 
         for (std::size_t k{i}; k < n; k++)
         {
-            absA = std::abs(A(k, i));
+            absA = std::abs(A(perm[k], i));
 
             if (absA > maxA)
             {
@@ -75,16 +74,15 @@ lu_result<T> lu_factor(Matrix<T> A)
         if (imax != i)
         {
             std::swap(perm[i], perm[imax]);
-            swap_rows(A, i, imax);
         }
 
         // Factorisation
         for (std::size_t j{i + 1}; j < n; j++)
         {
-            A(j, i) = A(j, i) / A(i, i);
+            A(perm[j], i) = A(perm[j], i) / A(perm[i], i);
             for (std::size_t k{i + 1}; k < n; k++)
             {
-                A(j, k) = A(j, k) - (A(j, i) * A(i, k));
+                A(perm[j], k) = A(perm[j], k) - (A(perm[j], i) * A(perm[i], k));
             }
         }
     }
@@ -96,16 +94,16 @@ lu_result<T> lu_factor(Matrix<T> A)
         {
             if (row == col)
             {
-                result.U(row, col) = A(row, col);
+                result.U(row, col) = A(perm[row], col);
                 result.L(row, col) = 1;
             }
             else if (row > col)
             {
-                result.L(row, col) = A(row, col);
+                result.L(row, col) = A(perm[row], col);
             }
             else
             {
-                result.U(row, col) = A(row, col);
+                result.U(row, col) = A(perm[row], col);
             }
         }
     }
