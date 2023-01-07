@@ -226,6 +226,75 @@ SolveData init_data(const Model& model)
     return {A, c, B, N, x_basic, z_non_basic, basics, non_basics};
 }
 
+Mat lu_solve(const Mat& L, const Mat& U, const std::vector<std::size_t>& perm, const Mat& b)
+{
+    // Solves L * U * x = b for x using the row permutation vector.
+    // Row permutations are used when forward solving with L.
+    return backward_subs(U, forward_subs(L, b, perm));
+}
+
+Mat lu_transpose_solve(const Mat& L, const Mat& U, const std::vector<std::size_t>& perm, const Mat& b)
+{
+    // Solves trans(U) * trans(L) * x = b for x using the row permutation vector.
+    // Row permutations are used when backward solving with trans(L).
+    // TODO: Avoid explicit creation of transpose via swapping indices.
+    return backward_subs(L.make_transpose(), forward_subs(U.make_transpose(), b), perm);
+}
+
+Mat eta_inverse_solve(const Mat& u, const Mat& dx, std::size_t i)
+{
+    // Solves Eta * y = u for y using the explicit inverse formula in VDB p 135.
+    // TODO: Avoid creation of e
+
+    auto e = Mat(dx.n_rows(), 1);
+    e(i, 0) = 1;
+    auto y = u - (u(i, 0) / dx(i, 0)) * (dx - e);
+    return y;
+};
+
+Mat eta_inverse_transpose_solve(const Mat& u, const Mat& dx, std::size_t i)
+{
+    // Solves trans(Eta) * y = u for y using the explicit inverse formula in VDB p 136.
+    // TODO: Avoid creation of e
+
+    auto e = Mat(dx.n_rows(), 1);
+    e(i, 0) = 1;
+    auto y = u - e * ((dx - e).make_transpose() * u) / dx(i, 0);
+    return y;
+};
+
+Mat ftran(const lu_result<Mat::value_type>& lu, const Mat& b, const std::vector<std::pair<Mat, std::size_t>>& etas)
+{
+    // Use the LU factorisation in the first iteration.
+    auto dx = lu_solve(lu.L, lu.U, lu.perm, b);
+
+    // Apply etas recursively to update dx.
+    for (const auto& [eta, leaving] : etas)
+    {
+        dx = eta_inverse_solve(dx, eta, leaving);
+    }
+
+    return dx;
+}
+
+Mat btran(const lu_result<Mat::value_type>& lu, const Mat& b, const std::vector<std::pair<Mat, std::size_t>>& etas)
+{
+    auto u = b;
+
+    // Apply etas recursively in reverse to update u.
+    auto it = std::rbegin(etas);
+    while (it != std::rend(etas))
+    {
+        u = eta_inverse_transpose_solve(u, it->first, it->second);
+        ++it;
+    }
+
+    // Use the LU factorisation
+    auto v = lu_transpose_solve(lu.L, lu.U, lu.perm, u);
+
+    return v;
+}
+
 bool solve_primal(SolveData& data, Parameters params)
 {
     // Solve using the primal (revised) simplex algorithm.
@@ -240,6 +309,12 @@ bool solve_primal(SolveData& data, Parameters params)
     std::vector<VarData>& basics = data.basics;
     std::vector<VarData>& non_basics = data.non_basics;
     int& iter = data.n_iter;
+
+    // Store dx and the leaving index each iteration
+    std::vector<std::pair<Mat, std::size_t>> etas;
+
+    // Original refactor
+    auto lu_current = jsolve::lu_factor(B);
 
     for (; iter <= params.max_iter; iter++)
     {
@@ -257,13 +332,10 @@ bool solve_primal(SolveData& data, Parameters params)
             return true;
         }
 
+        auto aj = N.slice({}, entering.value()); // Entering column
+
         // 3. Calculate dx (FTRAN)
-        auto [L, U, perm] = jsolve::lu_factor(B);
-
-        auto y = jsolve::forward_subs(L, N.slice({}, {entering.value()}), perm);
-        auto dx = jsolve::backward_subs(U, y);
-
-        log()->trace(dx);
+        auto dx = ftran(lu_current, aj, etas);
 
         // 4. Find the leaving variable
         std::optional<std::size_t> leaving = choose_leaving(x_basic, dx, params.EPS1);
@@ -286,9 +358,7 @@ bool solve_primal(SolveData& data, Parameters params)
         auto ei = Mat{B.n_rows(), 1};
         ei(leaving.value(), 0) = 1;
 
-        auto w = forward_subs(U.make_transpose(), ei);
-        auto v = backward_subs(L.make_transpose(), w, perm);
-        auto dz = -1.0 * N.make_transpose() * v;
+        auto dz = -1.0 * N.make_transpose() * btran(lu_current, ei, etas);
 
         // 7. Calculate dual step lengths
         // s = z/dz (j)
@@ -305,6 +375,9 @@ bool solve_primal(SolveData& data, Parameters params)
         B.update({}, {leaving.value()}, A.slice({}, static_cast<std::size_t>(non_basics[entering.value()].index)));
         N.update({}, {entering.value()}, A.slice({}, static_cast<std::size_t>(basics[leaving.value()].index)));
         std::swap(basics[leaving.value()], non_basics[entering.value()]);
+
+        // Save eta data
+        etas.push_back({dx, leaving.value()});
 
         log()->trace(B);
         log()->trace(N);
@@ -335,6 +408,12 @@ bool solve_dual(SolveData& data, Parameters params)
     std::vector<VarData>& non_basics = data.non_basics;
     int& iter = data.n_iter;
 
+    // Store dx and the leaving index each iteration
+    std::vector<std::pair<Mat, std::size_t>> etas;
+
+    // Original refactor
+    auto lu_current = jsolve::lu_factor(B);
+
     for (; iter <= params.max_iter; iter++)
     {
         log_iteration(iter, data);
@@ -351,15 +430,11 @@ bool solve_dual(SolveData& data, Parameters params)
             return true;
         }
 
-        // 3. Calculate dx (BTRAN)
-        auto [L, U, perm] = jsolve::lu_factor(B);
-
+        // 3. Calculate dz (BTRAN)
         auto ei = Mat{B.n_rows(), 1};
         ei(entering.value(), 0) = 1;
 
-        auto w = forward_subs(U.make_transpose(), ei);
-        auto v = backward_subs(L.make_transpose(), w, perm);
-        auto dz = -1.0 * N.make_transpose() * v;
+        auto dz = -1.0 * N.make_transpose() * btran(lu_current, ei, etas);
 
         log()->trace(dz);
 
@@ -381,8 +456,7 @@ bool solve_dual(SolveData& data, Parameters params)
 
         // 6. Calculate dx (FTRAN)
 
-        auto y = jsolve::forward_subs(L, N.slice({}, {leaving.value()}), perm);
-        auto dx = jsolve::backward_subs(U, y);
+        auto dx = ftran(lu_current, N.slice({}, {leaving.value()}), etas);
 
         log()->trace(dx);
 
@@ -403,6 +477,9 @@ bool solve_dual(SolveData& data, Parameters params)
         B.update({}, {entering.value()}, A.slice({}, static_cast<std::size_t>(non_basics[leaving.value()].index)));
         N.update({}, {leaving.value()}, A.slice({}, static_cast<std::size_t>(basics[entering.value()].index)));
         std::swap(basics[entering.value()], non_basics[leaving.value()]);
+
+        // Save eta data
+        etas.push_back({dx, entering.value()});
 
         log()->trace(B);
         log()->trace(N);
