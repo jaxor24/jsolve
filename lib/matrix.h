@@ -45,7 +45,7 @@ class Matrix
 
     Matrix slice(Range rows, Range cols) const;
 
-    void update(Range rows, Range cols, Matrix values);
+    void update(Range rows, Range cols, const Matrix& values);
 
     // Iterators -------------------------------------------------------------------------------
     matrix_iterator begin();
@@ -271,7 +271,7 @@ Matrix<T> Matrix<T>::slice(Range rows, Range cols) const
 }
 
 template <typename T>
-void Matrix<T>::update(Range rows, Range cols, Matrix sub)
+void Matrix<T>::update(Range rows, Range cols, const Matrix& sub)
 {
     // Update the specified range with the values in the provided sub matrix.
 
