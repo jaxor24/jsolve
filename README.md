@@ -215,7 +215,7 @@ There are many excellent references available. I have used these heavily:
 - Koberstein, *The Dual Simplex Method, Techniques for a fast and stable implementation*, 2005
 
 Others include:
-- Kipp, *Large Scale Linear and Integer Optimization", 1999
+- Kipp, *Large Scale Linear and Integer Optimization*, 1999
 - Michael Saunders, *CME338 Large-Scale Numerical Optimization*, 2019, Stanford University Course Notes
 - Robert Bixby, *Implementing The Simplex Method: The Initial Basis*, 1991
 
