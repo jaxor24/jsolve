@@ -5,7 +5,7 @@ namespace models
 jsolve::Model make_model_0()
 {
     // Model from:
-    // p86. Linear Programming (2014) Vanderbei.
+    // p86. 'Linear Programming' (Vanderbei, 2014)
 
     auto m = jsolve::Model(jsolve::Model::Sense::MAX, "Example");
 
@@ -39,7 +39,7 @@ jsolve::Model make_model_0()
 jsolve::Model make_model_1()
 {
     // Model from:
-    // p11. Linear Programming (2014) Vanderbei.
+    // p11. 'Linear Programming' (Vanderbei, 2014)
     // Model is solveable in 2 interations.
 
     auto m = jsolve::Model(jsolve::Model::Sense::MAX, "Example");
@@ -80,7 +80,7 @@ jsolve::Model make_model_1()
 jsolve::Model make_model_2()
 {
     // Model from:
-    // p17. Linear Programming (2014) Vanderbei.
+    // p17. 'Linear Programming' (Vanderbei, 2014)
     // Model has initial infeasible dictionary, requiring a 2 phase algorithm.
 
     auto m = jsolve::Model(jsolve::Model::Sense::MAX, "Example");
@@ -115,7 +115,7 @@ jsolve::Model make_model_2()
 jsolve::Model make_model_3()
 {
     // Model from:
-    // Problem 2.1 from Linear Programming (2014) Vanderbei.
+    // Problem 2.1 from 'Linear Programming' (Vanderbei, 2014)
 
     auto m = jsolve::Model(jsolve::Model::Sense::MAX, "P2.1 LP 2014");
 
@@ -152,7 +152,7 @@ jsolve::Model make_model_3()
 jsolve::Model make_model_4()
 {
     // Model from:
-    // Problem 2.2 from Linear Programming (2014) Vanderbei.
+    // Problem 2.2 from 'Linear Programming' (Vanderbei, 2014)
 
     auto m = jsolve::Model(jsolve::Model::Sense::MAX, "P2.2 LP 2014");
 
@@ -188,7 +188,7 @@ jsolve::Model make_model_4()
 jsolve::Model make_model_5()
 {
     // Model from:
-    // Problem 2.3 from Linear Programming (2014) Vanderbei.
+    // Problem 2.3 from 'Linear Programming' (Vanderbei, 2014)
 
     auto m = jsolve::Model(jsolve::Model::Sense::MAX, "P2.3 LP 2014");
 
@@ -217,7 +217,7 @@ jsolve::Model make_model_5()
 jsolve::Model make_model_6()
 {
     // Model from:
-    // Problem 2.8 from Linear Programming (2014) Vanderbei.
+    // Problem 2.8 from 'Linear Programming' (Vanderbei, 2014)
 
     auto m = jsolve::Model(jsolve::Model::Sense::MAX, "P2.8 LP 2014");
 
@@ -287,7 +287,7 @@ jsolve::Model make_model_6()
 jsolve::Model make_model_7()
 {
     // Model from:
-    // Problem 2.10 from Linear Programming (2014) Vanderbei.
+    // Problem 2.10 from 'Linear Programming' (Vanderbei, 2014)
 
     auto m = jsolve::Model(jsolve::Model::Sense::MAX, "P2.10 LP 2014");
 
@@ -316,7 +316,7 @@ jsolve::Model make_model_7()
 jsolve::Model make_model_8()
 {
     // Model from:
-    // Problem 2.11 from Linear Programming (2014) Vanderbei.
+    // Problem 2.11 from 'Linear Programming' (Vanderbei, 2014)
 
     auto m = jsolve::Model(jsolve::Model::Sense::MIN, "P2.11 LP 2014");
 
@@ -1254,7 +1254,7 @@ jsolve::Model make_model_27()
         c->add_to_lhs(0.15, x3);
     }
 
-        {
+    {
         auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C3");
         c->rhs() = 1;
         c->add_to_lhs(1, x1);

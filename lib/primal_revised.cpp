@@ -30,8 +30,8 @@ struct Parameters
 
 struct SolveData
 {
-    // Everything we need to do iterations of the revised simplex algorithm.
-
+    // Everything needed to do iterations of the revised simplex algorithm.
+    // Using notation from 'Linear Programming' (Vanderbei, 2020) p102.
     Mat A;
     Mat c;
     Mat B;
@@ -243,7 +243,7 @@ Mat lu_transpose_solve(const Mat& L, const Mat& U, const std::vector<std::size_t
 
 Mat eta_inverse_solve(const Mat& u, const Mat& dx, std::size_t i)
 {
-    // Solves Eta * y = u for y using the explicit inverse formula in VDB p 135.
+    // Solves Eta * y = u for y using the the formula from 'Linear Programming' (Vanderbei, 2020) p135.
     // TODO: Avoid creation of e
 
     auto e = Mat(dx.n_rows(), 1);
@@ -254,7 +254,7 @@ Mat eta_inverse_solve(const Mat& u, const Mat& dx, std::size_t i)
 
 Mat eta_inverse_transpose_solve(const Mat& u, const Mat& dx, std::size_t i)
 {
-    // Solves trans(Eta) * y = u for y using the explicit inverse formula in VDB p 136.
+    // Solves trans(Eta) * y = u for y using the formula from 'Linear Programming' (Vanderbei, 2020) p136.
     // TODO: Avoid creation of e
 
     auto e = Mat(dx.n_rows(), 1);
@@ -265,6 +265,11 @@ Mat eta_inverse_transpose_solve(const Mat& u, const Mat& dx, std::size_t i)
 
 Mat ftran(const lu_result<Mat::value_type>& lu, const Mat& b, const std::vector<std::pair<Mat, std::size_t>>& etas)
 {
+    // Implement FTRAN using the eta matrix factorisation of the basis, plus the initial LU factorisation.
+    // This is comination of the implementations from:
+    // 'Linear Programming' (Vanderbei, 2020) p133.
+    // 'Linear Programming' (Chvatal, 1983) p109.
+
     // Use the LU factorisation in the first iteration.
     auto dx = lu_solve(lu.L, lu.U, lu.perm, b);
 
@@ -279,6 +284,11 @@ Mat ftran(const lu_result<Mat::value_type>& lu, const Mat& b, const std::vector<
 
 Mat btran(const lu_result<Mat::value_type>& lu, const Mat& b, const std::vector<std::pair<Mat, std::size_t>>& etas)
 {
+    // Implement BTRAN using the eta matrix factorisation of the basis, plus the initial LU factorisation.
+    // This is comination of the implementations from:
+    // 'Linear Programming' (Vanderbei, 2020) p133.
+    // 'Linear Programming' (Chvatal, 1983) p109.
+
     auto u = b;
 
     // Apply etas recursively in reverse to update u.
@@ -298,7 +308,7 @@ Mat btran(const lu_result<Mat::value_type>& lu, const Mat& b, const std::vector<
 bool solve_primal(SolveData& data, Parameters params)
 {
     // Solve using the primal (revised) simplex algorithm.
-    // Uses implementation from Linear Programming (Vanderbei, 2014) p92.
+    // Uses implementation from 'Linear Programming' (Vanderbei, 2020) p102.
     // Returns true if a solution is present.
 
     Mat& A = data.A;
@@ -408,7 +418,7 @@ bool solve_primal(SolveData& data, Parameters params)
 bool solve_dual(SolveData& data, Parameters params)
 {
     // Solve using the dual (revised) simplex algorithm.
-    // Uses implementation from Linear Programming (Vanderbei, 2014) p92.
+    // Uses implementation from 'Linear Programming' (Vanderbei, 2020) p102.
     // Returns true if a solution is present.
 
     Mat& A = data.A;
