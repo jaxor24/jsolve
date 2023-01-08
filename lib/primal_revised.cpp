@@ -16,16 +16,14 @@
 
 namespace jsolve
 {
-using Mat = Matrix<double>;
-
 namespace
 {
 struct Parameters
 {
     int refactor_iter{100}; // Periodically recompute LU factorisation
     int max_iter{10000};    // Stopping criteria - max simplex iterations
-    double EPS1{1e-8};      // Minimum value to consider as exiting var
-    double EPS2{1e-5};      // Protection from division by zero
+    Number EPS1{1e-8};      // Minimum value to consider as exiting var
+    Number EPS2{1e-5};      // Protection from division by zero
 };
 
 struct SolveData
@@ -43,12 +41,12 @@ struct SolveData
     int n_iter{0};
 };
 
-std::optional<std::size_t> choose_entering(const Mat& column, double EPS2)
+std::optional<std::size_t> choose_entering(const Mat& column, Number EPS2)
 {
     // Choses most negative variable in the column vector.
 
     std::optional<std::size_t> entering;
-    Mat::value_type current_min{-EPS2};
+    Number current_min{-EPS2};
 
     for (std::size_t curr_idx = 0; curr_idx < column.n_rows(); curr_idx++)
     {
@@ -62,7 +60,7 @@ std::optional<std::size_t> choose_entering(const Mat& column, double EPS2)
     return entering;
 }
 
-std::optional<std::size_t> choose_leaving(const Mat& num, const Mat& denom, double EPS1)
+std::optional<std::size_t> choose_leaving(const Mat& num, const Mat& denom, Number EPS1)
 {
     // Calculates argmin(num/denom), where denom > zero.
 
@@ -86,9 +84,9 @@ std::optional<std::size_t> choose_leaving(const Mat& num, const Mat& denom, doub
     return leaving;
 }
 
-double calc_primal_obj(const Mat& c, const Mat& x_basic, const std::vector<VarData>& basics)
+Number calc_primal_obj(const Mat& c, const Mat& x_basic, const std::vector<VarData>& basics)
 {
-    double primal_obj{0.0};
+    Number primal_obj{0.0};
 
     for (std::size_t curr_idx = 0; curr_idx < x_basic.n_rows(); curr_idx++)
     {
@@ -226,21 +224,6 @@ SolveData init_data(const Model& model)
     return {A, c, B, N, x_basic, z_non_basic, basics, non_basics};
 }
 
-Mat lu_solve(const Mat& L, const Mat& U, const std::vector<std::size_t>& perm, const Mat& b)
-{
-    // Solves L * U * x = b for x using the row permutation vector.
-    // Row permutations are used when forward solving with L.
-    return backward_subs(U, forward_subs(L, b, perm));
-}
-
-Mat lu_transpose_solve(const Mat& L, const Mat& U, const std::vector<std::size_t>& perm, const Mat& b)
-{
-    // Solves trans(U) * trans(L) * x = b for x using the row permutation vector.
-    // Row permutations are used when backward solving with trans(L).
-    // TODO: Avoid explicit creation of transpose via swapping indices.
-    return backward_subs(L.make_transpose(), forward_subs(U.make_transpose(), b), perm);
-}
-
 Mat eta_inverse_solve(const Mat& u, const Mat& dx, std::size_t i)
 {
     // Solves Eta * y = u for y using the the formula from 'Linear Programming' (Vanderbei, 2020) p135.
@@ -263,7 +246,7 @@ Mat eta_inverse_transpose_solve(const Mat& u, const Mat& dx, std::size_t i)
     return y;
 };
 
-Mat ftran(const lu_result<Mat::value_type>& lu, const Mat& b, const std::vector<std::pair<Mat, std::size_t>>& etas)
+Mat ftran(const lu_result<Number>& lu, const Mat& b, const std::vector<std::pair<Mat, std::size_t>>& etas)
 {
     // Implement FTRAN using the eta matrix factorisation of the basis, plus the initial LU factorisation.
     // This is comination of the implementations from:
@@ -282,7 +265,7 @@ Mat ftran(const lu_result<Mat::value_type>& lu, const Mat& b, const std::vector<
     return dx;
 }
 
-Mat btran(const lu_result<Mat::value_type>& lu, const Mat& b, const std::vector<std::pair<Mat, std::size_t>>& etas)
+Mat btran(const lu_result<Number>& lu, const Mat& b, const std::vector<std::pair<Mat, std::size_t>>& etas)
 {
     // Implement BTRAN using the eta matrix factorisation of the basis, plus the initial LU factorisation.
     // This is comination of the implementations from:

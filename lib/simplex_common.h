@@ -9,7 +9,8 @@
 
 namespace jsolve
 {
-using Mat = Matrix<double>;
+using Number = double;
+using Mat = Matrix<Number>;
 
 struct VarData
 {
