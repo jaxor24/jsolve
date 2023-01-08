@@ -310,8 +310,9 @@ bool solve_primal(SolveData& data, Parameters params)
     auto lu_current{jsolve::lu_factor(B)};
     int refactor_age{0};
 
-    for (; iter <= params.max_iter; iter++)
+    while (iter <= params.max_iter)
     {
+        iter++;
         log_iteration(iter, data);
 
         if (refactor_age >= params.refactor_iter)
@@ -420,8 +421,9 @@ bool solve_dual(SolveData& data, Parameters params)
     auto lu_current{jsolve::lu_factor(B)};
     int refactor_age{0};
 
-    for (; iter <= params.max_iter; iter++)
+    while (iter <= params.max_iter)
     {
+        iter++;
         log_iteration(iter, data);
 
         if (refactor_age >= params.refactor_iter)
