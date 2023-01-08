@@ -29,6 +29,8 @@ The current implementation uses:
 Potential improvements:
 - Change to a sparse matrix representation
 - Implement other pricing methods like steepest edge or Devex
+- Implement a scaling mechanism
+- Use std::mdspan to avoid copying in pivoting
 
 Many other improvements may not yield much benefit until a sparse matrix implementation is used:
 - Markowitz pivoting in the LU factorisation
