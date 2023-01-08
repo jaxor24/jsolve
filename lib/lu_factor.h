@@ -30,6 +30,7 @@ lu_result<T> lu_factor(Matrix<T> A)
     // LU factorisation of A using the Doolittle method with max magnitude partial pivoting.
     // Uses a permuation vector to avoid swapping rows of A.
     // Returns L, U and a row permutation vector.
+    // TODO: This implementation could be improved by directly creating U and L.
 
     auto m{A.n_rows()};
     auto n{A.n_cols()};
