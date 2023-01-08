@@ -22,9 +22,10 @@ namespace
 {
 struct Parameters
 {
-    int max_iter{10000}; // Stopping criteria - max simplex iterations
-    double EPS1{1e-8};   // Minimum value to consider as exiting var
-    double EPS2{1e-5};   // Protection from division by zero
+    int refactor_iter{100}; // Periodically recompute LU factorisation
+    int max_iter{10000};    // Stopping criteria - max simplex iterations
+    double EPS1{1e-8};      // Minimum value to consider as exiting var
+    double EPS2{1e-5};      // Protection from division by zero
 };
 
 struct SolveData
@@ -313,12 +314,26 @@ bool solve_primal(SolveData& data, Parameters params)
     // Store dx and the leaving index each iteration
     std::vector<std::pair<Mat, std::size_t>> etas;
 
-    // Original refactor
-    auto lu_current = jsolve::lu_factor(B);
+    // Intial LU factorisation
+    auto lu_current{jsolve::lu_factor(B)};
+    int refactor_age{0};
 
     for (; iter <= params.max_iter; iter++)
     {
         log_iteration(iter, data);
+
+        if (refactor_age >= params.refactor_iter)
+        {
+            // Recompute LU factorisation of basis
+            log()->info("Re-factoring basis...");
+            lu_current = jsolve::lu_factor(B);
+            etas.clear();
+            refactor_age = 0;
+        }
+        else
+        {
+            refactor_age++;
+        }
 
         // 1. Check optimality
         // 2. Find entering variable
@@ -411,12 +426,26 @@ bool solve_dual(SolveData& data, Parameters params)
     // Store dx and the leaving index each iteration
     std::vector<std::pair<Mat, std::size_t>> etas;
 
-    // Original refactor
-    auto lu_current = jsolve::lu_factor(B);
+    // Intial LU factorisation
+    auto lu_current{jsolve::lu_factor(B)};
+    int refactor_age{0};
 
     for (; iter <= params.max_iter; iter++)
     {
         log_iteration(iter, data);
+
+        if (refactor_age >= params.refactor_iter)
+        {
+            // Recompute LU factorisation of basis
+            log()->info("Re-factoring basis...");
+            lu_current = jsolve::lu_factor(B);
+            etas.clear();
+            refactor_age = 0;
+        }
+        else
+        {
+            refactor_age++;
+        }
 
         // 1. Check optimality
         // 2. Find entering variable
