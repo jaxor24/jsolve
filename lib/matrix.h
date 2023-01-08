@@ -41,11 +41,10 @@ class Matrix
     std::pair<Matrix<T>, Matrix<std::size_t>> col_min() const;
 
     Matrix make_transpose() const;
-    Matrix abs() const;
 
     Matrix slice(Range rows, Range cols) const;
 
-    void update(Range rows, Range cols, Matrix values);
+    void update(Range rows, Range cols, const Matrix& values);
 
     // Iterators -------------------------------------------------------------------------------
     matrix_iterator begin();
@@ -237,14 +236,6 @@ Matrix<T> Matrix<T>::make_transpose() const
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::abs() const
-{
-    Matrix result{*this};
-    std::for_each(std::begin(result.m_data), std::end(result.m_data), [](auto& elem) { elem = std::abs(elem); });
-    return result;
-}
-
-template <typename T>
 Matrix<T> Matrix<T>::slice(Range rows, Range cols) const
 {
     if (!rows && !cols)
@@ -271,7 +262,7 @@ Matrix<T> Matrix<T>::slice(Range rows, Range cols) const
 }
 
 template <typename T>
-void Matrix<T>::update(Range rows, Range cols, Matrix sub)
+void Matrix<T>::update(Range rows, Range cols, const Matrix& sub)
 {
     // Update the specified range with the values in the provided sub matrix.
 

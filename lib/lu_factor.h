@@ -30,6 +30,7 @@ lu_result<T> lu_factor(Matrix<T> A)
     // LU factorisation of A using the Doolittle method with max magnitude partial pivoting.
     // Uses a permuation vector to avoid swapping rows of A.
     // Returns L, U and a row permutation vector.
+    // TODO: This implementation could be improved by directly creating U and L.
 
     auto m{A.n_rows()};
     auto n{A.n_cols()};
@@ -226,6 +227,25 @@ Matrix<U> forward_subs(const Matrix<U>& A, const Matrix<U>& b)
     auto perm = std::vector<std::size_t>(b.n_rows(), 0);
     std::iota(std::begin(perm), std::end(perm), 0); // [0, 1, ..., n];
     return forward_subs(A, b, perm);
+}
+
+template <typename T>
+Matrix<T> lu_solve(const Matrix<T>& L, const Matrix<T>& U, const std::vector<std::size_t>& perm, const Matrix<T>& b)
+{
+    // Solves L * U * x = b for x using the row permutation vector.
+    // Row permutations are used when forward solving with L.
+    return backward_subs(U, forward_subs(L, b, perm));
+}
+
+template <typename T>
+Matrix<T> lu_transpose_solve(
+    const Matrix<T>& L, const Matrix<T>& U, const std::vector<std::size_t>& perm, const Matrix<T>& b
+)
+{
+    // Solves trans(U) * trans(L) * x = b for x using the row permutation vector.
+    // Row permutations are used when backward solving with trans(L).
+    // TODO: Avoid explicit creation of transpose via swapping indices.
+    return backward_subs(L.make_transpose(), forward_subs(U.make_transpose(), b), perm);
 }
 
 } // namespace jsolve

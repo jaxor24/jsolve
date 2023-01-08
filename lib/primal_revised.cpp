@@ -16,21 +16,20 @@
 
 namespace jsolve
 {
-using Mat = Matrix<double>;
-
 namespace
 {
 struct Parameters
 {
-    int max_iter{10000}; // Stopping criteria - max simplex iterations
-    double EPS1{1e-8};   // Minimum value to consider as exiting var
-    double EPS2{1e-5};   // Protection from division by zero
+    int refactor_iter{50}; // Periodically recompute LU factorisation
+    int max_iter{10000};   // Stopping criteria - max simplex iterations
+    Number EPS1{1e-8};     // Minimum value to consider as exiting var
+    Number EPS2{1e-5};     // Protection from division by zero
 };
 
 struct SolveData
 {
-    // Everything we need to do iterations of the revised simplex algorithm.
-
+    // Everything needed to do iterations of the revised simplex algorithm.
+    // Using notation from 'Linear Programming' (Vanderbei, 2020) p102.
     Mat A;
     Mat c;
     Mat B;
@@ -42,12 +41,12 @@ struct SolveData
     int n_iter{0};
 };
 
-std::optional<std::size_t> choose_entering(const Mat& column, double EPS2)
+std::optional<std::size_t> choose_entering(const Mat& column, Number EPS2)
 {
     // Choses most negative variable in the column vector.
 
     std::optional<std::size_t> entering;
-    Mat::value_type current_min{-EPS2};
+    Number current_min{-EPS2};
 
     for (std::size_t curr_idx = 0; curr_idx < column.n_rows(); curr_idx++)
     {
@@ -61,7 +60,7 @@ std::optional<std::size_t> choose_entering(const Mat& column, double EPS2)
     return entering;
 }
 
-std::optional<std::size_t> choose_leaving(const Mat& num, const Mat& denom, double EPS1)
+std::optional<std::size_t> choose_leaving(const Mat& num, const Mat& denom, Number EPS1)
 {
     // Calculates argmin(num/denom), where denom > zero.
 
@@ -85,9 +84,9 @@ std::optional<std::size_t> choose_leaving(const Mat& num, const Mat& denom, doub
     return leaving;
 }
 
-double calc_primal_obj(const Mat& c, const Mat& x_basic, const std::vector<VarData>& basics)
+Number calc_primal_obj(const Mat& c, const Mat& x_basic, const std::vector<VarData>& basics)
 {
-    double primal_obj{0.0};
+    Number primal_obj{0.0};
 
     for (std::size_t curr_idx = 0; curr_idx < x_basic.n_rows(); curr_idx++)
     {
@@ -160,7 +159,6 @@ SolveData init_data(const Model& model)
 
     if (model.sense() == Model::Sense::MIN)
     {
-        // todo - this making -0
         c *= -1;
     }
 
@@ -226,10 +224,74 @@ SolveData init_data(const Model& model)
     return {A, c, B, N, x_basic, z_non_basic, basics, non_basics};
 }
 
+Mat eta_inverse_solve(const Mat& u, const Mat& dx, std::size_t i)
+{
+    // Solves Eta * y = u for y using the the formula from 'Linear Programming' (Vanderbei, 2020) p135.
+    // TODO: Avoid creation of e
+
+    auto e = Mat(dx.n_rows(), 1);
+    e(i, 0) = 1;
+    auto y = u - (u(i, 0) / dx(i, 0)) * (dx - e);
+    return y;
+};
+
+Mat eta_inverse_transpose_solve(const Mat& u, const Mat& dx, std::size_t i)
+{
+    // Solves trans(Eta) * y = u for y using the formula from 'Linear Programming' (Vanderbei, 2020) p136.
+    // TODO: Avoid creation of e
+
+    auto e = Mat(dx.n_rows(), 1);
+    e(i, 0) = 1;
+    auto y = u - e * ((dx - e).make_transpose() * u) / dx(i, 0);
+    return y;
+};
+
+Mat ftran(const lu_result<Number>& lu, const Mat& b, const std::vector<std::pair<Mat, std::size_t>>& etas)
+{
+    // Implement FTRAN using the eta matrix factorisation of the basis, plus the initial LU factorisation.
+    // This is comination of the implementations from:
+    // 'Linear Programming' (Vanderbei, 2020) p133.
+    // 'Linear Programming' (Chvatal, 1983) p109.
+
+    // Use the LU factorisation in the first iteration.
+    auto dx = lu_solve(lu.L, lu.U, lu.perm, b);
+
+    // Apply etas recursively to update dx.
+    for (const auto& [eta, leaving] : etas)
+    {
+        dx = eta_inverse_solve(dx, eta, leaving);
+    }
+
+    return dx;
+}
+
+Mat btran(const lu_result<Number>& lu, const Mat& b, const std::vector<std::pair<Mat, std::size_t>>& etas)
+{
+    // Implement BTRAN using the eta matrix factorisation of the basis, plus the initial LU factorisation.
+    // This is comination of the implementations from:
+    // 'Linear Programming' (Vanderbei, 2020) p133.
+    // 'Linear Programming' (Chvatal, 1983) p109.
+
+    auto u = b;
+
+    // Apply etas recursively in reverse to update u.
+    auto it = std::rbegin(etas);
+    while (it != std::rend(etas))
+    {
+        u = eta_inverse_transpose_solve(u, it->first, it->second);
+        ++it;
+    }
+
+    // Use the LU factorisation
+    auto v = lu_transpose_solve(lu.L, lu.U, lu.perm, u);
+
+    return v;
+}
+
 bool solve_primal(SolveData& data, Parameters params)
 {
     // Solve using the primal (revised) simplex algorithm.
-    // Uses implementation from Linear Programming (Vanderbei, 2014) p92.
+    // Uses implementation from 'Linear Programming' (Vanderbei, 2020) p102.
     // Returns true if a solution is present.
 
     Mat& A = data.A;
@@ -241,9 +303,30 @@ bool solve_primal(SolveData& data, Parameters params)
     std::vector<VarData>& non_basics = data.non_basics;
     int& iter = data.n_iter;
 
-    for (; iter <= params.max_iter; iter++)
+    // Store dx and the leaving index each iteration
+    std::vector<std::pair<Mat, std::size_t>> etas;
+
+    // Intial LU factorisation
+    auto lu_current{jsolve::lu_factor(B)};
+    int refactor_age{0};
+
+    while (iter <= params.max_iter)
     {
+        iter++;
         log_iteration(iter, data);
+
+        if (refactor_age >= params.refactor_iter)
+        {
+            // Recompute LU factorisation of basis
+            log()->info("Re-factoring basis...");
+            lu_current = jsolve::lu_factor(B);
+            etas.clear();
+            refactor_age = 0;
+        }
+        else
+        {
+            refactor_age++;
+        }
 
         // 1. Check optimality
         // 2. Find entering variable
@@ -258,12 +341,7 @@ bool solve_primal(SolveData& data, Parameters params)
         }
 
         // 3. Calculate dx (FTRAN)
-        auto [L, U, perm] = jsolve::lu_factor(B);
-
-        auto y = jsolve::forward_subs(L, N.slice({}, {entering.value()}), perm);
-        auto dx = jsolve::backward_subs(U, y);
-
-        log()->trace(dx);
+        auto dx = ftran(lu_current, N.slice({}, entering.value()), etas);
 
         // 4. Find the leaving variable
         std::optional<std::size_t> leaving = choose_leaving(x_basic, dx, params.EPS1);
@@ -286,9 +364,7 @@ bool solve_primal(SolveData& data, Parameters params)
         auto ei = Mat{B.n_rows(), 1};
         ei(leaving.value(), 0) = 1;
 
-        auto w = forward_subs(U.make_transpose(), ei);
-        auto v = backward_subs(L.make_transpose(), w, perm);
-        auto dz = -1.0 * N.make_transpose() * v;
+        auto dz = -1.0 * N.make_transpose() * btran(lu_current, ei, etas);
 
         // 7. Calculate dual step lengths
         // s = z/dz (j)
@@ -305,6 +381,9 @@ bool solve_primal(SolveData& data, Parameters params)
         B.update({}, {leaving.value()}, A.slice({}, static_cast<std::size_t>(non_basics[entering.value()].index)));
         N.update({}, {entering.value()}, A.slice({}, static_cast<std::size_t>(basics[leaving.value()].index)));
         std::swap(basics[leaving.value()], non_basics[entering.value()]);
+
+        // Save eta data
+        etas.push_back({dx, leaving.value()});
 
         log()->trace(B);
         log()->trace(N);
@@ -323,7 +402,7 @@ bool solve_primal(SolveData& data, Parameters params)
 bool solve_dual(SolveData& data, Parameters params)
 {
     // Solve using the dual (revised) simplex algorithm.
-    // Uses implementation from Linear Programming (Vanderbei, 2014) p92.
+    // Uses implementation from 'Linear Programming' (Vanderbei, 2020) p102.
     // Returns true if a solution is present.
 
     Mat& A = data.A;
@@ -335,9 +414,30 @@ bool solve_dual(SolveData& data, Parameters params)
     std::vector<VarData>& non_basics = data.non_basics;
     int& iter = data.n_iter;
 
-    for (; iter <= params.max_iter; iter++)
+    // Store dx and the leaving index each iteration
+    std::vector<std::pair<Mat, std::size_t>> etas;
+
+    // Intial LU factorisation
+    auto lu_current{jsolve::lu_factor(B)};
+    int refactor_age{0};
+
+    while (iter <= params.max_iter)
     {
+        iter++;
         log_iteration(iter, data);
+
+        if (refactor_age >= params.refactor_iter)
+        {
+            // Recompute LU factorisation of basis
+            log()->info("Re-factoring basis...");
+            lu_current = jsolve::lu_factor(B);
+            etas.clear();
+            refactor_age = 0;
+        }
+        else
+        {
+            refactor_age++;
+        }
 
         // 1. Check optimality
         // 2. Find entering variable
@@ -351,15 +451,11 @@ bool solve_dual(SolveData& data, Parameters params)
             return true;
         }
 
-        // 3. Calculate dx (BTRAN)
-        auto [L, U, perm] = jsolve::lu_factor(B);
-
+        // 3. Calculate dz (BTRAN)
         auto ei = Mat{B.n_rows(), 1};
         ei(entering.value(), 0) = 1;
 
-        auto w = forward_subs(U.make_transpose(), ei);
-        auto v = backward_subs(L.make_transpose(), w, perm);
-        auto dz = -1.0 * N.make_transpose() * v;
+        auto dz = -1.0 * N.make_transpose() * btran(lu_current, ei, etas);
 
         log()->trace(dz);
 
@@ -380,9 +476,7 @@ bool solve_dual(SolveData& data, Parameters params)
         auto s = z_non_basic(leaving.value(), 0) / dz(leaving.value(), 0);
 
         // 6. Calculate dx (FTRAN)
-
-        auto y = jsolve::forward_subs(L, N.slice({}, {leaving.value()}), perm);
-        auto dx = jsolve::backward_subs(U, y);
+        auto dx = ftran(lu_current, N.slice({}, {leaving.value()}), etas);
 
         log()->trace(dx);
 
@@ -403,6 +497,9 @@ bool solve_dual(SolveData& data, Parameters params)
         B.update({}, {entering.value()}, A.slice({}, static_cast<std::size_t>(non_basics[leaving.value()].index)));
         N.update({}, {leaving.value()}, A.slice({}, static_cast<std::size_t>(basics[entering.value()].index)));
         std::swap(basics[entering.value()], non_basics[leaving.value()]);
+
+        // Save eta data
+        etas.push_back({dx, entering.value()});
 
         log()->trace(B);
         log()->trace(N);
