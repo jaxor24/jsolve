@@ -161,7 +161,6 @@ SolveData init_data(const Model& model)
 
     if (model.sense() == Model::Sense::MIN)
     {
-        // todo - this making -0
         c *= -1;
     }
 
@@ -347,10 +346,8 @@ bool solve_primal(SolveData& data, Parameters params)
             return true;
         }
 
-        auto aj = N.slice({}, entering.value()); // Entering column
-
         // 3. Calculate dx (FTRAN)
-        auto dx = ftran(lu_current, aj, etas);
+        auto dx = ftran(lu_current, N.slice({}, entering.value()), etas);
 
         // 4. Find the leaving variable
         std::optional<std::size_t> leaving = choose_leaving(x_basic, dx, params.EPS1);
@@ -484,7 +481,6 @@ bool solve_dual(SolveData& data, Parameters params)
         auto s = z_non_basic(leaving.value(), 0) / dz(leaving.value(), 0);
 
         // 6. Calculate dx (FTRAN)
-
         auto dx = ftran(lu_current, N.slice({}, {leaving.value()}), etas);
 
         log()->trace(dx);
