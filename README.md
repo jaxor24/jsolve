@@ -1,6 +1,7 @@
 # jsolve
 ### Overview
-My goal is to implement an LP solver of increasing complexity, and test out modern C++ features.
+My goal is to implement an LP solver that can solve all the NETLIB models.
+This will be done by layering in complexity, while testing modern C++ features.
 
 There are many variations of the algorithm. My plan is:
 
@@ -10,18 +11,37 @@ There are many variations of the algorithm. My plan is:
 4. &#9745; Revised dual algorithm (i.e. matrix based approach, Gaussian elimination)
 5. &#9745; Two phase revised algorithm (i.e. combine the above to handle infeasible starting bases)
 6. &#9745; Replace Gaussian elimination with LU factorisation
-7. Re-use (update) LU factorisation between iterations
-8. General simplex algorithm (i.e. handle bounded variables)
+7. &#9745; Re-use an LU factorisation between iterations (using Eta-matrix method)
+8. General simplex algorithm (i.e. handle bounded variables in pivoting)
 
-I have just completed (6) above.
+Implementing the general simplex algorithm (i.e. 'the simplex method with bounded variables') is a significant
+increase in complexity.
 
-There are many excellent references available. I have used these heavily so far:
-- Vanderbei, *Linear Programming*, 2014
+The current implementation uses:
+- Two-phase (dual then primal) revised simplex method
+- Dantzig's 'largest coefficient' full pricing method
+- Variable bounds as explicit constraints
+- Dense matrix implementation (allows the code to reflect matrix notation)
+- LU factorisation (via Doolittle's method) to avoid explicit matrix inverses
+- Re-uses the LU factorisation between iterations using an eta-matrix FTRAN/BTRAN
+- Periodically re-calculates the LU factorisation to improve numerical stability and performance
+
+Potential improvements:
+- Change to a sparse matrix representation
+- Implement other pricing methods like steepest edge or Devex
+
+Many other improvements may not yield much benefit until a sparse matrix implementation is used:
+- Markowitz pivoting in the LU factorisation
+- Alternative LU factorisation updates like Forrest and Tomlin, Suhl and Suhl, etc.
+
+There are many excellent references available. I have used these heavily:
+- Vanderbei, *Linear Programming*, 2020
 - Chvatal, *Linear Programming*, 1983
-- Winston, *Operations Research*, 2004
 - Bradley, *Applied Mathematical Programming*, 1977
+- Nocedal, *Numerical Optimization*, 2006
+- Koberstein, *The Dual Simplex Method, Techniques for a fast and stable implementation*, 2005
 
-Robert Bixby's 2015 talk, "Solving Linear Programs: The Dual Simplex Algorithm", also provides some great context and insights.
+Robert Bixby's 2015 talk, "Solving Linear Programs: The Dual Simplex Algorithm", also provides some great insights.
 
 ### New C++ Features
 Used:
