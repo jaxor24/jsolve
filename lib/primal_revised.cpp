@@ -20,10 +20,10 @@ namespace
 {
 struct Parameters
 {
-    int refactor_iter{100}; // Periodically recompute LU factorisation
-    int max_iter{10000};    // Stopping criteria - max simplex iterations
-    Number EPS1{1e-8};      // Minimum value to consider as exiting var
-    Number EPS2{1e-5};      // Protection from division by zero
+    int refactor_iter{50}; // Periodically recompute LU factorisation
+    int max_iter{10000};   // Stopping criteria - max simplex iterations
+    Number EPS1{1e-8};     // Minimum value to consider as exiting var
+    Number EPS2{1e-5};     // Protection from division by zero
 };
 
 struct SolveData
