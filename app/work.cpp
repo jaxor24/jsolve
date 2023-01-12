@@ -16,7 +16,7 @@ void go(std::filesystem::path file)
 
     log()->info(model.to_string());
 
-    auto solution{jsolve::solve(model, jsolve::alg_type::REVISED)};
+    auto solution{jsolve::solve(model)};
 
     if (solution)
     {
