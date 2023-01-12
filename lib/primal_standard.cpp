@@ -290,6 +290,8 @@ Solution extract_solution(const Model& user_model, const StandardFormModel& mode
 
     Solution sol;
 
+    obj_phase_2 += user_model.constant();
+
     sol.objective = user_model.sense() == Model::Sense::MIN ? -1.0 * obj_phase_2 : obj_phase_2;
 
     for (auto& [idx, var] : model.locations.basics)

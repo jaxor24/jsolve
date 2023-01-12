@@ -58,19 +58,11 @@ void convert_bounds(jsolve::Model& model)
     // Needed until we have a general simplex implementation
 
     auto it_var = std::begin(model.get_variables());
+    bool need_increment{true};
     while (it_var != std::end(model.get_variables()))
     {
+        need_increment = true;
         const auto& variable = it_var->second;
-
-        if (variable->lower_bound() > 0)
-        {
-            // Lower bounds are converted to constraints
-            auto* constraint = model.make_constraint(
-                jsolve::Constraint::Type::GREAT, fmt::format("BND_{}_GEQ_{}", variable->name(), variable->lower_bound())
-            );
-            constraint->rhs() = variable->lower_bound();
-            constraint->add_to_lhs(1.0, variable.get());
-        }
 
         if (variable->upper_bound() < std::numeric_limits<double>::infinity())
         {
@@ -82,7 +74,45 @@ void convert_bounds(jsolve::Model& model)
             constraint->add_to_lhs(1.0, variable.get());
         }
 
-        ++it_var;
+        if (variable->lower_bound() != 0 && variable->lower_bound() != -std::numeric_limits<double>::infinity())
+        {
+            // Lower bounds are handled by variable substitution l < x_a becomes 0 < x_b - l
+
+            auto* variable_new = model.make_variable(
+                jsolve::Variable::Type::LINEAR,
+                fmt::format("BND_{}_GRT_{}_SUBS", variable->name(), variable->lower_bound())
+            );
+
+            variable_new->cost() = variable->cost();
+
+            // Add constant to the objective
+            model.constant() += variable->cost() * -variable->lower_bound();
+
+            // Replace in constraints
+            for (const auto& [constraint_name, constraint] : model.get_constraints())
+            {
+                auto entry = constraint->get_entries().find(variable.get());
+
+                if (entry != std::end(constraint->get_entries()))
+                {
+                    // Delete the existing entry
+                    auto coefficient = entry->second;
+                    constraint->get_entries().erase(entry);
+                    // Add the new variable
+                    constraint->add_to_lhs(coefficient, variable_new);
+                    constraint->rhs() += (coefficient * -variable->lower_bound());
+                }
+            }
+
+            ++it_var;
+            need_increment = false;
+            model.remove_variable(variable->name());
+        }
+
+        if (need_increment)
+        {
+            ++it_var;
+        }
     }
 }
 
