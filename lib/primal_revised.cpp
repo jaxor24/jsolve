@@ -521,7 +521,7 @@ Solution extract_solution(const Model& model, SolveData& data)
 
     Solution sol{};
 
-    auto primal = calc_primal_obj(data.c, data.x_basic, data.basics);
+    auto primal = calc_primal_obj(data.c, data.x_basic, data.basics) + model.constant();
 
     sol.objective = model.sense() == Model::Sense::MIN ? -1.0 * primal : primal;
 

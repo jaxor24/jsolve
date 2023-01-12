@@ -35,6 +35,9 @@ class Model : public Counter<Model>
     std::string& objective_name();
     const std::string& objective_name() const;
 
+    double constant() const;
+    double& constant();
+
     Variable* make_variable(Variable::Type type, const std::string& name);
     Constraint* make_constraint(Constraint::Type type, const std::string& name);
 
@@ -58,6 +61,7 @@ class Model : public Counter<Model>
     Sense m_sense{Sense::MIN};
 
     std::string m_objective_name;
+    double m_constant{0.0};
 
     std::map<std::string, std::unique_ptr<Variable>> m_variables;
     std::map<std::string, std::unique_ptr<Constraint>> m_constraints;

@@ -32,6 +32,16 @@ const std::string& Model::objective_name() const
     return m_objective_name;
 }
 
+double& Model::constant()
+{
+    return m_constant;
+}
+
+double Model::constant() const
+{
+    return m_constant;
+}
+
 Variable* Model::make_variable(Variable::Type type, const std::string& name)
 {
     auto [it, result] = m_variables.try_emplace(name, nullptr);
@@ -95,6 +105,12 @@ std::string Model::to_long_string() const
     }
 
     s.append(" ");
+
+    if (m_constant != 0)
+    {
+        s.append(fmt::format(" {}", m_constant));
+    }
+
 
     auto it = std::begin(m_variables);
     while (it != std::end(m_variables))
