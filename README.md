@@ -124,7 +124,7 @@ I am using the classic [Netlib](https://netlib.org/) set of models to measure pr
 | 59 | SCAGR7   | 130  | 140   | 553       | \-2331389.3 | 249                 | 1.15             |
 | 73 | SHARE2B  | 97   | 79    | 730       | \-415.73    | 164                 | 0.26             |
 | 53 | RECIPE   | 92   | 180   | 752       | \-266.62    | 98                  | 0.89             |
-| 88 | VTP.BASE | 199  | 203   | 914       | 129831.46   | mps bounds          |                  |
+| 88 | VTP.BASE | 199  | 203   | 914       | 129831.46   | 450                 | 5.60             |
 | 43 | LOTFI    | 154  | 308   | 1086      | \-25.26     | 385                 | 2.76             |
 | 72 | SHARE1B  | 118  | 225   | 1182      | \-76589.32  | 608                 | 2.87             |
 | 14 | BOEING2  | 167  | 143   | 1339      | \-315.02    | mps ranges          |                  |
@@ -146,7 +146,7 @@ I am using the classic [Netlib](https://netlib.org/) set of models to measure pr
 | 65 | SCSD1    | 78   | 760   | 3148      | 8.67        | 148                 | 7.68             |
 | 35 | GFRD-PNC | 617  | 1092  | 3467      | 6902236     | 681                 | 270              |
 | 9  | BEACONFD | 174  | 262   | 3476      | 33592.49    | 181                 | 1.71             |
-| 84 | STANDMPS | 468  | 1075  | 3686      | 1406.02     | mps bounds          |                  |
+| 84 | STANDMPS | 468  | 1075  | 3686      | 1406.02     | 267                 | 33.2             |
 | 82 | STAIR    | 357  | 467   | 3857      | \-251.27    | mps bounds          |                  |
 | 13 | BOEING1  | 351  | 384   | 3865      | \-335.21    | mps ranges          |                  |
 | 64 | SCRS8    | 491  | 1169  | 4029      | 904.3       | 1559                | 142              |
