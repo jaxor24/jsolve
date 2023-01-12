@@ -97,6 +97,10 @@ void process_rhs_data_record(jsolve::Model& model, const std::vector<std::string
         {
             constraint->rhs() = rhs;
         }
+        else if (model.objective_name() == constraint_name)
+        {
+            model.constant() = rhs;
+        }
         else
         {
             throw jsolve::MPSError(fmt::format("Constraint not found: {}", constraint_name));
