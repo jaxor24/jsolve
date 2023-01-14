@@ -102,7 +102,7 @@ Objective = -464.75 (18 iterations)
 ```
 #### Dependencies
 I have tried to keep these to a minimum (and implement all the numerical code myself):
-- [catch2](https://github.com/gabime/spdlog) for unit testing
+- [catch2](https://github.com/catchorg/Catch2) for unit testing
 - [spdlog](https://github.com/gabime/spdlog) for logging
 - [google benchmark](https://github.com/google/benchmark) for profiling and benchmarking
 - [commandline](https://schneegans.github.io/tutorials/2019/08/06/commandline) for a the CLI
