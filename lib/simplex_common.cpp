@@ -76,7 +76,7 @@ void convert_bounds(jsolve::Model& model)
 
         if (variable->lower_bound() != 0 && variable->lower_bound() != -std::numeric_limits<double>::infinity())
         {
-            // Lower bounds are handled by variable substitution l < x_a becomes 0 < x_b - l
+            // Lower bounds are handled by variable substitution l < x_a becomes 0 < x_a - l = x_b so x_a = x_b + l
 
             auto* variable_new = model.make_variable(
                 jsolve::Variable::Type::LINEAR,
@@ -86,7 +86,7 @@ void convert_bounds(jsolve::Model& model)
             variable_new->cost() = variable->cost();
 
             // Add constant to the objective
-            model.constant() += variable->cost() * -variable->lower_bound();
+            model.constant() += variable->cost() * variable->lower_bound();
 
             // Replace in constraints
             for (const auto& [constraint_name, constraint] : model.get_constraints())
