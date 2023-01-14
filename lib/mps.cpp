@@ -147,17 +147,8 @@ void process_bounds_data_record(jsolve::Model& model, const std::vector<std::str
         // Fixed value
         auto* variable = model.get_variable(words.size() == 3 ? words.at(1) : words.at(2));
         const auto& bound_value = std::stod(words.size() == 3 ? words.at(2) : words.at(3));
-
-        if (bound_value < 0.0)
-        {
-            // Can't handle negative variables with current simplex implementation.
-            throw jsolve::MPSError(fmt::format("Unhandled MPS fixed values < 0 for variable: {}", words.at(2)));
-        }
-        else
-        {
-            variable->lower_bound() = bound_value;
-            variable->upper_bound() = bound_value;
-        }
+        variable->lower_bound() = bound_value;
+        variable->upper_bound() = bound_value;
     }
     else if (bound_type == "FR")
     {

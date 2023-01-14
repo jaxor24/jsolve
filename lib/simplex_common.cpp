@@ -52,6 +52,49 @@ void convert_free_variables(jsolve::Model& model)
     }
 }
 
+void convert_fixed_variables(jsolve::Model& model)
+{
+    // Free variables are removed and replaced with their constant value
+
+    auto it_var = std::begin(model.get_variables());
+    while (it_var != std::end(model.get_variables()))
+    {
+        const auto& variable = it_var->second;
+
+        if (variable->lower_bound() == variable->upper_bound())
+        {
+            // For a <= x <= a we just replace x with a
+
+            const auto constant{variable->upper_bound()};
+
+            // Add constant to the objective
+            model.constant() += variable->cost() * constant;
+
+            // Replace in constraints
+            for (const auto& [constraint_name, constraint] : model.get_constraints())
+            {
+                auto entry = constraint->get_entries().find(variable.get());
+
+                if (entry != std::end(constraint->get_entries()))
+                {
+                    // Delete the existing entry
+                    auto coefficient = entry->second;
+                    constraint->get_entries().erase(entry);
+                    // Add the new variable
+                    constraint->rhs() -= (coefficient * constant);
+                }
+            }
+
+            ++it_var;
+            model.remove_variable(variable->name());
+        }
+        else
+        {
+            ++it_var;
+        }
+    }
+}
+
 void convert_bounds(jsolve::Model& model)
 {
     // Convert variable bounds to constraints
@@ -225,6 +268,7 @@ void pre_process_model(jsolve::Model& model)
     // Convert all constraints to EQ via slack variables
 
     convert_free_variables(model);
+    convert_fixed_variables(model);
     convert_bounds(model);
     convert_equality_constraints(model);
     convert_geq_to_leq(model);
