@@ -99,7 +99,7 @@ void process_rhs_data_record(jsolve::Model& model, const std::vector<std::string
         }
         else if (model.objective_name() == constraint_name)
         {
-            model.constant() = rhs;
+            model.constant() = -rhs;  // We multiply by -1 to handle an objective 'RHS'
         }
         else
         {
