@@ -169,7 +169,7 @@ I am using the classic [Netlib](https://netlib.org/) set of models to measure pr
 | 34 | GANGES   | 1310 | 1681  | 7021      | \-109586.36 | timeout             |                  |
 | 62 | SCFXM3   | 991  | 1371  | 7846      | 54901.25    | timeout             |                  |
 | 69 | SCTAP2   | 1091 | 1880  | 8124      | 1724.81     | 779                 | 421              |
-| 39 | GROW22   | 441  | 946   | 8318      | \-160834336 | mps error           |                  |
+| 39 | GROW22   | 441  | 946   | 8318      | \-160834336 | 1310                | 1047             |
 | 75 | SHIP04L  | 403  | 2118  | 8450      | 1793324.54  | 381                 | 30.3             |
 | 81 | SIERRA   | 1228 | 2036  | 9252      | 15394362.2  | error               |                  |
 | 86 | STOCFOR2 | 2158 | 2031  | 9492      | \-39024.41  | timeout             |                  |
