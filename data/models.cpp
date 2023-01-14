@@ -1265,4 +1265,48 @@ jsolve::Model make_model_27()
     return m;
 }
 
+jsolve::Model make_model_28()
+{
+    // Fabricated model with fixed variables (lb = ub)
+
+    auto m = jsolve::Model(jsolve::Model::Sense::MIN, "JR_FX");
+
+    auto* x1 = m.make_variable(jsolve::Variable::Type::LINEAR, "x1");
+    auto* x2 = m.make_variable(jsolve::Variable::Type::LINEAR, "x2");
+    auto* x3 = m.make_variable(jsolve::Variable::Type::LINEAR, "x3");
+
+    x1->cost() = -1;
+    x2->cost() = 1;
+    x3->cost() = 1;
+
+    x3->lower_bound() = 5;
+    x3->upper_bound() = 5;
+
+    {
+        auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C1");
+        c->rhs() = 6;
+        c->add_to_lhs(-0.8, x1);
+        c->add_to_lhs(0.1, x2);
+        c->add_to_lhs(0.15, x3);
+    }
+
+    {
+        auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C2");
+        c->rhs() = 3;
+        c->add_to_lhs(0.1, x1);
+        c->add_to_lhs(-0.8, x2);
+        c->add_to_lhs(0.15, x3);
+    }
+
+    {
+        auto* c = m.make_constraint(jsolve::Constraint::Type::LESS, "C3");
+        c->rhs() = 10;
+        c->add_to_lhs(1, x1);
+        c->add_to_lhs(1, x2);
+        c->add_to_lhs(1, x3);
+    }
+
+    return m;
+}
+
 } // namespace models

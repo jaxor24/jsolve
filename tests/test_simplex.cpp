@@ -388,4 +388,17 @@ TEST_CASE("jsolve::solve")
         REQUIRE(approx_equal(solution.value().variables.at("x2"), 1));
         REQUIRE(approx_equal(solution.value().variables.at("x3"), 1));
     }
+
+    SECTION("model 28")
+    {
+        INFO("Solver: " << alg_str);
+        auto model = models::make_model_28();
+        auto solution = current_alg(model);
+
+        REQUIRE(solution.has_value());
+        REQUIRE(approx_equal(solution.value().objective, 0));
+        REQUIRE(approx_equal(solution.value().variables.at("x1"), 5));
+        REQUIRE(approx_equal(solution.value().variables.at("x2"), 0));
+        REQUIRE(!solution.value().variables.contains("x3")); // Fixed variable is replaced by a constant
+    }
 }

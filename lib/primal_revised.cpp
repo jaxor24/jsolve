@@ -521,9 +521,17 @@ Solution extract_solution(const Model& model, SolveData& data)
 
     Solution sol{};
 
-    auto primal = calc_primal_obj(data.c, data.x_basic, data.basics) + model.constant();
+    auto primal = calc_primal_obj(data.c, data.x_basic, data.basics);
 
-    sol.objective = model.sense() == Model::Sense::MIN ? -1.0 * primal : primal;
+    // We haven't negated the objective constant
+    if (model.sense() == Model::Sense::MIN)
+    {
+        sol.objective = -1.0 * (primal - model.constant());
+    }
+    else
+    {
+        sol.objective = primal + model.constant();
+    }
 
     for (std::size_t idx{0}; const auto& var_data : data.basics)
     {
