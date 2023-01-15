@@ -84,13 +84,13 @@ std::optional<std::size_t> choose_leaving(const Mat& num, const Mat& denom, Numb
     return leaving;
 }
 
-Number calc_primal_obj(const Mat& c, const Mat& x_basic, const std::vector<VarData>& basics)
+Number calc_primal_obj(const SolveData& data)
 {
     Number primal_obj{0.0};
 
-    for (std::size_t curr_idx = 0; curr_idx < x_basic.n_rows(); curr_idx++)
+    for (std::size_t curr_idx = 0; curr_idx < data.x_basic.n_rows(); curr_idx++)
     {
-        primal_obj += c(basics[curr_idx].index, 0) * x_basic(curr_idx, 0);
+        primal_obj += data.c(data.basics[curr_idx].index, 0) * data.x_basic(curr_idx, 0);
     }
 
     return primal_obj;
@@ -104,7 +104,7 @@ void log_iteration(int iter, const SolveData& data)
         return current < 0 ? sum + current : sum;
     };
 
-    auto primal_obj{calc_primal_obj(data.c, data.x_basic, data.basics)};
+    auto primal_obj{calc_primal_obj(data)};
     auto dual_infeas = std::accumulate(std::begin(data.z_non_basic), std::end(data.z_non_basic), 0.0, sum_if_negative);
     auto primal_infeas = std::accumulate(std::begin(data.x_basic), std::end(data.x_basic), 0.0, sum_if_negative);
 
@@ -521,7 +521,7 @@ Solution extract_solution(const Model& model, SolveData& data)
 
     Solution sol{};
 
-    auto primal = calc_primal_obj(data.c, data.x_basic, data.basics);
+    auto primal = calc_primal_obj(data);
 
     // We haven't negated the objective constant
     if (model.sense() == Model::Sense::MIN)
