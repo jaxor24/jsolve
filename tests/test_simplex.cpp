@@ -37,7 +37,7 @@ TEST_CASE("jsolve::solve")
         auto solution = current_alg(model);
 
         REQUIRE(solution.has_value());
-        REQUIRE(approx_equal(solution.value().objective, 13.0));
+        REQUIRE(solution.value().objective == Approx(13.0));
         REQUIRE(approx_equal(solution.value().variables.at("x1"), 2.0));
         REQUIRE(approx_equal(solution.value().variables.at("x2"), 0.0));
         REQUIRE(approx_equal(solution.value().variables.at("x3"), 1.0));
@@ -62,7 +62,7 @@ TEST_CASE("jsolve::solve")
         auto solution = current_alg(model);
 
         REQUIRE(solution.has_value());
-        REQUIRE(approx_equal(solution.value().objective, 17.0));
+        REQUIRE(solution.value().objective == Approx(17.0));
         REQUIRE(approx_equal(solution.value().variables.at("x1"), 2.0));
         REQUIRE(approx_equal(solution.value().variables.at("x2"), 0.0));
         REQUIRE(approx_equal(solution.value().variables.at("x3"), 1.0));

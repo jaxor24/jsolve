@@ -7,7 +7,6 @@ namespace jsolve
 std::optional<Solution> solve(Model& model)
 {
     Timer timer{info_logger(), "Solving"};
-
     pre_process_model(model);
     return solve_simplex_revised(model);
 }
