@@ -39,6 +39,8 @@ struct SolveData
     std::vector<VarData> basics;
     std::vector<VarData> non_basics;
     int n_iter{0};
+    std::vector<Number> row_scale_factors;
+    std::vector<Number> col_scale_factors;
 };
 
 std::optional<std::size_t> choose_entering(const Mat& column, Number EPS2)
@@ -120,6 +122,67 @@ void log_iteration(int iter, const SolveData& data)
     {
         log()->debug(progress);
     }
+}
+
+std::pair<std::vector<Number>, std::vector<Number>> scale_system(Mat& A, Mat& b, Mat& c)
+{
+    // Scale the model using equilibration scaling
+    // Described in "Computational Techniques of the Simplex Method" (Maros, 2003) p110
+
+    std::vector<Number> row_scale_factors;
+
+    // Row scaling
+    for (std::size_t i{0}; i < A.n_rows(); i++)
+    {
+        Number row_abs_max{0};
+
+        for (std::size_t j{0}; j < A.n_cols(); j++)
+        {
+            row_abs_max = std::max(row_abs_max, std::abs(A(i, j)));
+        }
+
+        row_scale_factors.push_back(1.0 / row_abs_max);
+
+        for (std::size_t j{0}; j < A.n_cols(); j++)
+        {
+            // A rows
+            A(i, j) = A(i, j) * row_scale_factors[i];
+        }
+
+        // b rows
+        b(i, 0) = b(i, 0) * row_scale_factors[i];
+    }
+
+    std::vector<Number> col_scale_factors;
+
+    void(c.make_transpose());
+    // Col scaling (A)
+    for (std::size_t j{0}; j < A.n_cols(); j++)
+    {
+        Number col_abs_max{0};
+
+        for (std::size_t i{0}; i < A.n_rows(); i++)
+        {
+            col_abs_max = std::max(col_abs_max, std::abs(A(i, j)));
+        }
+
+        col_scale_factors.push_back(1.0 / col_abs_max);
+
+        for (std::size_t i{0}; i < A.n_rows(); i++)
+        {
+            if (i == 0)
+            {
+                // Scale c here
+                c(i, j) = c(i, j) * col_scale_factors[j];
+            }
+
+            // A cols
+            A(i, j) = A(i, j) * col_scale_factors[j];
+        }
+    }
+
+    return {row_scale_factors, col_scale_factors};
+}
 } // namespace
 
 SolveData init_data(const Model& model)
@@ -174,8 +237,10 @@ SolveData init_data(const Model& model)
 
     log()->trace(b);
 
-    // Find the initial basis
+    // Scale
+    auto [row_scale_factors, col_scale_factors] = scale_system(A, b, c);
 
+    // Find the initial basis
     std::size_t basis_size = std::ranges::count_if(model.get_variables(), [](const auto& pair) {
         return pair.second->slack() || pair.second->artifical();
     });
@@ -221,7 +286,7 @@ SolveData init_data(const Model& model)
     log()->trace(x_basic);
     log()->trace(z_non_basic);
 
-    return {A, c, B, N, x_basic, z_non_basic, basics, non_basics};
+    return {A, c, B, N, x_basic, z_non_basic, basics, non_basics, 0, row_scale_factors, col_scale_factors};
 }
 
 Mat eta_inverse_solve(const Mat& u, const Mat& dx, std::size_t i)
@@ -535,7 +600,8 @@ Solution extract_solution(const Model& model, SolveData& data)
 
     for (std::size_t idx{0}; const auto& var_data : data.basics)
     {
-        sol.variables[model.get_variable(var_data.index)->name()] = data.x_basic(idx, 0);
+        sol.variables[model.get_variable(var_data.index)->name()] =
+            data.x_basic(idx, 0) * data.col_scale_factors[var_data.index];
         ++idx;
     }
 
@@ -592,8 +658,6 @@ void update_primal_objective(SolveData& data, const Mat& objective)
     auto N_t = data.N.make_transpose();
     data.z_non_basic.update({}, {}, data.z_non_basic + (N_t * v));
 }
-
-} // namespace
 
 std::optional<Solution> solve_simplex_revised(const Model& model)
 {
