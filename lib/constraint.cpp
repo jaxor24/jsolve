@@ -96,4 +96,5 @@ std::string Constraint::to_string() const
 
     return s;
 }
+
 } // namespace jsolve

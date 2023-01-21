@@ -43,4 +43,5 @@ class Constraint : public Counter<Constraint>
 };
 
 std::ostream& operator<<(std::ostream& os, const Constraint& c);
+
 } // namespace jsolve
