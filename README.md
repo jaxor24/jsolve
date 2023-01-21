@@ -181,7 +181,7 @@ I am using the classic [Netlib](https://netlib.org/) set of models to measure pr
 | 1  | 25FV47   | 822  | 1571  | 11127     | 5501.85     | timeout             |                  |
 | 67 | SCSD8    | 398  | 2750  | 11334     | 905         | 2431                | 232              |
 | 52 | PILOTNOV | 976  | 2172  | 13129     | \-4497.28   | timeout             |                  |
-| 47 | NESM     | 663  | 2923  | 13988     | 14076073    | mps ranges          |                  |
+| 47 | NESM     | 663  | 2923  | 13988     | 14076073    | 4665                | 11698            |
 | 19 | CZPROB   | 930  | 3523  | 14173     | 2185196.7   | timeout             |                  |
 | 29 | FIT1D    | 25   | 1026  | 14430     | \-9146.38   | 1333                | 238              |
 | 12 | BNL2     | 2325 | 3489  | 16124     | 1811.24     | error               |                  |
