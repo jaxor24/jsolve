@@ -26,11 +26,11 @@ class Constraint : public Counter<Constraint>
     double rhs() const;
     double& rhs();
 
+    const std::map<Variable*, double, Variable::CompareNames>& entries() const;
+    std::map<Variable*, double, Variable::CompareNames>& entries();
+
     void add_to_lhs(double coeff, Variable* var);
     void add_to_rhs(double coeff, Variable* var);
-
-    const std::map<Variable*, double, Variable::CompareNames>& get_entries() const;
-    std::map<Variable*, double, Variable::CompareNames>& get_entries();
 
     std::string to_string() const;
 
@@ -43,4 +43,5 @@ class Constraint : public Counter<Constraint>
 };
 
 std::ostream& operator<<(std::ostream& os, const Constraint& c);
+
 } // namespace jsolve

@@ -47,12 +47,12 @@ void Constraint::add_to_rhs(double coeff, Variable* var)
     add_to_lhs(-1 * coeff, var);
 }
 
-const std::map<Variable*, double, Variable::CompareNames>& Constraint::get_entries() const
+const std::map<Variable*, double, Variable::CompareNames>& Constraint::entries() const
 {
     return m_entries;
 }
 
-std::map<Variable*, double, Variable::CompareNames>& Constraint::get_entries()
+std::map<Variable*, double, Variable::CompareNames>& Constraint::entries()
 {
     return m_entries;
 }
@@ -96,4 +96,5 @@ std::string Constraint::to_string() const
 
     return s;
 }
+
 } // namespace jsolve

@@ -99,7 +99,7 @@ void process_rhs_data_record(jsolve::Model& model, const std::vector<std::string
         }
         else if (model.objective_name() == constraint_name)
         {
-            model.constant() = -rhs;  // We multiply by -1 to handle an objective 'RHS'
+            model.constant() = -rhs; // We multiply by -1 to handle an objective 'RHS'
         }
         else
         {
@@ -161,6 +161,66 @@ void process_bounds_data_record(jsolve::Model& model, const std::vector<std::str
         throw jsolve::MPSError(fmt::format("Unhandled MPS BOUNDS type: {}", bound_type));
     }
 }
+
+void process_ranges_data_record(jsolve::Model& model, const std::vector<std::string>& words)
+{
+    // Ranges records are very strange. They define new upper or lower limits on the RHS of constraints.
+    // We process this into new constraints, since we have no concept of general counds.
+    // For a GEQ constraint, the range value (r) sets a new upper limit, eg:
+    // x1 + x2 >= 5 becomes 5 + |r| >= x1 + x2 >= 5
+    // For a LEQ constraint, the range value (r) sets a new lower limit, eg:
+    // x1 + x2 <= 5 becomes 5 - |r| <= x1 + x2 <= 5
+
+    auto it = std::cbegin(words);
+    auto it_end = std::cend(words) - 1;
+
+    for (; it != it_end; ++it)
+    {
+        ++it;
+        auto constraint_name = *it;
+
+        auto* constraint = model.get_constraint(constraint_name);
+
+        if (constraint)
+        {
+            auto range = std::stod(*(it + 1));
+
+            if (constraint->type() == jsolve::Constraint::Type::GREAT)
+            {
+                // Add a copy of this constraint changed to which is LEQ, RHS + |r|
+                auto* new_constraint{model.make_constraint(
+                    jsolve::Constraint::Type::LESS, fmt::format("{}_RANGES_GEQ_UPPER", constraint_name)
+                )};
+                new_constraint->entries() = constraint->entries();
+                new_constraint->type() = jsolve::Constraint::Type::LESS;
+                new_constraint->rhs() += std::abs(range);
+            }
+            else if (constraint->type() == jsolve::Constraint::Type::LESS)
+            {
+                // Add a copy of this constraint changed to which is GEQ, RHS - |r|
+                auto* new_constraint{model.make_constraint(
+                    jsolve::Constraint::Type::GREAT, fmt::format("{}_RANGES_LEQ_LOWER", constraint_name)
+                )};
+                new_constraint->entries() = constraint->entries();
+                new_constraint->type() = jsolve::Constraint::Type::GREAT;
+                new_constraint->rhs() -= std::abs(range);
+            }
+            else if (constraint->type() == jsolve::Constraint::Type::EQUAL)
+            {
+                throw jsolve::MPSError("RANGS for EQ not implemented");
+            }
+            else
+            {
+                throw jsolve::MPSError("Impossible");
+            }
+        }
+        else
+        {
+            throw jsolve::MPSError(fmt::format("Constraint not found: {}", constraint_name));
+        }
+    }
+}
+
 } // namespace
 
 namespace jsolve
@@ -281,7 +341,7 @@ void process_data_record(
     }
     else if (section == section::RANGES)
     {
-        throw MPSError("Unhandled MPS section RANGES");
+        process_ranges_data_record(model.value(), words);
     }
 }
 
