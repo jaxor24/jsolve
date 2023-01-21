@@ -111,7 +111,6 @@ std::string Model::to_long_string() const
         s.append(fmt::format(" {}", m_constant));
     }
 
-
     auto it = std::begin(m_variables);
     while (it != std::end(m_variables))
     {
@@ -187,7 +186,7 @@ void Model::remove_variable(const std::string& name)
 {
     for (auto& [constraint_name, constraint] : m_constraints)
     {
-        constraint->get_entries().erase(get_variable(name));
+        constraint->entries().erase(get_variable(name));
     }
 
     [[maybe_unused]] auto result = m_variables.erase(name);

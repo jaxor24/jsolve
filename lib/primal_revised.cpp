@@ -203,8 +203,8 @@ SolveData init_data(const Model& model)
         assert(cons_pair.second->type() == Constraint::Type::EQUAL);
         for (const auto& [n_var, var_pair] : enumerate(model.get_variables()))
         {
-            auto found_entry = cons_pair.second->get_entries().find(var_pair.second.get());
-            if (found_entry != std::end(cons_pair.second->get_entries()))
+            auto found_entry = cons_pair.second->entries().find(var_pair.second.get());
+            if (found_entry != std::end(cons_pair.second->entries()))
             {
                 A(n_cons, n_var) = found_entry->second;
             }

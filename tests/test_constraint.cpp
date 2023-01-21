@@ -121,8 +121,8 @@ TEST_CASE("constraint::get_entries()", "[constraint]")
         auto c = jsolve::Constraint{jsolve::Constraint::Type::LESS, "constraint"};
         auto v = std::make_unique<jsolve::Variable>(jsolve::Variable::Type::LINEAR, "variable");
         c.add_to_lhs(5.0, v.get());
-        REQUIRE(c.get_entries().size() == 1);
-        REQUIRE(c.get_entries().at(v.get()) == 5.0);
+        REQUIRE(c.entries().size() == 1);
+        REQUIRE(c.entries().at(v.get()) == 5.0);
     }
 
     SECTION("one rhs entry")
@@ -130,8 +130,8 @@ TEST_CASE("constraint::get_entries()", "[constraint]")
         auto c = jsolve::Constraint{jsolve::Constraint::Type::LESS, "constraint"};
         auto v = std::make_unique<jsolve::Variable>(jsolve::Variable::Type::LINEAR, "variable");
         c.add_to_rhs(4.0, v.get());
-        REQUIRE(c.get_entries().size() == 1);
-        REQUIRE(c.get_entries().at(v.get()) == -4.0);
+        REQUIRE(c.entries().size() == 1);
+        REQUIRE(c.entries().at(v.get()) == -4.0);
     }
 
     SECTION("same variable rhs and lhs")
@@ -140,7 +140,7 @@ TEST_CASE("constraint::get_entries()", "[constraint]")
         auto v = std::make_unique<jsolve::Variable>(jsolve::Variable::Type::LINEAR, "variable");
         c.add_to_rhs(-2.0, v.get());
         c.add_to_lhs(4.0, v.get());
-        REQUIRE(c.get_entries().size() == 1);
-        REQUIRE(c.get_entries().at(v.get()) == 6.0);
+        REQUIRE(c.entries().size() == 1);
+        REQUIRE(c.entries().at(v.get()) == 6.0);
     }
 }

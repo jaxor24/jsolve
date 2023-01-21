@@ -29,13 +29,13 @@ void convert_free_variables(jsolve::Model& model)
 
             for (const auto& [constraint_name, constraint] : model.get_constraints())
             {
-                auto entry = constraint->get_entries().find(variable.get());
+                auto entry = constraint->entries().find(variable.get());
 
-                if (entry != std::end(constraint->get_entries()))
+                if (entry != std::end(constraint->entries()))
                 {
                     // Delete the existing entry
                     auto coefficient = entry->second;
-                    constraint->get_entries().erase(entry);
+                    constraint->entries().erase(entry);
                     // Add the two new variables
                     constraint->add_to_lhs(coefficient, variable_positive);
                     constraint->add_to_lhs(-coefficient, variable_negative);
@@ -73,13 +73,13 @@ void convert_fixed_variables(jsolve::Model& model)
             // Replace in constraints
             for (const auto& [constraint_name, constraint] : model.get_constraints())
             {
-                auto entry = constraint->get_entries().find(variable.get());
+                auto entry = constraint->entries().find(variable.get());
 
-                if (entry != std::end(constraint->get_entries()))
+                if (entry != std::end(constraint->entries()))
                 {
                     // Delete the existing entry
                     auto coefficient = entry->second;
-                    constraint->get_entries().erase(entry);
+                    constraint->entries().erase(entry);
                     // Add the new variable
                     constraint->rhs() -= (coefficient * constant);
                 }
@@ -134,13 +134,13 @@ void convert_bounds(jsolve::Model& model)
             // Replace in constraints
             for (const auto& [constraint_name, constraint] : model.get_constraints())
             {
-                auto entry = constraint->get_entries().find(variable.get());
+                auto entry = constraint->entries().find(variable.get());
 
-                if (entry != std::end(constraint->get_entries()))
+                if (entry != std::end(constraint->entries()))
                 {
                     // Delete the existing entry
                     auto coefficient = entry->second;
-                    constraint->get_entries().erase(entry);
+                    constraint->entries().erase(entry);
                     // Add the new variable
                     constraint->add_to_lhs(coefficient, variable_new);
                     constraint->rhs() += (coefficient * -variable->lower_bound());
@@ -184,8 +184,8 @@ void convert_equality_constraints(jsolve::Model& model)
             geq_constraint->rhs() = constraint->rhs();
             leq_constraint->rhs() = constraint->rhs();
 
-            geq_constraint->get_entries() = constraint->get_entries();
-            leq_constraint->get_entries() = constraint->get_entries();
+            geq_constraint->entries() = constraint->entries();
+            leq_constraint->entries() = constraint->entries();
 
             ++it_cons;
             model.remove_constraint(constraint->name());
@@ -207,7 +207,7 @@ void convert_geq_to_leq(jsolve::Model& model)
         {
             constraint->type() = jsolve::Constraint::Type::LESS;
             constraint->rhs() *= -1;
-            std::for_each(std::begin(constraint->get_entries()), std::end(constraint->get_entries()), [](auto& pair) {
+            std::for_each(std::begin(constraint->entries()), std::end(constraint->entries()), [](auto& pair) {
                 pair.second *= -1;
             });
         }

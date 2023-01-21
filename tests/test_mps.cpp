@@ -43,7 +43,7 @@ TEST_CASE("jsolve::mps::read_mps", "[matrix]")
                 const auto* lim1 = model.get_constraint("LIM1");
                 REQUIRE(lim1->type() == jsolve::Constraint::Type::LESS);
                 REQUIRE(lim1->rhs() == 5);
-                const auto& lim1_entries = lim1->get_entries();
+                const auto& lim1_entries = lim1->entries();
                 REQUIRE(lim1_entries.size() == 2);
                 REQUIRE(lim1_entries.at(x1) == 1);
                 REQUIRE(lim1_entries.at(y2) == 1);
@@ -53,7 +53,7 @@ TEST_CASE("jsolve::mps::read_mps", "[matrix]")
                 const auto* lim2 = model.get_constraint("LIM2");
                 REQUIRE(lim2->type() == jsolve::Constraint::Type::GREAT);
                 REQUIRE(lim2->rhs() == 10);
-                const auto& lim2_entries = lim2->get_entries();
+                const auto& lim2_entries = lim2->entries();
                 REQUIRE(lim2_entries.size() == 2);
                 REQUIRE(lim2_entries.at(x1) == 1);
                 REQUIRE(lim2_entries.at(z3) == 1);
@@ -63,7 +63,7 @@ TEST_CASE("jsolve::mps::read_mps", "[matrix]")
                 const auto* myeqn = model.get_constraint("MYEQN");
                 REQUIRE(myeqn->type() == jsolve::Constraint::Type::EQUAL);
                 REQUIRE(myeqn->rhs() == 7);
-                const auto& myeqn_entries = myeqn->get_entries();
+                const auto& myeqn_entries = myeqn->entries();
                 REQUIRE(myeqn_entries.size() == 2);
                 REQUIRE(myeqn_entries.at(y2) == -1);
                 REQUIRE(myeqn_entries.at(z3) == 1);
