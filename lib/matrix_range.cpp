@@ -1,5 +1,4 @@
 #include "matrix_range.h"
-
 #include "matrix_error.h"
 
 Range::Range(std::size_t start, std::size_t end)

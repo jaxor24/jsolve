@@ -7,6 +7,7 @@
 #include "logging.h"
 #include "tools.h"
 
+#include <iomanip>
 #include <iostream>
 #include <numeric>
 #include <optional>
@@ -21,25 +22,13 @@ class Matrix
     typedef AllIterator<T> matrix_iterator;
     typedef AllIterator<const T> const_matrix_iterator;
 
-    typedef RowIterator<T> row_iterator;
-    typedef ColIterator<T> col_iterator;
-
     explicit Matrix(std::size_t r, std::size_t c);
     explicit Matrix(std::size_t r, std::size_t c, T initial);
 
     std::size_t n_rows() const;
     std::size_t n_cols() const;
 
-    T max() const;
     T min() const;
-    T sum() const;
-
-    std::pair<Matrix<T>, Matrix<std::size_t>> row_max() const;
-    std::pair<Matrix<T>, Matrix<std::size_t>> row_min() const;
-
-    std::pair<Matrix<T>, Matrix<std::size_t>> col_max() const;
-    std::pair<Matrix<T>, Matrix<std::size_t>> col_min() const;
-
     Matrix make_transpose() const;
 
     Matrix slice(Range rows, Range cols) const;
@@ -47,6 +36,7 @@ class Matrix
     void update(Range rows, Range cols, const Matrix& values);
 
     // Iterators -------------------------------------------------------------------------------
+
     matrix_iterator begin();
     matrix_iterator end();
 
@@ -55,12 +45,6 @@ class Matrix
 
     const_matrix_iterator cbegin() const;
     const_matrix_iterator cend() const;
-
-    auto enumerate_rows();
-    auto enumerate_rows() const;
-
-    auto enumerate_cols();
-    auto enumerate_cols() const;
 
     // Operators -------------------------------------------------------------------------------
 
@@ -102,7 +86,6 @@ class Matrix
     std::size_t m_n_cols{0};
 };
 
-#include "matrix_free_function.hpp"
 #include "matrix_operator.hpp"
 
 // Matrix:: member functions
@@ -138,87 +121,10 @@ std::size_t Matrix<T>::n_cols() const
 }
 
 template <typename T>
-T Matrix<T>::max() const
-{
-    return *std::max_element(std::begin(m_data), std::end(m_data));
-}
-
-template <typename T>
 T Matrix<T>::min() const
 {
     return *std::min_element(std::begin(m_data), std::end(m_data));
 }
-
-template <typename T>
-T Matrix<T>::sum() const
-{
-    return std::accumulate(std::begin(m_data), std::end(m_data), T{0});
-}
-
-template <typename T>
-std::pair<Matrix<T>, Matrix<std::size_t>> Matrix<T>::row_max() const
-{
-    Matrix<T> values{n_rows(), 1, std::numeric_limits<T>::lowest()};
-    Matrix<std::size_t> indices{n_rows(), 1, 0};
-
-    for (auto [n_row, row] : enumerate_rows())
-    {
-        auto it = std::max_element(std::begin(row), std::end(row));
-        values(n_row, 0) = *it;
-        indices(n_row, 0) = std::distance(std::begin(row), it);
-    }
-
-    return {values, indices};
-}
-
-template <typename T>
-std::pair<Matrix<T>, Matrix<std::size_t>> Matrix<T>::row_min() const
-{
-    Matrix<T> values{n_rows(), 1, std::numeric_limits<T>::max()};
-    Matrix<std::size_t> indices{n_rows(), 1, 0};
-
-    for (auto [n_row, row] : enumerate_rows())
-    {
-        auto it = std::min_element(std::begin(row), std::end(row));
-        values(n_row, 0) = *it;
-        indices(n_row, 0) = std::distance(std::begin(row), it);
-    }
-
-    return {values, indices};
-}
-
-template <typename T>
-std::pair<Matrix<T>, Matrix<std::size_t>> Matrix<T>::col_max() const
-{
-    Matrix<T> values{1, n_cols(), std::numeric_limits<T>::lowest()};
-    Matrix<std::size_t> indices{1, n_cols(), 0};
-
-    for (auto [n_col, col] : enumerate_cols())
-    {
-        auto it = std::max_element(std::begin(col), std::end(col));
-        values(0, n_col) = *it;
-        indices(0, n_col) = std::distance(std::begin(col), it);
-    }
-
-    return {values, indices};
-}
-
-template <typename T>
-std::pair<Matrix<T>, Matrix<std::size_t>> Matrix<T>::col_min() const
-{
-    Matrix<T> values{1, n_cols(), std::numeric_limits<T>::max()};
-    Matrix<std::size_t> indices{1, n_cols(), 0};
-
-    for (auto [n_col, col] : enumerate_cols())
-    {
-        auto it = std::min_element(std::begin(col), std::end(col));
-        values(0, n_col) = *it;
-        indices(0, n_col) = std::distance(std::begin(col), it);
-    }
-
-    return {values, indices};
-}
-
 template <typename T>
 Matrix<T> Matrix<T>::make_transpose() const
 {
@@ -367,25 +273,30 @@ typename Matrix<T>::const_matrix_iterator Matrix<T>::cend() const
 }
 
 template <typename T>
-auto Matrix<T>::enumerate_rows()
+std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 {
-    return IterableWrapper<RowEnumerator<matrix_iterator>>{begin(), end()};
-}
+    os << std::fixed << std::setprecision(4);
+    os << "\n";
+    os << "[";
+    for (const auto& [n_elem, elem] : enumerate(m.m_data))
+    {
+        os << std::setw(7) << elem;
 
-template <typename T>
-auto Matrix<T>::enumerate_rows() const
-{
-    return IterableWrapper<RowEnumerator<const_matrix_iterator>>{cbegin(), cend()};
-}
+        if (n_elem + 1 != m.m_data.size())
+        {
+            if ((n_elem + 1) % m.n_cols() == 0)
+            {
+                os << "\n";
+                os << "  ";
+            }
+            else
+            {
+                os << ",";
+            }
+        }
+    }
 
-template <typename T>
-auto Matrix<T>::enumerate_cols()
-{
-    return IterableWrapper<ColEnumerator<matrix_iterator>>{begin(), end()};
-}
+    os << "]\n";
 
-template <typename T>
-auto Matrix<T>::enumerate_cols() const
-{
-    return IterableWrapper<ColEnumerator<const_matrix_iterator>>{cbegin(), cend()};
+    return os;
 }
