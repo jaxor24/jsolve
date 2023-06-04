@@ -31,8 +31,8 @@ Implementing (8) is a significant undertaking and is not covered in detail in ma
 The current implementation features:
 - Two-phase (dual then primal) revised simplex method
 - Dantzig's 'largest coefficient' full pricing method
-- Variable bounds as explicit constraints
-- Dense matrix implementation
+- Variable bounds as explicit constraints (slow)
+- Dense matrix implementation (slow)
 - LU factorisation (via Doolittle's method) to avoid explicit matrix inverses
 - Re-uses the LU factorisation between iterations using an eta-matrix FTRAN/BTRAN
 - Periodically re-calculates the LU factorisation (every 50 iterations seems to work well)
